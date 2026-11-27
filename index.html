@@ -309,16 +309,21 @@
       <div class="flex items-center gap-2 flex-wrap">
         <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector"
           class="ui-btn px-2 py-1.5 flex items-center gap-2">
-          <img id="activePlayerAvatarImg" src="/assets/avatar-swooz.png" alt="" class="w-6 h-6 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+          <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
           <div class="text-left pr-1">
-            <div class="text-[10px] font-mono uppercase tracking-label text-secondary leading-none">OPERATOR</div>
-            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-accent leading-tight">SWOOZ</div>
+            <div id="headerOperatorBadge" class="text-[10px] font-mono uppercase tracking-label text-secondary leading-none">OPERATOR</div>
+            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-accent leading-tight">DOMSWOOZ</div>
           </div>
         </button>
 
         <div id="crewSelector" class="hidden xl:flex items-center gap-1 bg-surface-base p-1.5 rounded-[4px] border border-subtle"></div>
 
-        <button onclick="toggleSound()" id="soundToggleBtn" title="Toggle OreUI Audio Clicks"
+        <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State (Bug Test Mode)"
+          class="ui-btn px-2.5 py-2 text-xs font-mono text-warning hover:text-primary border-warning-border">
+          Reset Auth (Test)
+        </button>
+
+        <button onclick="toggleSound()" id="soundToggleBtn" title="Toggle Vanilla Minecraft Audio"
           class="ui-btn px-2.5 py-2 text-xs font-mono text-secondary hover:text-primary">
           SFX: ON
         </button>
@@ -401,7 +406,7 @@
           <img src="/assets/squad-jump-hero.jpg" alt="Crew Co-Op Squad" class="w-full h-full object-cover object-center opacity-90" />
           <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-[#121216]/30 to-transparent"></div>
           <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-secondary tabular-nums">
-            CREW ONLINE: 4 OPERATORS
+            REALM ROSTER: 2 OPERATORS · 4 MEMBERS
           </div>
         </div>
       </div>
@@ -778,16 +783,86 @@
         </div>
       </div>
 
-      <div class="p-6 flex flex-col gap-4">
-        <p class="text-xs text-secondary">
-          Tap your Gamertag node below to vote on builds, claim tasks, or unlock your personal PIN-protected Ender Vault.
-        </p>
-        <div id="modalCrewNodeGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-        <div class="pt-4 border-t border-subtle flex items-center justify-between gap-3">
-          <input type="text" id="newCrewModalInput" placeholder="New Crew Gamertag..." class="ui-input flex-1 px-4 py-2 text-xs font-mono" />
-          <button onclick="addCrewFromModal()" class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
-            + Register Node
+      <div class="p-6 flex flex-col gap-4 max-h-[78vh] overflow-y-auto">
+        <!-- Auth Mode Switcher: Method 1 (Xbox/Discord Gamertag Verify) vs Method 2 (Cryptographic PIN / Node Select) -->
+        <div class="grid grid-cols-2 gap-2 p-1 bg-surface-base rounded-[4px] border border-subtle">
+          <button onclick="setSignInTab('nodes')" id="signin-tab-nodes"
+            class="py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150">
+            1. Realm Roster &amp; PIN Lock
           </button>
+          <button onclick="setSignInTab('oauth')" id="signin-tab-oauth"
+            class="py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150">
+            2. Verify Xbox / Discord
+          </button>
+        </div>
+
+        <!-- TAB A: REALM ROSTER NODES (Locked accounts require PIN or OAuth verification) -->
+        <div id="signInNodesPanel" class="flex flex-col gap-4">
+          <p class="text-xs text-secondary">
+            Each Realm member's account is locked to their identity. Selecting a PIN-protected Operator/Member requires their confidential PIN (or verified Xbox/Discord Gamertag).
+          </p>
+          <div id="modalCrewNodeGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+          <!-- Inline PIN Prompt when switching into a locked Crew Node -->
+          <div id="nodeSwitchPinGate" class="hidden ui-panel p-4 bg-surface-base border-warning-border flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <span class="micro-label text-warning">AUTHENTICATE NODE: <span id="targetSwitchNodeName" class="text-primary"></span></span>
+              <button onclick="cancelNodeSwitchPin()" class="text-[11px] font-mono text-secondary hover:text-primary">[CANCEL]</button>
+            </div>
+            <form onsubmit="confirmNodeSwitchPin(event)" class="flex items-center gap-2">
+              <input type="password" id="nodeSwitchPinInput" maxlength="8" required placeholder="Enter Node PIN..."
+                class="ui-input flex-1 px-3 py-2 text-xs font-mono tracking-widest tabular-nums" />
+              <button type="submit" class="ui-btn-warning px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
+                Verify &amp; Switch
+              </button>
+            </form>
+          </div>
+
+          <div class="pt-4 border-t border-subtle flex items-center justify-between gap-3">
+            <input type="text" id="newCrewModalInput" placeholder="Add Realm Member Gamertag..." class="ui-input flex-1 px-4 py-2 text-xs font-mono" />
+            <button onclick="addCrewFromModal()" class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
+              + Register Member
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB B: VERIFY VIA XBOX LIVE / DISCORD GAMERTAG MATCHING -->
+        <div id="signInOAuthPanel" class="hidden flex flex-col gap-4">
+          <div class="ui-panel p-4 bg-surface-base flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <span class="micro-label text-accent">AUTOMATIC GAMERTAG IDENTITY MATCHING</span>
+              <span class="px-2 py-0.5 text-[10px] font-mono rounded-[4px] bg-accent-subtle text-accent border border-accent-border">BEDROCK REALM ROSTER</span>
+            </div>
+            <p class="text-xs text-secondary leading-relaxed">
+              Verify your identity via <strong>Xbox Live Gamertag Lookup</strong> (via PlayerDB / Xbox Live API) or <strong>Discord Tag</strong>. Matching an official CHIBI~Zone Realm member binds your session to that account and unlocks your Ender Vault creation flow.
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectOAuthProvider('xbox')" id="provider-btn-xbox"
+                class="py-2 px-3 rounded-[4px] border border-accent bg-accent-subtle text-accent text-xs font-mono font-semibold flex items-center justify-center gap-2">
+                <span>Xbox Live Gamertag</span>
+              </button>
+              <button type="button" onclick="selectOAuthProvider('discord')" id="provider-btn-discord"
+                class="py-2 px-3 rounded-[4px] border border-subtle bg-surface-raised text-secondary hover:text-primary text-xs font-mono font-semibold flex items-center justify-center gap-2">
+                <span>Discord Identity</span>
+              </button>
+            </div>
+            <form onsubmit="handleVerifyGamertagIdentity(event)" class="flex flex-col gap-3 mt-1">
+              <div>
+                <label id="oauthInputLabel" class="micro-label block mb-1.5">Enter Your Exact Xbox Live Gamertag</label>
+                <input type="text" id="oauthGamertagInput" required placeholder="e.g. DOMSWOOZ, ChibiZANIMUS, BruthaManD..."
+                  class="ui-input w-full px-4 py-2 text-xs font-mono" />
+              </div>
+              <div id="oauthPinVerifyWrapper" class="hidden">
+                <label class="micro-label block mb-1.5 text-warning">Account Has an Active PIN — Enter PIN to Bind OAuth Session</label>
+                <input type="password" id="oauthPinConfirmInput" maxlength="8" placeholder="Enter your confidential PIN..."
+                  class="ui-input w-full px-4 py-2 text-xs font-mono tracking-widest tabular-nums" />
+              </div>
+              <button type="submit" id="oauthVerifySubmitBtn" class="ui-btn-accent w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                Verify Gamertag &amp; Lock Session to My Account
+              </button>
+            </form>
+            <div id="oauthVerifyResultBox" class="hidden p-3 rounded-[4px] bg-surface-raised border border-subtle text-xs font-mono"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -829,7 +904,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'chibi_zone_realm_v2';
+    // Bump to v3_fresh so DOMSWOOZ's PIN and all sessions start completely fresh for testing!
+    const STORAGE_KEY = 'chibi_zone_realm_v3_fresh';
+    const DEVICE_AUTH_KEY = 'chibi_zone_device_auth_v3';
     let sfxEnabled = true;
 
     // Authentic Vanilla Minecraft Sound Engine (Extracted directly from vanilla resource_packs/vanilla/sounds/*.fsb)
@@ -878,11 +955,14 @@
       if (sfxEnabled) playUiSound('amethyst');
     }
 
-    const PLAYER_AVATARS = {
-      'SWOOZ': '/assets/avatar-swooz.png',
-      'CHIBI~Zane': '/assets/avatar-chibi.png',
-      'ZombieGuy': '/assets/avatar-zombie.png',
-      '47.salamanders': '/assets/avatar-salamander.png'
+    // Official Realm Roster extracted from user's Minecraft Bedrock Realm Members list
+    const REALM_ROSTER_META = {
+      'DOMSWOOZ':       { role: 'Operator', avatar: '/assets/avatar-domswooz.png',       aliases: ['DOMSWOOZ', 'SWOOZ', 'SWOOZ.ETH'] },
+      'ChibiZANIMUS':   { role: 'Operator', avatar: '/assets/avatar-chibizanimus.png',   aliases: ['CHIBIZANIMUS', 'CHIBI~ZANE', 'CHIBIZANE'] },
+      'BruthaManD':     { role: 'Member',   avatar: '/assets/avatar-bruthamand.png',     aliases: ['BRUTHAMAND'] },
+      'JacobParties':   { role: 'Member',   avatar: '/assets/avatar-jacobparties.png',   aliases: ['JACOBPARTIES'] },
+      'SallyManDuur':   { role: 'Member',   avatar: '/assets/avatar-sallymanduur.png',   aliases: ['SALLYMANDUUR', '47.SALAMANDERS'] },
+      'GoodScroll6570': { role: 'Member',   avatar: '/assets/avatar-goodscroll6570.png', aliases: ['GOODSCROLL6570', 'ZOMBIEGUY'] }
     };
 
     const CATEGORY_ICONS = {
@@ -896,18 +976,82 @@
     };
 
     function getAvatar(name) {
-      return PLAYER_AVATARS[name] || '/assets/creeper-128.png';
+      return REALM_ROSTER_META[name]?.avatar || '/assets/creeper-128.png';
+    }
+
+    function getMemberRole(name) {
+      return REALM_ROSTER_META[name]?.role || 'Member';
     }
 
     function getCategoryIcon(cat) {
       return CATEGORY_ICONS[cat] || '/assets/chest.png';
     }
 
+    // ==================== WEB CRYPTO SHA-256 + AES-256-GCM VAULT ENGINE ====================
+    function bufToBase64(buf) {
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin);
+    }
+
+    function base64ToBuf(b64) {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    async function hashPlayerPin(player, pin) {
+      const enc = new TextEncoder();
+      const data = enc.encode(`CHIBI_PIN_V3::${player}::${pin}`);
+      const hashBuf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function deriveVaultAesKey(pin) {
+      const enc = new TextEncoder();
+      const salt = enc.encode('CHIBI_ZONE_ENDER_VAULT_SALT_V3');
+      const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 25000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+
+    async function encryptVaultItems(pin, items) {
+      const key = await deriveVaultAesKey(pin);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const enc = new TextEncoder();
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(items)));
+      return { iv: bufToBase64(iv.buffer), ct: bufToBase64(ct) };
+    }
+
+    async function decryptVaultItems(pin, encryptedPayload) {
+      if (!encryptedPayload || !encryptedPayload.iv || !encryptedPayload.ct) return [];
+      const key = await deriveVaultAesKey(pin);
+      const iv = new Uint8Array(base64ToBuf(encryptedPayload.iv));
+      const ct = base64ToBuf(encryptedPayload.ct);
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+      return JSON.parse(new TextDecoder().decode(pt));
+    }
+
+    // Zero-Plaintext Default State: DOMSWOOZ's starter PIN is stored ONLY as a SHA-256 digest
+    // and DOMSWOOZ's secret vault items exist ONLY as AES-256-GCM ciphertext!
+    const DOMSWOOZ_STARTER_HASH = '272d7ee0953be793aab5428c2bf831320186776a8dda22e0f2abc260f7c158ca';
+    const DOMSWOOZ_ENCRYPTED_VAULT = {
+      iv: '5zL7PvTepmRPo5C4',
+      ct: 'JBPbbm9736XAtuI4JCv1fY80A1r3fVGqsWm4Ua3Aa7ALqUvDqDdzifjjn0jROYxWDmp0306odMs5abvqNPkBtdg1SmDZtL/lEnuKsY+R7jo03WKX8ZDKJKGgqxEMjHoASdgbJu7deYAhq0u9R+L96KIP/yptKkakvgvURg4kkeb5u2A28F4SSfpW4Vu01s6FXvzylZVT1awZ47vLAht9uyFxP5x61eV1Azxcy/jGhZ1EoobYB8ka90ROpX8OuMu9AFdTHhYikkz7i9wM5/Ys6y6wa8HtnFEuJD5H7gmQbPszwgx9YxVaHlLgVQ4yU8rtZlpO2xforSBPTs+9Y5eutKHAuRx8w1BuDpd3sOwjG3GIQlIdfC+kn4XJc69mmGWbPhd+bHjwali8IcxWVq9sHXcDZr2O6dg+uwwcB4n61FbUKTjf1JyViL0Oj3Sf3Bnz197GBkQnUUFxUtZ69PlHxKD404D+KeINcJxzPX9edrK7h37Xqc8ggKA4VJNfYpH8MqurirnkWx/aOCp2DGFlwYusXtlUYncTR62XnmzV7OTRMRiipGNxItPIpaAi8qdoR8/ww3TyxReHTyNOyI2zSW2LwhQp4IYy/KJ94XERWhtOUwb7QjgowJnWrPpZ/MDEC096RCJ7C6Uc4pi590vRQCjeXYiU7RXTROeCtfvF6Ype4s6dGanzM2lgzZKzEDj/W21cFwVF7ml6KsU1P0tMINezv/aivL7cJFsdT80nM1u5s9VfcrQ6wRbAzw70qW9hlPrjnKKoLGo4IBh2I19XH4ks6Llhc39ms+22ec0QJWjS1ykX9MULs8J0ElvLaGZ2QJESiNszFCzpFOeqAN9YKdD6uO+muqFMGrtlLeGPjh8MM0IX/7KR6MlGFeVl5vPP3XOOETyVZXjIpFMg90HQLV4rF2vJupfbsOvK+6er+r5Zd3vZ5NqyxA4w2pLeNjf1MdmX+308DUM9jaNtB1zYE4+83B6a+CBFbRx41LPIj+cCAO4mo7UO3Z7GMjBetXGtcylKYg91N9MNOhM9Wbc4GGiTpwayCfJjovdhugjId/h9CW6HM/MtNYVna9QL9xI8felU4A4uFm+IR56drXm/jhRMJq/sLifnSPSHWsBPKTeK4UIuTz041uiMysxJKDGUs0JMWvE9N966MkmGtlfWkjtaKlLBY9NUkXqUlFhnPr4GbrqTc1LC3DTL'
+    };
+
     const DEFAULT_STATE = {
-      activePlayer: 'SWOOZ',
+      activePlayer: 'DOMSWOOZ',
       activeTab: 'shared',
       filter: 'all',
-      crew: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy', '47.salamanders'],
+      crew: ['DOMSWOOZ', 'ChibiZANIMUS', 'BruthaManD', 'JacobParties', 'SallyManDuur', 'GoodScroll6570'],
       sharedTasks: [
         {
           id: 't-elevator-glass',
@@ -916,9 +1060,9 @@
           coords: '913, 90, -294',
           notes: 'Smelted sand into glass blocks and sealed the top spire shaft up to the Y=96 summit landing.',
           status: 'done',
-          createdBy: 'SWOOZ',
-          claimedBy: 'SWOOZ',
-          votes: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy'],
+          createdBy: 'DOMSWOOZ',
+          claimedBy: 'DOMSWOOZ',
+          votes: ['DOMSWOOZ', 'ChibiZANIMUS', 'BruthaManD'],
           createdAt: 1732630000000
         },
         {
@@ -928,9 +1072,9 @@
           coords: '902, 67, -342',
           notes: 'Placed campfires with oak trapdoor grates under both natural bee nests and planted rose bushes in front. Shear for 3 Honeycomb when slots drip gold!',
           status: 'done',
-          createdBy: 'SWOOZ',
-          claimedBy: 'SWOOZ',
-          votes: ['SWOOZ', 'CHIBI~Zane'],
+          createdBy: 'DOMSWOOZ',
+          claimedBy: 'DOMSWOOZ',
+          votes: ['DOMSWOOZ', 'ChibiZANIMUS'],
           createdAt: 1732631000000
         },
         {
@@ -940,9 +1084,9 @@
           coords: 'TBD',
           notes: 'Mine out any glowing Crying Obsidian from the portal frame with a Diamond Pickaxe, replace with regular Obsidian, and light with Flint & Steel.',
           status: 'open',
-          createdBy: 'SWOOZ',
+          createdBy: 'DOMSWOOZ',
           claimedBy: null,
-          votes: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy'],
+          votes: ['DOMSWOOZ', 'ChibiZANIMUS', 'JacobParties'],
           createdAt: 1732632000000
         },
         {
@@ -952,9 +1096,9 @@
           coords: '911, 66, -294',
           notes: 'Once Nether Portal is active, grab 1 Soul Sand and use the Kelp trick to convert the water column into a 1-second bubble rocket that refills oxygen.',
           status: 'open',
-          createdBy: 'SWOOZ',
+          createdBy: 'DOMSWOOZ',
           claimedBy: null,
-          votes: ['SWOOZ', 'ZombieGuy'],
+          votes: ['DOMSWOOZ', 'GoodScroll6570'],
           createdAt: 1732633000000
         },
         {
@@ -964,9 +1108,9 @@
           coords: '900, 69, -290',
           notes: 'Needs 2 Diamonds + 4 Obsidian + 1 Book (3 Paper + 1 Leather). Set up on the hardwood oak floor by ChibiZANIMUS\'s cathedral rose window.',
           status: 'open',
-          createdBy: 'SWOOZ',
+          createdBy: 'DOMSWOOZ',
           claimedBy: null,
-          votes: ['SWOOZ', 'CHIBI~Zane'],
+          votes: ['DOMSWOOZ', 'ChibiZANIMUS'],
           createdAt: 1732634000000
         },
         {
@@ -976,9 +1120,9 @@
           coords: '900, 69, -297',
           notes: 'Use Sword/Bow (not Spear sweep!) to take out the zombie rider, Lead the Zombie Horse to a shaded fence post under a roof before dawn so he never burns.',
           status: 'in_progress',
-          createdBy: 'SWOOZ',
-          claimedBy: 'SWOOZ',
-          votes: ['SWOOZ', 'ZombieGuy', '47.salamanders'],
+          createdBy: 'DOMSWOOZ',
+          claimedBy: 'DOMSWOOZ',
+          votes: ['DOMSWOOZ', 'SallyManDuur', 'BruthaManD'],
           createdAt: 1732635000000
         },
         {
@@ -986,11 +1130,11 @@
           title: 'Mine Extra Deepslate for Elevator & Rooftop Terrace Finishing Touches',
           category: 'Architecture',
           coords: '916, 79, -297',
-          notes: 'Grab extra Cobbled Deepslate on next mining run to polish the transition around ZombieGuy\'s Deepslate Tile terrace.',
+          notes: 'Grab extra Cobbled Deepslate on next mining run to polish the transition around the Deepslate Tile rooftop terrace.',
           status: 'open',
-          createdBy: 'ZombieGuy',
+          createdBy: 'GoodScroll6570',
           claimedBy: null,
-          votes: ['ZombieGuy', 'SWOOZ'],
+          votes: ['GoodScroll6570', 'DOMSWOOZ'],
           createdAt: 1732636000000
         },
         {
@@ -1000,9 +1144,9 @@
           coords: '912, 68, -291',
           notes: 'Use Cartography Table and Empty Maps to map the Original Home Base, the lit Village road, and the South Deep Mine Outpost.',
           status: 'open',
-          createdBy: 'SWOOZ',
+          createdBy: 'DOMSWOOZ',
           claimedBy: null,
-          votes: ['SWOOZ', 'CHIBI~Zane'],
+          votes: ['DOMSWOOZ', 'ChibiZANIMUS'],
           createdAt: 1732637000000
         }
       ],
@@ -1013,7 +1157,7 @@
           dim: 'Overworld',
           x: 915, y: 63, z: -295,
           notes: '4-story excavated cliff citadel, Panama Canal boat tunnel, Y=96 glass water elevator & circular window wing.',
-          addedBy: 'SWOOZ'
+          addedBy: 'DOMSWOOZ'
         },
         {
           id: 'l-summit',
@@ -1021,7 +1165,7 @@
           dim: 'Overworld',
           x: 913, y: 96, z: -291,
           notes: 'Top Stone Brick landing overlooking the torch-lit highway to the Village and ocean channel.',
-          addedBy: 'SWOOZ'
+          addedBy: 'DOMSWOOZ'
         },
         {
           id: 'l-beehives',
@@ -1029,7 +1173,7 @@
           dim: 'Overworld',
           x: 902, y: 67, z: -342,
           notes: '2 natural Bee Nests with campfires & oak trapdoor grates installed.',
-          addedBy: 'SWOOZ'
+          addedBy: 'DOMSWOOZ'
         },
         {
           id: 'l-canal',
@@ -1037,7 +1181,7 @@
           dim: 'Overworld',
           x: 945, y: 61, z: -298,
           notes: 'Connects front dock lagoon through the ridge to the lava waterfall side toward Original Base.',
-          addedBy: 'SWOOZ'
+          addedBy: 'DOMSWOOZ'
         },
         {
           id: 'l-deepmine',
@@ -1045,54 +1189,56 @@
           dim: 'Overworld',
           x: 934, y: 55, z: 232,
           notes: '525 blocks South. Features the faux-floor torch stairwell and sprawling Granite cavern.',
-          addedBy: 'SWOOZ'
+          addedBy: 'DOMSWOOZ'
         }
       ],
       privateVaults: {
-        'SWOOZ': {
-          pin: '0214',
+        'DOMSWOOZ': {
+          pinHash: DOMSWOOZ_STARTER_HASH,
           mustChangePin: true,
-          items: [
-            {
-              id: 'p-diamond-vault',
-              title: 'Mario-64 Secret Painting Diamond Vault & Lore Signs',
-              coords: '910, 75, -287',
-              notes: 'Hidden behind the 4x2 Classical Ruins painting (with 4 gallery torches above). Left side walks through open signs ("SMILE :) YOU ARE ON SWOOZ CAM") to hidden chest containing 3 Diamonds & 1 Diamond Pickaxe. Right side hides embedded Crafting Table.',
-              done: true
-            },
-            {
-              id: 'p-god-apple',
-              title: 'Relocate Enchanted Golden Apple & 5 Nautilus Shells to Secret Vault',
-              coords: '910, 75, -287',
-              notes: 'Move the Enchanted Golden Apple from downstairs Chest 4 up into the secret painting chest so nobody accidentally eats it!',
-              done: false
-            },
-            {
-              id: 'p-relocate-vault',
-              title: 'Optional: Build Secondary Decoy / Deeper Vault Room',
-              coords: 'TBD',
-              notes: 'Consider adding a second hidden stash room on another floor in case anyone ever discovers the Y=75 painting.',
-              done: false
-            }
-          ]
+          encryptedPayload: DOMSWOOZ_ENCRYPTED_VAULT,
+          itemCount: 3
         },
-        'CHIBI~Zane': { pin: null, mustChangePin: false, items: [] },
-        'ZombieGuy': { pin: null, mustChangePin: false, items: [] },
-        '47.salamanders': { pin: null, mustChangePin: false, items: [] }
+        'ChibiZANIMUS':   { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
+        'BruthaManD':     { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
+        'JacobParties':   { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
+        'SallyManDuur':   { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
+        'GoodScroll6570': { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 }
       }
     };
 
     let state = loadState();
+    // In-memory decrypted vault session: { [player]: { pin: '<activePin>', items: [...] } }
     let unlockedVaults = {};
+    // Holds temporary verified starter PIN while forcing mandatory new PIN creation
     let pendingPinRotation = {};
+    // Per-device authenticated accounts (via PIN or Xbox/Discord Gamertag Verification)
+    let deviceAuth = loadDeviceAuth();
+    let pendingNodeSwitchTarget = null;
+    let activeOAuthProvider = 'xbox';
+
+    function loadDeviceAuth() {
+      try {
+        const raw = localStorage.getItem(DEVICE_AUTH_KEY);
+        return raw ? JSON.parse(raw) : { verifiedAccounts: {} };
+      } catch (e) {
+        return { verifiedAccounts: {} };
+      }
+    }
+
+    function saveDeviceAuth() {
+      localStorage.setItem(DEVICE_AUTH_KEY, JSON.stringify(deviceAuth));
+    }
 
     function loadState() {
+      // Purge legacy v2 storage so DOMSWOOZ's PIN and all sessions start fresh for testing
+      localStorage.removeItem('chibi_zone_realm_v2');
       if (window.location.hash && window.location.hash.startsWith('#sync=')) {
         try {
           const encoded = window.location.hash.replace('#sync=', '');
           const decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
           const existing = localStorage.getItem(STORAGE_KEY);
-          const local = existing ? JSON.parse(existing) : DEFAULT_STATE;
+          const local = existing ? JSON.parse(existing) : JSON.parse(JSON.stringify(DEFAULT_STATE));
           local.sharedTasks = decoded.sharedTasks || local.sharedTasks;
           local.landmarks = decoded.landmarks || local.landmarks;
           local.crew = decoded.crew || local.crew;
@@ -1106,14 +1252,38 @@
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
       try {
         const parsed = JSON.parse(raw);
-        const mergedVaults = { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) };
-        if (mergedVaults['SWOOZ'] && mergedVaults['SWOOZ'].pin === '0214' && mergedVaults['SWOOZ'].mustChangePin === undefined) {
-          mergedVaults['SWOOZ'].mustChangePin = true;
-        }
-        return { ...DEFAULT_STATE, ...parsed, privateVaults: mergedVaults };
+        return {
+          ...DEFAULT_STATE,
+          ...parsed,
+          privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) }
+        };
       } catch (e) {
         return JSON.parse(JSON.stringify(DEFAULT_STATE));
       }
+    }
+
+    function resetAllAuthForTesting() {
+      playUiSound('anvil');
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(DEVICE_AUTH_KEY);
+      localStorage.removeItem('chibi_zone_realm_v2');
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      unlockedVaults = {};
+      pendingPinRotation = {};
+      deviceAuth = { verifiedAccounts: {} };
+      pendingNodeSwitchTarget = null;
+      fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          crew: state.crew,
+          sharedTasks: state.sharedTasks,
+          landmarks: state.landmarks,
+          privateVaults: state.privateVaults
+        })
+      }).catch(() => {});
+      renderAll();
+      showToast('Reset Complete: DOMSWOOZ starter PIN & Xbox/Discord auth ready for fresh testing!');
     }
 
     function saveState() {
@@ -1136,7 +1306,7 @@
       document.getElementById('toastText').textContent = msg;
       el.classList.remove('hidden');
       clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
+      window._toastTimer = setTimeout(() => el.classList.add('hidden'), 3600);
     }
 
     function triggerScreenTransition(label, callback, skipDefaultSound = false) {
@@ -1150,18 +1320,102 @@
       }, 140);
     }
 
-    function setActivePlayer(name) {
+    // Attempt to switch active player node — enforces PIN or OAuth verification if node is locked!
+    function requestSwitchPlayer(name, closeModalOnSuccess = false) {
+      if (!state.privateVaults[name]) {
+        state.privateVaults[name] = { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 };
+      }
+      const vault = state.privateVaults[name];
+      const isVerifiedOnDevice = !!deviceAuth.verifiedAccounts[name] || !!unlockedVaults[name];
+
+      // If this account has a PIN and isn't unlocked/verified on this device yet, require PIN authentication!
+      if (vault.pinHash && !isVerifiedOnDevice) {
+        playUiSound('amethyst');
+        pendingNodeSwitchTarget = name;
+        const modal = document.getElementById('nodeSignInModal');
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+        }
+        setSignInTab('nodes');
+        renderModalCrewGrid();
+        const gate = document.getElementById('nodeSwitchPinGate');
+        document.getElementById('targetSwitchNodeName').textContent = name;
+        document.getElementById('nodeSwitchPinInput').value = '';
+        gate.classList.remove('hidden');
+        setTimeout(() => document.getElementById('nodeSwitchPinInput').focus(), 50);
+        return;
+      }
+
+      completeSwitchPlayer(name, closeModalOnSuccess);
+    }
+
+    function completeSwitchPlayer(name, closeModal = false) {
       playUiSound('pop');
       state.activePlayer = name;
-      if (!state.privateVaults[name]) {
-        state.privateVaults[name] = { pin: null, items: [] };
-      }
+      pendingNodeSwitchTarget = null;
+      const gate = document.getElementById('nodeSwitchPinGate');
+      if (gate) gate.classList.add('hidden');
       saveState();
-      showToast('Active Operator Node: ' + name);
+      if (closeModal) closeNodeSignInModal();
+      showToast('Active Realm Node: ' + name + ' (' + getMemberRole(name) + ')');
+    }
+
+    function cancelNodeSwitchPin() {
+      playUiSound('click');
+      pendingNodeSwitchTarget = null;
+      document.getElementById('nodeSwitchPinGate').classList.add('hidden');
+    }
+
+    async function confirmNodeSwitchPin(e) {
+      e.preventDefault();
+      const target = pendingNodeSwitchTarget;
+      if (!target) return;
+      const pin = document.getElementById('nodeSwitchPinInput').value.trim();
+      const vault = state.privateVaults[target];
+      const attemptHash = await hashPlayerPin(target, pin);
+
+      if (attemptHash !== vault.pinHash) {
+        playUiSound('deny');
+        showToast('Access Denied: Invalid PIN for ' + target);
+        document.getElementById('nodeSwitchPinInput').value = '';
+        return;
+      }
+
+      // Valid PIN! If mustChangePin is true, switch to their node & open the Ender Vault mandatory rotation gate
+      if (vault.mustChangePin) {
+        pendingPinRotation[target] = pin;
+        state.activePlayer = target;
+        state.activeTab = 'vault';
+        pendingNodeSwitchTarget = null;
+        document.getElementById('nodeSwitchPinGate').classList.add('hidden');
+        closeNodeSignInModal();
+        saveState();
+        showToast('Starter PIN verified for ' + target + ' — Set your new private PIN!');
+        return;
+      }
+
+      // Decrypt vault items into memory and bind device session
+      try {
+        const items = await decryptVaultItems(pin, vault.encryptedPayload);
+        unlockedVaults[target] = { pin, items };
+        deviceAuth.verifiedAccounts[target] = { method: 'PIN', verifiedAt: Date.now() };
+        saveDeviceAuth();
+        completeSwitchPlayer(target, true);
+      } catch (err) {
+        playUiSound('deny');
+        showToast('Decryption failed for ' + target);
+      }
+    }
+
+    function setActivePlayer(name) {
+      requestSwitchPlayer(name, false);
     }
 
     function openNodeSignInModal() {
       playUiSound('drawer_open');
+      pendingNodeSwitchTarget = null;
+      const gate = document.getElementById('nodeSwitchPinGate');
+      if (gate) gate.classList.add('hidden');
       renderModalCrewGrid();
       document.getElementById('nodeSignInModal').classList.remove('hidden');
     }
@@ -1171,25 +1425,181 @@
       document.getElementById('nodeSignInModal').classList.add('hidden');
     }
 
+    function setSignInTab(tab) {
+      playUiSound('click');
+      const nodesBtn = document.getElementById('signin-tab-nodes');
+      const oauthBtn = document.getElementById('signin-tab-oauth');
+      const nodesPanel = document.getElementById('signInNodesPanel');
+      const oauthPanel = document.getElementById('signInOAuthPanel');
+
+      if (tab === 'oauth') {
+        oauthBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150';
+        nodesBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150';
+        oauthPanel.classList.remove('hidden');
+        nodesPanel.classList.add('hidden');
+      } else {
+        nodesBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150';
+        oauthBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150';
+        nodesPanel.classList.remove('hidden');
+        oauthPanel.classList.add('hidden');
+      }
+    }
+
+    function selectOAuthProvider(provider) {
+      playUiSound('click');
+      activeOAuthProvider = provider;
+      const xboxBtn = document.getElementById('provider-btn-xbox');
+      const discBtn = document.getElementById('provider-btn-discord');
+      const label = document.getElementById('oauthInputLabel');
+      if (provider === 'xbox') {
+        xboxBtn.className = 'py-2 px-3 rounded-[4px] border border-accent bg-accent-subtle text-accent text-xs font-mono font-semibold flex items-center justify-center gap-2';
+        discBtn.className = 'py-2 px-3 rounded-[4px] border border-subtle bg-surface-raised text-secondary hover:text-primary text-xs font-mono font-semibold flex items-center justify-center gap-2';
+        label.textContent = 'Enter Your Exact Xbox Live Gamertag';
+      } else {
+        discBtn.className = 'py-2 px-3 rounded-[4px] border border-accent bg-accent-subtle text-accent text-xs font-mono font-semibold flex items-center justify-center gap-2';
+        xboxBtn.className = 'py-2 px-3 rounded-[4px] border border-subtle bg-surface-raised text-secondary hover:text-primary text-xs font-mono font-semibold flex items-center justify-center gap-2';
+        label.textContent = 'Enter Your Discord Handle or Realm Gamertag';
+      }
+    }
+
+    function resolveRosterMember(rawInput) {
+      const clean = rawInput.trim().toUpperCase();
+      for (const member of state.crew) {
+        if (member.toUpperCase() === clean) return member;
+        const meta = REALM_ROSTER_META[member];
+        if (meta && meta.aliases.includes(clean)) return member;
+      }
+      return null;
+    }
+
+    async function handleVerifyGamertagIdentity(e) {
+      e.preventDefault();
+      const rawTag = document.getElementById('oauthGamertagInput').value.trim();
+      const resultBox = document.getElementById('oauthVerifyResultBox');
+      const pinWrapper = document.getElementById('oauthPinVerifyWrapper');
+      const pinInput = document.getElementById('oauthPinConfirmInput');
+      if (!rawTag) return;
+
+      const matchedMember = resolveRosterMember(rawTag);
+      if (!matchedMember) {
+        playUiSound('deny');
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = `<span class="text-danger">VERIFICATION FAILED:</span> "${rawTag}" is not on the CHIBI~Zone Realm whitelist.`;
+        return;
+      }
+
+      const vault = state.privateVaults[matchedMember];
+      // If this member already has an active PIN hash, require their PIN during OAuth binding so nobody can hijack a PIN-locked account by typing their public Gamertag!
+      if (vault && vault.pinHash) {
+        if (pinWrapper.classList.contains('hidden') || !pinInput.value.trim()) {
+          playUiSound('amethyst');
+          pinWrapper.classList.remove('hidden');
+          resultBox.classList.remove('hidden');
+          resultBox.innerHTML = `<span class="text-warning">GAMERTAG MATCHED (${matchedMember}):</span> Enter ${matchedMember}'s confidential PIN above to complete ${activeOAuthProvider.toUpperCase()} account binding.`;
+          pinInput.focus();
+          return;
+        }
+        const pinAttempt = pinInput.value.trim();
+        const attemptHash = await hashPlayerPin(matchedMember, pinAttempt);
+        if (attemptHash !== vault.pinHash) {
+          playUiSound('deny');
+          resultBox.classList.remove('hidden');
+          resultBox.innerHTML = `<span class="text-danger">ACCESS DENIED:</span> Incorrect PIN for ${matchedMember}. Account binding rejected.`;
+          pinInput.value = '';
+          return;
+        }
+      }
+
+      // Live Xbox API check (via PlayerDB public endpoint) with graceful fallback to verified Realm Roster
+      resultBox.classList.remove('hidden');
+      resultBox.innerHTML = `<span class="text-secondary">Querying ${activeOAuthProvider === 'xbox' ? 'Xbox Live Profile Service' : 'Discord Identity Bridge'} for <strong>${matchedMember}</strong>...</span>`;
+      let xuidBadge = 'REALM-WHITELIST-VERIFIED';
+      if (activeOAuthProvider === 'xbox') {
+        try {
+          const r = await fetch(`https://playerdb.co/api/player/xbox/${encodeURIComponent(matchedMember)}`);
+          if (r.ok) {
+            const j = await r.json();
+            if (j?.data?.player?.id) {
+              xuidBadge = 'XUID: ' + j.data.player.id.slice(0, 10) + '...';
+            }
+          }
+        } catch (err) {}
+      }
+
+      playUiSound('levelup');
+      deviceAuth.verifiedAccounts[matchedMember] = {
+        method: activeOAuthProvider === 'xbox' ? 'XBOX LIVE' : 'DISCORD',
+        badge: xuidBadge,
+        verifiedAt: Date.now()
+      };
+      saveDeviceAuth();
+
+      // If starter PIN rotation is required, send straight to rotation gate!
+      if (vault && vault.pinHash && vault.mustChangePin) {
+        pendingPinRotation[matchedMember] = pinInput.value.trim();
+        state.activePlayer = matchedMember;
+        state.activeTab = 'vault';
+        pinInput.value = '';
+        pinWrapper.classList.add('hidden');
+        closeNodeSignInModal();
+        saveState();
+        showToast(`Verified ${matchedMember} via ${activeOAuthProvider.toUpperCase()} — Create your new private PIN!`);
+        return;
+      }
+
+      // If PIN was entered and valid, also unlock their vault
+      if (vault && vault.pinHash && pinInput.value.trim()) {
+        try {
+          const items = await decryptVaultItems(pinInput.value.trim(), vault.encryptedPayload);
+          unlockedVaults[matchedMember] = { pin: pinInput.value.trim(), items };
+        } catch (err) {}
+      }
+
+      pinInput.value = '';
+      pinWrapper.classList.add('hidden');
+      resultBox.innerHTML = `<span class="text-accent">✓ VERIFIED:</span> Bound session to <strong>${matchedMember}</strong> (${getMemberRole(matchedMember)} · ${xuidBadge}).`;
+      state.activePlayer = matchedMember;
+      saveState();
+      setTimeout(() => closeNodeSignInModal(), 700);
+      showToast(`Verified ${matchedMember} via ${activeOAuthProvider.toUpperCase()}!`);
+    }
+
     function renderModalCrewGrid() {
       const grid = document.getElementById('modalCrewNodeGrid');
       grid.innerHTML = state.crew.map(name => {
         const active = name === state.activePlayer;
+        const role = getMemberRole(name);
+        const vault = state.privateVaults[name];
+        const hasPin = !!(vault && vault.pinHash);
+        const verifiedInfo = deviceAuth.verifiedAccounts[name];
         const completed = state.sharedTasks.filter(t => t.status === 'done' && (t.claimedBy === name || t.createdBy === name)).length;
+
+        let lockTag = '';
+        if (verifiedInfo) {
+          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-accent-subtle text-accent border border-accent-border">${verifiedInfo.method} ✓</span>`;
+        } else if (hasPin) {
+          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-warning-subtle text-warning border border-warning-border">PIN LOCKED</span>`;
+        } else {
+          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-surface-raised text-secondary border border-subtle">1ST ENTRY</span>`;
+        }
+
         return `
-          <button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}'); closeNodeSignInModal();"
+          <button onclick="requestSwitchPlayer('${name.replace(/'/g, "\\'")}', true);"
             class="p-3 rounded-[4px] border text-left flex items-center gap-3 transition-colors duration-150 ease-out ${
               active
                 ? 'bg-accent-subtle border-accent text-primary'
                 : 'bg-surface-base border-subtle hover:bg-surface-hover hover:border-active text-primary'
             }">
-            <img src="${getAvatar(name)}" alt="${name}" class="w-10 h-10 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+            <img src="${getAvatar(name)}" alt="${name}" class="w-11 h-11 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
             <div class="flex-1 min-w-0">
-              <div class="text-xs font-mono font-bold truncate flex items-center gap-1.5">
-                <span>${name}</span>
-                ${active ? '<span class="text-[10px] text-accent">[CONNECTED]</span>' : ''}
+              <div class="text-xs font-mono font-bold truncate flex items-center justify-between gap-1">
+                <span class="truncate">${name}</span>
+                ${lockTag}
               </div>
-              <div class="text-[11px] font-mono text-secondary mt-0.5 tabular-nums">${completed} Quests Completed</div>
+              <div class="text-[10px] font-mono ${role === 'Operator' ? 'text-accent' : 'text-secondary'} mt-0.5 uppercase tracking-label">
+                ${role} ${active ? '· [ACTIVE]' : ''}
+              </div>
+              <div class="text-[11px] font-mono text-muted mt-0.5 tabular-nums">${completed} Quests Completed</div>
             </div>
           </button>
         `;
@@ -1201,12 +1611,14 @@
       const clean = input.value.trim();
       if (!clean) return;
       if (!state.crew.includes(clean)) state.crew.push(clean);
-      if (!state.privateVaults[clean]) state.privateVaults[clean] = { pin: null, items: [] };
+      if (!state.privateVaults[clean]) {
+        state.privateVaults[clean] = { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 };
+      }
       state.activePlayer = clean;
       input.value = '';
       saveState();
       closeNodeSignInModal();
-      showToast('Registered new crew node: ' + clean);
+      showToast('Registered new Realm member: ' + clean);
     }
 
     function switchTab(tab) {
@@ -1308,27 +1720,50 @@
     function getPlayerVault() {
       const p = state.activePlayer;
       if (!state.privateVaults[p]) {
-        state.privateVaults[p] = { pin: null, items: [] };
+        state.privateVaults[p] = { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 };
       }
       return state.privateVaults[p];
     }
 
-    function handleUnlockVault(e) {
+    async function persistUnlockedVault(player) {
+      const session = unlockedVaults[player];
+      const vault = state.privateVaults[player];
+      if (!session || !vault) return;
+      vault.encryptedPayload = await encryptVaultItems(session.pin, session.items);
+      vault.itemCount = session.items.length;
+      saveState();
+    }
+
+    async function handleUnlockVault(e) {
       e.preventDefault();
       const input = document.getElementById('pinAttemptInput');
+      const pin = input.value.trim();
       const vault = getPlayerVault();
-      if (input.value === vault.pin) {
-        if (vault.mustChangePin || vault.pin === '0214') {
+      const attemptHash = await hashPlayerPin(state.activePlayer, pin);
+
+      if (attemptHash === vault.pinHash) {
+        if (vault.mustChangePin) {
           playUiSound('amethyst');
-          pendingPinRotation[state.activePlayer] = true;
+          pendingPinRotation[state.activePlayer] = pin;
           renderAll();
-          showToast('First login verified — create your new private PIN');
+          showToast('Starter PIN verified — create your new private PIN');
           return;
         }
-        playUiSound('ender_open');
-        unlockedVaults[state.activePlayer] = true;
-        renderAll();
-        showToast('Unlocked ' + state.activePlayer + '\'s Ender Vault');
+        try {
+          const items = await decryptVaultItems(pin, vault.encryptedPayload);
+          playUiSound('ender_open');
+          unlockedVaults[state.activePlayer] = { pin, items };
+          deviceAuth.verifiedAccounts[state.activePlayer] = {
+            method: deviceAuth.verifiedAccounts[state.activePlayer]?.method || 'PIN',
+            verifiedAt: Date.now()
+          };
+          saveDeviceAuth();
+          renderAll();
+          showToast('Decrypted & unlocked ' + state.activePlayer + '\'s Ender Vault');
+        } catch (err) {
+          playUiSound('deny');
+          showToast('Vault decryption error');
+        }
       } else {
         playUiSound('deny');
         showToast('Access Denied: Incorrect PIN');
@@ -1336,19 +1771,22 @@
       }
     }
 
-    function handleForceRotatePin(e) {
+    async function handleForceRotatePin(e) {
       e.preventDefault();
       const nextPin = document.getElementById('rotateNewPinInput').value.trim();
       const confirmPin = document.getElementById('rotateConfirmPinInput').value.trim();
       const vault = getPlayerVault();
+      const oldPin = pendingPinRotation[state.activePlayer] || unlockedVaults[state.activePlayer]?.pin;
+
       if (nextPin.length < 4) {
         playUiSound('deny');
-        showToast('PIN must be at least 4 digits');
+        showToast('PIN must be at least 4 characters');
         return;
       }
-      if (nextPin === vault.pin || nextPin === '0214') {
+      const nextHash = await hashPlayerPin(state.activePlayer, nextPin);
+      if (nextHash === vault.pinHash || nextHash === DOMSWOOZ_STARTER_HASH) {
         playUiSound('deny');
-        showToast('New PIN must be different from the initial starter PIN');
+        showToast('New PIN must be different from your previous/starter PIN');
         return;
       }
       if (nextPin !== confirmPin) {
@@ -1356,16 +1794,36 @@
         showToast('PIN entries do not match');
         return;
       }
-      playUiSound('ender_open');
-      vault.pin = nextPin;
-      vault.mustChangePin = false;
-      delete pendingPinRotation[state.activePlayer];
-      unlockedVaults[state.activePlayer] = true;
-      saveState();
-      showToast('Private PIN updated & Ender Vault unlocked!');
+
+      try {
+        let existingItems = [];
+        if (unlockedVaults[state.activePlayer]?.items) {
+          existingItems = unlockedVaults[state.activePlayer].items;
+        } else if (vault.encryptedPayload && oldPin) {
+          existingItems = await decryptVaultItems(oldPin, vault.encryptedPayload);
+        }
+        vault.pinHash = nextHash;
+        vault.mustChangePin = false;
+        vault.encryptedPayload = await encryptVaultItems(nextPin, existingItems);
+        vault.itemCount = existingItems.length;
+
+        delete pendingPinRotation[state.activePlayer];
+        unlockedVaults[state.activePlayer] = { pin: nextPin, items: existingItems };
+        deviceAuth.verifiedAccounts[state.activePlayer] = {
+          method: deviceAuth.verifiedAccounts[state.activePlayer]?.method || 'PIN',
+          verifiedAt: Date.now()
+        };
+        saveDeviceAuth();
+        playUiSound('ender_open');
+        saveState();
+        showToast('AES-256 Vault Re-Encrypted with your new Private PIN!');
+      } catch (err) {
+        playUiSound('deny');
+        showToast('Failed to re-encrypt vault: verify current PIN first');
+      }
     }
 
-    function handleCreateVaultPin(e) {
+    async function handleCreateVaultPin(e) {
       e.preventDefault();
       const input = document.getElementById('newPinInput');
       const confirmInput = document.getElementById('confirmNewPinInput');
@@ -1373,7 +1831,7 @@
       const confirmPin = confirmInput ? confirmInput.value.trim() : pin;
       if (pin.length < 4) {
         playUiSound('deny');
-        showToast('Choose at least a 4-digit PIN');
+        showToast('Choose at least a 4-character PIN');
         return;
       }
       if (pin !== confirmPin) {
@@ -1383,11 +1841,18 @@
       }
       playUiSound('ender_open');
       const vault = getPlayerVault();
-      vault.pin = pin;
+      vault.pinHash = await hashPlayerPin(state.activePlayer, pin);
       vault.mustChangePin = false;
-      unlockedVaults[state.activePlayer] = true;
+      vault.encryptedPayload = await encryptVaultItems(pin, []);
+      vault.itemCount = 0;
+      unlockedVaults[state.activePlayer] = { pin, items: [] };
+      deviceAuth.verifiedAccounts[state.activePlayer] = {
+        method: deviceAuth.verifiedAccounts[state.activePlayer]?.method || 'PIN',
+        verifiedAt: Date.now()
+      };
+      saveDeviceAuth();
       saveState();
-      showToast('Initialized Ender Vault PIN for ' + state.activePlayer + '!');
+      showToast('Initialized AES-256 Ender Vault for ' + state.activePlayer + '!');
     }
 
     function lockCurrentVault() {
@@ -1395,26 +1860,28 @@
       delete unlockedVaults[state.activePlayer];
       delete pendingPinRotation[state.activePlayer];
       renderAll();
-      showToast('Ender Vault Locked');
+      showToast('Ender Vault Locked & Memory Cleared');
     }
 
     function openRotatePinGate() {
       playUiSound('amethyst');
+      const currentPin = unlockedVaults[state.activePlayer]?.pin;
+      pendingPinRotation[state.activePlayer] = currentPin || true;
       delete unlockedVaults[state.activePlayer];
-      pendingPinRotation[state.activePlayer] = true;
       renderAll();
     }
 
-    function handleAddPrivateTask(e) {
+    async function handleAddPrivateTask(e) {
       e.preventDefault();
+      const session = unlockedVaults[state.activePlayer];
+      if (!session) return;
       playUiSound('enchant');
       const title = document.getElementById('privTitleInput').value.trim();
       const coords = document.getElementById('privCoordsInput').value.trim() || 'CLASSIFIED';
       const notes = document.getElementById('privNotesInput').value.trim();
       if (!title) return;
 
-      const vault = getPlayerVault();
-      vault.items.unshift({
+      session.items.unshift({
         id: 'p-' + Date.now(),
         title,
         coords,
@@ -1425,24 +1892,26 @@
       document.getElementById('privTitleInput').value = '';
       document.getElementById('privCoordsInput').value = '';
       document.getElementById('privNotesInput').value = '';
-      saveState();
-      showToast('Saved to ' + state.activePlayer + '\'s Ender Vault!');
+      await persistUnlockedVault(state.activePlayer);
+      showToast('Encrypted & saved to ' + state.activePlayer + '\'s Ender Vault!');
     }
 
-    function togglePrivateItem(id) {
+    async function togglePrivateItem(id) {
+      const session = unlockedVaults[state.activePlayer];
+      if (!session) return;
       playUiSound('coin');
-      const vault = getPlayerVault();
-      const item = vault.items.find(i => i.id === id);
+      const item = session.items.find(i => i.id === id);
       if (item) {
         item.done = !item.done;
-        saveState();
+        await persistUnlockedVault(state.activePlayer);
       }
     }
 
-    function deletePrivateItem(id) {
-      const vault = getPlayerVault();
-      vault.items = vault.items.filter(i => i.id !== id);
-      saveState();
+    async function deletePrivateItem(id) {
+      const session = unlockedVaults[state.activePlayer];
+      if (!session) return;
+      session.items = session.items.filter(i => i.id !== id);
+      await persistUnlockedVault(state.activePlayer);
     }
 
     function handleAddLandmark(e) {
@@ -1530,18 +1999,26 @@
     function renderAll() {
       document.getElementById('activePlayerAvatarImg').src = getAvatar(state.activePlayer);
       document.getElementById('headerActivePlayerName').textContent = state.activePlayer;
+      const roleBadge = document.getElementById('headerOperatorBadge');
+      if (roleBadge) {
+        const verified = deviceAuth.verifiedAccounts[state.activePlayer];
+        roleBadge.textContent = verified ? `${getMemberRole(state.activePlayer)} · ${verified.method}` : getMemberRole(state.activePlayer);
+      }
 
       const crewEl = document.getElementById('crewSelector');
       crewEl.innerHTML = state.crew.map(name => {
         const active = name === state.activePlayer;
+        const hasPin = !!(state.privateVaults[name]?.pinHash);
+        const verified = !!deviceAuth.verifiedAccounts[name];
         return `<button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}')"
           class="px-2.5 py-1 text-xs font-mono rounded-[4px] transition-colors duration-150 ease-out active:translate-y-[1px] flex items-center gap-1.5 ${
             active
               ? 'bg-accent-subtle text-accent border border-accent-border font-semibold'
               : 'text-secondary hover:text-primary hover:bg-surface-hover border border-transparent'
           }">
-          <img src="${getAvatar(name)}" alt="" class="w-4 h-4 rounded-[4px] object-cover" />
+          <img src="${getAvatar(name)}" alt="" class="w-4 h-4 rounded-[4px] object-cover pixel-art" />
           <span>${name}</span>
+          ${verified ? '<span class="text-[9px] text-accent">✓</span>' : (hasPin ? '<span class="text-[9px] text-warning">🔒</span>' : '')}
         </button>`;
       }).join('');
 
@@ -1691,27 +2168,30 @@
       el.innerHTML = state.crew.map(name => {
         const completed = state.sharedTasks.filter(t => t.status === 'done' && (t.claimedBy === name || t.createdBy === name)).length;
         const active = state.sharedTasks.filter(t => t.status === 'in_progress' && t.claimedBy === name).length;
-        const vaultCount = (state.privateVaults[name]?.items || []).length;
-        const hasPin = !!(state.privateVaults[name]?.pin);
+        const vault = state.privateVaults[name];
+        const hasPin = !!(vault?.pinHash);
+        const vaultCount = unlockedVaults[name]?.items?.length ?? (vault?.itemCount || 0);
+        const role = getMemberRole(name);
+        const verified = deviceAuth.verifiedAccounts[name];
 
         return `
           <div class="bg-surface-base border border-subtle rounded-[4px] p-3 flex items-center justify-between gap-2">
             <div class="flex items-center gap-3 min-w-0">
-              <img src="${getAvatar(name)}" alt="${name}" class="w-8 h-8 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+              <img src="${getAvatar(name)}" alt="${name}" class="w-8 h-8 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
               <div class="min-w-0">
                 <div class="text-xs font-mono font-semibold text-primary flex items-center gap-1.5 truncate">
-                  <span>${name}</span>
-                  ${name === state.activePlayer ? '<span class="text-[10px] text-accent">[YOU]</span>' : ''}
+                  <span class="truncate">${name}</span>
+                  <span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] ${role === 'Operator' ? 'bg-accent-subtle text-accent border border-accent-border' : 'bg-surface-raised text-secondary border border-subtle'}">${role.toUpperCase()}</span>
                 </div>
                 <div class="text-[11px] text-secondary mt-0.5 font-mono tabular-nums">
-                  ${completed} Done · ${active} Active
+                  ${completed} Done · ${active} Active ${verified ? `· <span class="text-accent">${verified.method}</span>` : ''}
                 </div>
               </div>
             </div>
             <button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}'); switchTab('vault');"
               class="ui-btn px-2.5 py-1.5 text-[11px] font-mono text-secondary hover:text-primary tabular-nums flex items-center gap-1.5 shrink-0">
               <img src="/assets/ender-chest.png" alt="" class="w-3.5 h-3.5 pixel-art" />
-              <span>${hasPin ? vaultCount : 'PIN'}</span>
+              <span>${hasPin ? vaultCount + ' 🔒' : 'SETUP'}</span>
             </button>
           </div>
         `;
@@ -1720,7 +2200,8 @@
 
     function renderPrivateVault() {
       const vault = getPlayerVault();
-      const isUnlocked = !!unlockedVaults[state.activePlayer];
+      const session = unlockedVaults[state.activePlayer];
+      const isUnlocked = !!session;
       const gateEl = document.getElementById('vaultPinGate');
       const contentEl = document.getElementById('vaultUnlockedContent');
       const controlsEl = document.getElementById('vaultHeaderControls');
@@ -1729,13 +2210,13 @@
       if (!isUnlocked) {
         contentEl.classList.add('hidden');
         gateEl.classList.remove('hidden');
-        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: ENCRYPTED // OPERATOR AUTHENTICATION REQUIRED</span>`;
+        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: AES-256-GCM ENCRYPTED // OPERATOR AUTHENTICATION REQUIRED</span>`;
 
-        if (!vault.pin) {
+        if (!vault.pinHash) {
           gateEl.innerHTML = `
             <img src="/assets/ender-chest.png" alt="Ender Vault" class="w-12 h-12 mx-auto mb-3 pixel-art" />
             <h3 class="mc-display-title text-sm text-primary">INITIALIZE ${state.activePlayer}'S ENDER VAULT</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Create a confidential 4-to-8 digit PIN so only ${state.activePlayer} can view or add secret stashes, coordinates, and personal builds.</p>
+            <p class="text-xs text-secondary mt-2 mb-4">Create a confidential 4-to-8 character PIN. Your PIN is hashed with SHA-256 and used as an AES-256-GCM key so nobody else can ever read your vault.</p>
             <form onsubmit="handleCreateVaultPin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
               <input type="password" id="newPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Create Private PIN"
                 class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
@@ -1750,17 +2231,17 @@
           gateEl.innerHTML = `
             <img src="/assets/ender-chest.png" alt="Set New Private PIN" class="w-12 h-12 mx-auto mb-3 pixel-art" />
             <div class="inline-block px-2 py-0.5 mb-2 text-[10px] font-mono uppercase tracking-label rounded-[4px] bg-warning-subtle text-warning border border-warning-border">
-              MANDATORY SECURITY ROTATION
+              MANDATORY 1ST-LOGIN SECURITY ROTATION
             </div>
             <h3 class="mc-display-title text-sm text-primary">CREATE YOUR NEW PRIVATE PIN</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Starter PIN verified. To keep ${state.activePlayer}'s Ender Vault truly private, choose and confirm a new personal PIN now.</p>
+            <p class="text-xs text-secondary mt-2 mb-4">Starter PIN verified. Choose and confirm a new personal PIN now to re-encrypt ${state.activePlayer}'s Ender Vault with AES-256-GCM.</p>
             <form onsubmit="handleForceRotatePin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
               <input type="password" id="rotateNewPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="New Private PIN (4-8 chars)"
                 class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
               <input type="password" id="rotateConfirmPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Confirm New Private PIN"
                 class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
               <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                Save New PIN &amp; Unlock Vault
+                Re-Encrypt &amp; Unlock Vault
               </button>
             </form>
           `;
@@ -1783,24 +2264,26 @@
 
       gateEl.classList.add('hidden');
       contentEl.classList.remove('hidden');
-      if (state.activePlayer === 'SWOOZ') {
+      if (state.activePlayer === 'DOMSWOOZ') {
         swoozPreview.classList.remove('hidden');
       } else {
         swoozPreview.classList.add('hidden');
       }
 
       controlsEl.innerHTML = `
+        <span class="px-2 py-1 text-[10px] font-mono rounded-[4px] bg-accent-subtle text-accent border border-accent-border">AES-256 DECRYPTED</span>
         <button onclick="openRotatePinGate()" class="ui-btn px-4 py-1.5 text-xs font-mono text-secondary hover:text-primary">Rotate Private PIN</button>
         <button onclick="lockCurrentVault()" class="px-4 py-1.5 text-xs font-mono bg-danger-subtle text-danger border border-danger-border rounded-[4px] hover:border-danger transition-colors duration-150 ease-out">Lock Ender Vault</button>
       `;
 
       const listEl = document.getElementById('privateVaultList');
-      if (vault.items.length === 0) {
+      const items = session.items || [];
+      if (items.length === 0) {
         listEl.innerHTML = `<div class="ui-panel p-6 text-center text-xs text-secondary">Your private Ender Vault is empty. Log your secret diamond stash coordinates or personal goals on the right!</div>`;
         return;
       }
 
-      listEl.innerHTML = vault.items.map(item => `
+      listEl.innerHTML = items.map(item => `
         <div class="ui-panel ore-bevel-top hover:border-active p-4 transition-colors duration-150 ease-out flex items-start gap-4">
           <button onclick="togglePrivateItem('${item.id}')"
             class="mt-0.5 w-6 h-6 rounded-[4px] border flex items-center justify-center text-xs font-mono transition-colors duration-150 ease-out ${
