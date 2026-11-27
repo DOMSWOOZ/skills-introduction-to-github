@@ -550,15 +550,13 @@
                   <div>
                     <div class="flex items-center gap-2 mb-1">
                       <img src="/assets/first-diamond.png" alt="" class="w-4 h-4 pixel-art" />
-                      <span class="micro-label text-accent">VERIFIED VAULT CAM // Y=75</span>
+                      <span class="micro-label text-accent">VERIFIED VAULT CAM // AES-256 DECRYPTED</span>
                     </div>
-                    <h3 class="text-sm font-semibold tracking-tight text-primary">4x2 Classical Ruins Painting Entrance</h3>
-                    <p class="text-xs text-secondary mt-1">
-                      Walk straight through the left side of the canvas (past the "SMILE :) YOU ARE ON SWOOZ CAM" signs) to access the hidden chest. Click the right side to use the hidden Crafting Table.
-                    </p>
+                    <h3 id="swoozVaultPreviewTitle" class="text-sm font-semibold tracking-tight text-primary"></h3>
+                    <p id="swoozVaultPreviewNotes" class="text-xs text-secondary mt-1"></p>
                   </div>
                   <div class="mt-3 pt-2 border-t border-subtle flex items-center justify-between text-[11px] font-mono text-secondary tabular-nums">
-                    <span>LOCATION: 910, 75, -287</span>
+                    <span id="swoozVaultPreviewCoords"></span>
                     <span class="text-accent">STATUS: CONCEALED</span>
                   </div>
                 </div>
@@ -583,7 +581,7 @@
                 </div>
                 <div>
                   <label class="micro-label block mb-2">Secret Coordinates (X, Y, Z)</label>
-                  <input type="text" id="privCoordsInput" placeholder="e.g. 910, 75, -287"
+                  <input type="text" id="privCoordsInput" placeholder="e.g. X, Y, Z"
                     class="ui-input w-full px-4 py-2 text-xs font-mono tabular-nums" />
                 </div>
                 <div>
@@ -2264,8 +2262,11 @@
 
       gateEl.classList.add('hidden');
       contentEl.classList.remove('hidden');
-      if (state.activePlayer === 'DOMSWOOZ') {
+      if (state.activePlayer === 'DOMSWOOZ' && session.items && session.items[0]) {
         swoozPreview.classList.remove('hidden');
+        document.getElementById('swoozVaultPreviewTitle').textContent = session.items[0].title;
+        document.getElementById('swoozVaultPreviewNotes').textContent = session.items[0].notes;
+        document.getElementById('swoozVaultPreviewCoords').textContent = 'LOCATION: ' + session.items[0].coords;
       } else {
         swoozPreview.classList.add('hidden');
       }
