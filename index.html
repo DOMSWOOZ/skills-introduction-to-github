@@ -504,6 +504,13 @@
         <span id="gpsCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">5</span>
       </button>
 
+      <button onclick="switchTab('backpack')" id="tab-backpack" role="tab" aria-selected="false"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/container-shulker.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>Backpacker</span>
+        <span id="backpackTierBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#107C10] border border-white/20 text-white tabular-nums">LVL 0/5</span>
+      </button>
+
       <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
         class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
@@ -982,7 +989,245 @@
       </div>
     </section>
 
+    <!-- ==================== TAB 5: CHIBIZANIMUS'S "ULTIMATE BACKPACKER" 5-LEVEL ACHIEVEMENT SYSTEM ==================== -->
+    <section id="view-backpack" class="hidden flex flex-col gap-4">
+
+      <!-- Ultimate Backpacker Hero Banner & Rules -->
+      <div class="xb-panel p-5 flex flex-col gap-4">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-white/10 pb-4">
+          <div class="flex items-start gap-3.5">
+            <div class="ore-slot p-2.5 flex items-center justify-center shrink-0">
+              <img src="/assets/anim-achieve.gif" alt="Ultimate Backpacker Trophy" class="w-12 h-12 pixel-art object-contain" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="bg-[#107C10] px-2 py-0.5 border border-white/20 font-mojangles text-[10px] text-white uppercase">DESIGNED BY CHIBIZANIMUS</span>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">5-TIER FOOD SELF-SUFFICIENCY PROTOCOL</span>
+              </div>
+              <h2 class="font-mc-ten text-2xl text-white uppercase mt-1">ULTIMATE BACKPACKER ACHIEVEMENT SYSTEM</h2>
+              <p class="text-xs text-[#A0A0A0] mt-1 max-w-3xl leading-relaxed">
+                <strong>Completion Rule:</strong> Must have every container slot filled with your selected tracked food item, each maxing out the slot with a full stack of <span class="font-mojangles text-white">64</span>. Complete all 4 storage density tiers plus the 13-item automated Hopper/Dropper pipeline to earn the <span class="font-mojangles text-[#6BC349]">"ULTIMATE BACKPACKER"</span> title!
+              </p>
+            </div>
+          </div>
+          <div id="backpackHeroMasterBadge" class="ore-slot px-4 py-3 text-right shrink-0">
+            <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">OPERATOR RANK (<span id="backpackHeroPlayerName">DOMSWOOZ</span>)</span>
+            <span id="backpackHeroRankTitle" class="font-mc-ten text-lg text-warning uppercase">NOVICE FORAGER (0 / 5)</span>
+          </div>
+        </div>
+
+        <!-- 5-Tier Overview Progress Strip -->
+        <div id="backpackTierOverviewStrip" class="grid grid-cols-1 sm:grid-cols-5 gap-2.5"></div>
+      </div>
+
+      <!-- 2-Column Xbox Dashboard Split: Left 4 Cols (Food Item Selector, Crew Leaderboard & Bedrock Script API Bridge) + Right 8 Cols (Interactive 27/54-Slot Container Inspector) -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+        <!-- LEFT 4 COLS: Tracked Food Selector, Crew Leaderboard, & Live Bedrock Script API Bridge -->
+        <div class="md:col-span-4 flex flex-col gap-4">
+
+          <!-- Tracked Food Item Selector -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/golden-apple.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">1. Select Tracked Food Supply</span>
+              </div>
+              <span id="backpackActiveFoodLabel" class="font-mojangles text-xs text-[#6BC349]">GOLDEN APPLE</span>
+            </div>
+            <div class="p-3 flex flex-col gap-2">
+              <p class="text-[11px] text-[#A0A0A0]">Choose the self-sufficiency food ration you are stacking to <span class="font-mojangles text-white">64</span> across your containers:</p>
+              <div id="backpackFoodSelectorGrid" class="grid grid-cols-2 gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Crew Ultimate Backpacker Leaderboard -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/star-golden.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Realm Backpacker Standings</span>
+              </div>
+              <span class="font-mojangles text-[11px] text-white">6 PLAYERS</span>
+            </div>
+            <div id="backpackLeaderboardList" class="p-3 flex flex-col gap-2"></div>
+          </div>
+
+          <!-- Official Minecraft Bedrock Script API (@minecraft/server) Live In-Game Bridge -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">Live In-Game Bedrock Script API</span>
+              <span class="bg-[#107C10] px-1.5 py-0.5 border border-white/20 font-mojangles text-[10px] text-white">WEBHOOK READY</span>
+            </div>
+            <div class="p-3.5 flex flex-col gap-3 text-xs">
+              <p class="text-[#A0A0A0] leading-relaxed">
+                Uses <code class="text-white font-mono">world.afterEvents.playerInteractWithBlock</code> &amp; <code class="text-white font-mono">BlockInventoryComponent</code> to inspect Barrels, Double Chests, Ender Chests, Shulker Boxes &amp; Hoppers live in-game, firing <code class="text-[#6BC349] font-mono">/title @a title "ULTIMATE BACKPACKER"</code> and syncing to <code class="text-white font-mono">POST /api/backpack-webhook</code>.
+              </p>
+              <button onclick="openBedrockScriptModal()" class="ore-btn ore-btn-stone w-full font-semibold">
+                <span class="font-sans text-xs uppercase tracking-tight">View / Copy Bedrock Script Add-On</span>
+                <span class="font-mojangles text-xs bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">Y</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT 8 COLS: Active Level Selector & Interactive 27-Slot / 54-Slot / 13-Hopper Ore UI Container Grid -->
+        <div class="md:col-span-8 flex flex-col gap-4">
+
+          <!-- Level Tabs (Level 1..5) -->
+          <div class="xb-panel p-3 flex flex-wrap items-center justify-between gap-2">
+            <div id="backpackLevelTabs" class="flex items-center gap-2 flex-wrap"></div>
+            <div class="flex items-center gap-2">
+              <button onclick="fillNextBackpackSlot()" class="ore-btn px-3 py-1.5 text-xs font-mono uppercase">
+                <span>+1 Stack (64)</span>
+                <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">A</span>
+              </button>
+              <button onclick="maxAllBackpackSlots()" class="ore-btn ore-btn-primary px-3 py-1.5 text-xs font-mono uppercase">
+                <span>Fill All 64x (Complete Tier)</span>
+                <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">X</span>
+              </button>
+              <button onclick="clearCurrentBackpackLevel()" class="ore-btn px-2.5 py-1.5 text-xs font-mono text-[#A0A0A0] hover:text-danger">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Container Inspector Card -->
+          <div class="xb-panel p-4 flex flex-col gap-4">
+            <div class="flex flex-wrap items-start justify-between gap-4 border-b border-white/10 pb-3">
+              <div class="flex items-center gap-3">
+                <div class="ore-slot p-2.5 flex items-center justify-center">
+                  <img id="bpInspectorIcon" src="/assets/container-barrel.png" alt="" class="w-9 h-9 pixel-art object-contain" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span id="bpInspectorTierTag" class="bg-[#107C10] px-2 py-0.5 border border-white/20 font-mojangles text-[10px] text-white uppercase">LEVEL 1 // EARLY-TO-MID STORAGE</span>
+                    <span id="bpInspectorStatusBadge" class="ore-slot px-2 py-0.5 font-mojangles text-[10px] text-warning uppercase">IN PROGRESS</span>
+                  </div>
+                  <h3 id="bpInspectorTitle" class="font-mc-ten text-xl text-white uppercase mt-1">LEVEL 1: BARRELS (27-SLOT COMPACT STORAGE)</h3>
+                  <p id="bpInspectorDesc" class="text-xs text-[#A0A0A0] mt-0.5"></p>
+                </div>
+              </div>
+
+              <!-- Recessed Stack & Item Math Telemetry -->
+              <div class="flex items-center gap-2">
+                <div class="ore-slot px-3 py-2 text-right">
+                  <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">SLOTS AT 64x</span>
+                  <span id="bpInspectorSlotCount" class="font-mojangles text-lg text-white tabular-nums">00 / 27</span>
+                </div>
+                <div class="ore-slot px-3 py-2 text-right">
+                  <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">TOTAL FOOD ITEMS</span>
+                  <span id="bpInspectorItemTotal" class="font-mojangles text-lg text-[#6BC349] tabular-nums">0 / 1,728</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Minecraft 9-Column Recessed Inventory Slot Grid (.ore-slot) -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span id="bpGridHeaderLabel" class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">CONTAINER INVENTORY SLOTS (CLICK ANY SLOT TO TOGGLE FULL 64x STACK)</span>
+                <span id="bpComparatorSignalLabel" class="font-mojangles text-xs text-[#8E8E8E]">REDSTONE COMPARATOR SIGNAL: 00 / 15</span>
+              </div>
+              <div id="backpackSlotsGrid" class="grid grid-cols-9 gap-1.5 bg-[#141415] p-3 border-2 border-[#0B0B0C]"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
   </main>
+
+  <!-- ==================== XBOX / MINECRAFT ACHIEVEMENT UNLOCKED FANFARE BANNER ==================== -->
+  <div id="achievementFanfareOverlay" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none">
+    <div class="xb-panel bg-[#181818] border-2 border-[#6BC349] p-3.5 flex items-center gap-3.5 pointer-events-auto">
+      <div class="w-12 h-12 bg-[#107C10] border border-white/30 flex items-center justify-center shrink-0">
+        <img id="fanfareIcon" src="/assets/anim-achieve.gif" alt="" class="w-9 h-9 pixel-art object-contain" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span id="fanfareHeaderTag" class="font-mojangles text-[11px] uppercase text-[#6BC349]">ACHIEVEMENT UNLOCKED // +100G</span>
+        </div>
+        <div id="fanfareTitle" class="font-mc-ten text-base text-white uppercase truncate mt-0.5">ULTIMATE BACKPACKER</div>
+        <div id="fanfareSubtitle" class="font-mono text-[11px] text-[#E0E0E0] truncate">DOMSWOOZ maxed out Level 1: Barrels (1,728 items)!</div>
+      </div>
+      <button onclick="hideAchievementFanfare()" class="ore-btn px-2 py-1 text-xs font-mono">OK</button>
+    </div>
+  </div>
+
+  <!-- ==================== BEDROCK SCRIPT API (@minecraft/server) MODAL ==================== -->
+  <div id="bedrockScriptModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="xb-panel max-w-2xl w-full overflow-hidden border-white/25">
+      <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img src="/assets/container-shulker.png" alt="" class="w-5 h-5 pixel-art" />
+          <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">BEDROCK SCRIPT API (@minecraft/server) // LIVE CONTAINER WATCHER</span>
+        </div>
+        <button onclick="closeBedrockScriptModal()" class="ore-btn px-2 py-1 text-xs font-mono">CLOSE [B]</button>
+      </div>
+      <div class="p-5 flex flex-col gap-4 max-h-[80vh] overflow-y-auto text-xs">
+        <p class="text-[#A0A0A0] leading-relaxed">
+          Drop this script into a Bedrock Behavior Pack (<code class="text-white">scripts/main.js</code>) or Dedicated Server to automatically inspect any Barrel, Double Chest, Ender Chest, Shulker Box, or Hopper when a player interacts with it, fire the in-game <code class="text-[#6BC349]">/title @a title "ULTIMATE BACKPACKER"</code> celebration on every PC/Console/Mobile screen, and sync directly to <code class="text-white">/api/backpack-webhook</code>:
+        </p>
+        <pre id="bedrockScriptCodeBlock" class="ore-slot p-3 font-mono text-[11px] text-[#E0E0E0] overflow-x-auto leading-relaxed select-all">import { world, system } from "@minecraft/server";
+
+const TRACKED_FOODS = new Set([
+  "minecraft:cooked_beef", "minecraft:golden_carrot", "minecraft:baked_potato",
+  "minecraft:bread", "minecraft:cooked_porkchop", "minecraft:golden_apple",
+  "minecraft:enchanted_golden_apple", "minecraft:honey_bottle", "minecraft:cooked_salmon"
+]);
+
+world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
+  system.run(() =&gt; {
+    const inv = block.getComponent("minecraft:inventory")?.container;
+    if (!inv) return;
+    const totalSlots = inv.size; // 27 (Barrel/Shulker) or 54 (Double Chest) or 5 (Hopper)
+    let maxedFoodSlots = 0;
+    let totalFoodCount = 0;
+    let detectedFoodId = null;
+
+    for (let i = 0; i &lt; totalSlots; i++) {
+      const item = inv.getItem(i);
+      if (item &amp;&amp; TRACKED_FOODS.has(item.typeId)) {
+        detectedFoodId = item.typeId;
+        totalFoodCount += item.amount;
+        if (item.amount === 64) maxedFoodSlots++;
+      }
+    }
+
+    // Level 1 (Barrel 27x64), Level 2 (Double Chest 54x64), Level 4 (Shulker 27x64)
+    if ((totalSlots === 27 || totalSlots === 54) &amp;&amp; maxedFoodSlots === totalSlots) {
+      const tierName = block.typeId.includes("barrel") ? "LEVEL 1: BARREL MASTER"
+        : block.typeId.includes("shulker") ? "LEVEL 4: SHULKER DENSITY"
+        : "LEVEL 2: DOUBLE CHEST";
+      player.runCommandAsync(`title @a title "§a${tierName}"`);
+      player.runCommandAsync(`title @a subtitle "§e${player.name} filled ${totalSlots}x64 (${totalFoodCount} ${detectedFoodId.replace('minecraft:','')})!"`);
+      player.runCommandAsync(`playsound random.levelup @a`);
+    }
+
+    // Level 5 (Hopper / Dropper Automated Pipeline: 13+ food items moving through)
+    if ((block.typeId.includes("hopper") || block.typeId.includes("dropper")) &amp;&amp; totalFoodCount &gt;= 13) {
+      player.runCommandAsync(`title @a title "§6ULTIMATE BACKPACKER"`);
+      player.runCommandAsync(`title @a subtitle "§a${player.name} automated ${totalFoodCount} food items via Hoppers &amp; Droppers!"`);
+      player.runCommandAsync(`playsound ui.toast.challenge_complete @a`);
+    }
+  });
+});</pre>
+        <div class="flex items-center justify-between gap-3">
+          <button onclick="copyBedrockScriptCode()" class="ore-btn ore-btn-primary px-4 py-2 font-mono uppercase">
+            <span>Copy Bedrock Script API Code</span>
+            <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
+          </button>
+          <button onclick="simulateLiveWebhookTrigger()" class="ore-btn ore-btn-stone px-4 py-2 font-mono font-semibold uppercase">
+            <span>Test Live In-Game Webhook Trigger</span>
+            <span class="font-mojangles text-xs bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">X</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ==================== CREW NODE SIGN-IN MODAL (Using User Selection #1: network-signin.jpg) ==================== -->
   <div id="nodeSignInModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
@@ -1472,8 +1717,84 @@
         'JacobParties':   { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
         'SallyManDuur':   { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 },
         'GoodScroll6570': { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 }
+      },
+      backpackProgress: {
+        'DOMSWOOZ':       { foodId: 'golden_apple',  activeLevel: 1, levels: { 1: 18, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'ChibiZANIMUS':   { foodId: 'dream_apple',   activeLevel: 4, levels: { 1: 27, 2: 54, 3: 27, 4: 19, 5: 0 } },
+        'BruthaManD':     { foodId: 'cooked_beef',   activeLevel: 1, levels: { 1: 12, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'JacobParties':   { foodId: 'golden_carrot', activeLevel: 1, levels: { 1: 9,  2: 0, 3: 0, 4: 0, 5: 0 } },
+        'SallyManDuur':   { foodId: 'honey_bottle',  activeLevel: 1, levels: { 1: 15, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'GoodScroll6570': { foodId: 'baked_potato',  activeLevel: 1, levels: { 1: 6,  2: 0, 3: 0, 4: 0, 5: 0 } }
       }
     };
+
+    // ==================== CHIBIZANIMUS'S "ULTIMATE BACKPACKER" 5-LEVEL ACHIEVEMENT DEFINITIONS ====================
+    const BACKPACK_LEVELS = [
+      {
+        id: 1,
+        name: 'Level 1: Barrels (27-Slot Compact Storage)',
+        shortName: 'LVL 1: BARRELS',
+        slots: 27,
+        stackSize: 64,
+        totalItems: 1728,
+        icon: '/assets/container-barrel.png',
+        tag: 'LEVEL 1 // COMPACT 27-SLOT WALL STORAGE',
+        desc: 'Compact 27-slot storage that opens even with a solid block above it, useful in tight spaces or walls. Fill all 27 slots with full 64x stacks (1,728 food items).'
+      },
+      {
+        id: 2,
+        name: 'Level 2: Double Chests (54-Slot Stationary Storage)',
+        shortName: 'LVL 2: DOUBLE CHEST',
+        slots: 54,
+        stackSize: 64,
+        totalItems: 3456,
+        icon: '/assets/container-chest.png',
+        tag: 'LEVEL 2 // STATIONARY 54-SLOT BULK STORAGE',
+        desc: 'Basic stationary 54-slot storage for initial resources, tools, and bulk provisions. Fill all 54 slots with full 64x stacks (3,456 food items).'
+      },
+      {
+        id: 3,
+        name: 'Level 3: Ender Chest (27-Slot Cross-Dimensional Storage)',
+        shortName: 'LVL 3: ENDER CHEST',
+        slots: 27,
+        stackSize: 64,
+        totalItems: 1728,
+        icon: '/assets/container-ender-chest.png',
+        tag: 'LEVEL 3 // PERSONAL 27-SLOT CROSS-DIMENSIONAL RESERVE',
+        desc: 'Personal 27-slot storage shared across dimensions and linked to any Ender Chest you place. Fill all 27 slots with full 64x stacks (1,728 food items).'
+      },
+      {
+        id: 4,
+        name: 'Level 4: Shulker Boxes (27-Slot Portable Density)',
+        shortName: 'LVL 4: SHULKER BOX',
+        slots: 27,
+        stackSize: 64,
+        totalItems: 1728,
+        icon: '/assets/container-shulker.png',
+        tag: 'LEVEL 4 // MID-TO-LATE GAME PORTABLE DENSITY',
+        desc: 'Portable 27-slot containers that retain their contents when broken, letting you pack full chests into a single inventory slot or inside Ender Chests.'
+      },
+      {
+        id: 5,
+        name: 'Level 5: Hoppers & Droppers (13-Item Automated Pipeline)',
+        shortName: 'LVL 5: HOPPER AUTO',
+        slots: 13,
+        stackSize: 64,
+        totalItems: 832,
+        icon: '/assets/container-copper-chest.png',
+        tag: 'LEVEL 5 // AUTOMATED & BULK STORAGE PIPELINE',
+        desc: 'Once you move 13 food items/stacks between containers, water streams, and processing machines automatically, you are awarded: "ULTIMATE BACKPACKER"!'
+      }
+    ];
+
+    const BACKPACK_FOOD_OPTIONS = [
+      { id: 'golden_apple',  name: 'Golden Apple',         mcId: 'minecraft:golden_apple',           icon: '/assets/golden-apple.png' },
+      { id: 'dream_apple',   name: 'Enchanted G-Apple',    mcId: 'minecraft:enchanted_golden_apple', icon: '/assets/anim-dream-apple.gif' },
+      { id: 'honey_bottle',  name: 'Apis Honey Ration',    mcId: 'minecraft:honey_bottle',           icon: '/assets/potion-bottle.png' },
+      { id: 'cooked_beef',   name: 'Cooked Steak (64x)',   mcId: 'minecraft:cooked_beef',            icon: '/assets/achieve-bottle.png' },
+      { id: 'golden_carrot', name: 'Golden Carrots (64x)', mcId: 'minecraft:golden_carrot',          icon: '/assets/star-golden.png' },
+      { id: 'baked_potato',  name: 'Baked Potatoes (64x)', mcId: 'minecraft:baked_potato',           icon: '/assets/first-diamond.png' }
+    ];
 
     let state = loadState();
     // In-memory decrypted vault session: { [player]: { pin: '<activePin>', items: [...] } }
@@ -1510,6 +1831,9 @@
           local.sharedTasks = decoded.sharedTasks || local.sharedTasks;
           local.landmarks = decoded.landmarks || local.landmarks;
           local.crew = decoded.crew || local.crew;
+          if (decoded.backpackProgress) {
+            local.backpackProgress = { ...DEFAULT_STATE.backpackProgress, ...decoded.backpackProgress };
+          }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
           history.replaceState(null, '', window.location.pathname);
           setTimeout(() => showToast('Synced shared board from crew link!'), 300);
@@ -1523,7 +1847,8 @@
         return {
           ...DEFAULT_STATE,
           ...parsed,
-          privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) }
+          privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) },
+          backpackProgress: { ...DEFAULT_STATE.backpackProgress, ...(parsed.backpackProgress || {}) }
         };
       } catch (e) {
         return JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -1547,7 +1872,8 @@
           crew: state.crew,
           sharedTasks: state.sharedTasks,
           landmarks: state.landmarks,
-          privateVaults: state.privateVaults
+          privateVaults: state.privateVaults,
+          backpackProgress: state.backpackProgress
         })
       }).catch(() => {});
       renderAll();
@@ -1563,7 +1889,8 @@
           crew: state.crew,
           sharedTasks: state.sharedTasks,
           landmarks: state.landmarks,
-          privateVaults: state.privateVaults
+          privateVaults: state.privateVaults,
+          backpackProgress: state.backpackProgress
         })
       }).catch(() => {});
       renderAll();
@@ -1877,6 +2204,7 @@
         shared: 'enchant',
         vault: 'ender_open',
         gps: 'drawmap',
+        backpack: 'toast',
         gallery: 'amethyst'
       };
       playUiSound(tabSounds[tab] || 'drawer_open');
@@ -1884,6 +2212,7 @@
         shared: 'LOADING SHARED QUEST BOARD...',
         vault: 'ACCESSING ENDER TREASURY...',
         gps: 'CALIBRATING REALM GPS...',
+        backpack: 'OPENING ULTIMATE BACKPACKER PROTOCOL...',
         gallery: 'OPENING CITADEL ARCHIVE...'
       };
       triggerScreenTransition(labels[tab] || 'SWITCHING SECTOR...', () => {
@@ -2292,9 +2621,10 @@
         lockBadge.className = 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums';
       }
 
-      ['shared', 'vault', 'gps', 'gallery'].forEach(t => {
+      ['shared', 'vault', 'gps', 'backpack', 'gallery'].forEach(t => {
         const btn = document.getElementById('tab-' + t);
         const view = document.getElementById('view-' + t);
+        if (!btn || !view) return;
         if (state.activeTab === t) {
           btn.setAttribute('aria-selected', 'true');
           btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
@@ -2310,6 +2640,7 @@
       renderCrewStats();
       renderPrivateVault();
       renderGpsTable();
+      renderBackpackSystem();
     }
 
     function renderSharedTasks() {
@@ -2422,6 +2753,7 @@
         const vaultCount = unlockedVaults[name]?.items?.length ?? (vault?.itemCount || 0);
         const role = getMemberRole(name);
         const verified = deviceAuth.verifiedAccounts[name];
+        const bpCompleted = getPlayerCompletedBackpackTiers(name);
 
         return `
           <div class="ore-slot p-2.5 flex items-center justify-between gap-2">
@@ -2431,9 +2763,10 @@
                 <div class="text-xs font-mono font-bold text-white flex items-center gap-1.5 truncate">
                   <span class="truncate">${name}</span>
                   <span class="px-1.5 py-0.5 text-[9px] font-mojangles ${role === 'Operator' ? 'bg-[#107C10] text-white border border-white/20' : 'bg-[#1C1C1C] text-[#A0A0A0] border border-white/10'}">${role.toUpperCase()}</span>
+                  ${bpCompleted === 5 ? '<span class="px-1.5 py-0.5 text-[9px] font-mojangles bg-[#107C10] text-white border border-white/30">ULTIMATE BACKPACKER</span>' : ''}
                 </div>
                 <div class="text-[11px] text-[#A0A0A0] mt-0.5 font-mojangles tabular-nums">
-                  ${String(completed).padStart(2, '0')} DONE · ${String(active).padStart(2, '0')} ACTIVE ${verified ? `· <span class="text-[#6BC349]">${verified.method}</span>` : ''}
+                  ${String(completed).padStart(2, '0')} DONE · ${String(active).padStart(2, '0')} ACTIVE · BP ${bpCompleted}/5 ${verified ? `· <span class="text-[#6BC349]">${verified.method}</span>` : ''}
                 </div>
               </div>
             </div>
@@ -2598,6 +2931,400 @@
       }).join('');
     }
 
+    // ==================== CHIBIZANIMUS'S "ULTIMATE BACKPACKER" 5-LEVEL ACHIEVEMENT ENGINE ====================
+    function getPlayerBackpack(player = state.activePlayer) {
+      if (!state.backpackProgress) state.backpackProgress = {};
+      if (!state.backpackProgress[player]) {
+        state.backpackProgress[player] = {
+          foodId: 'golden_apple',
+          activeLevel: 1,
+          levels: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+        };
+      }
+      const bp = state.backpackProgress[player];
+      if (!bp.levels) bp.levels = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      if (!bp.activeLevel) bp.activeLevel = 1;
+      if (!bp.foodId) bp.foodId = 'golden_apple';
+      return bp;
+    }
+
+    function getFoodMeta(foodId) {
+      return BACKPACK_FOOD_OPTIONS.find(f => f.id === foodId) || BACKPACK_FOOD_OPTIONS[0];
+    }
+
+    function getPlayerCompletedBackpackTiers(player = state.activePlayer) {
+      const bp = getPlayerBackpack(player);
+      let completed = 0;
+      for (const lvl of BACKPACK_LEVELS) {
+        const filled = bp.levels[lvl.id] || 0;
+        if (filled >= lvl.slots) completed++;
+      }
+      return completed;
+    }
+
+    function getBackpackRankTitle(completedTiers) {
+      if (completedTiers >= 5) return 'ULTIMATE BACKPACKER (5 / 5)';
+      if (completedTiers === 4) return 'SHULKER LOGISTICS MASTER (4 / 5)';
+      if (completedTiers === 3) return 'ENDER VAULT PROVISIONER (3 / 5)';
+      if (completedTiers === 2) return 'DOUBLE-CHEST STOCKPILER (2 / 5)';
+      if (completedTiers === 1) return 'BARREL RATION KEEPER (1 / 5)';
+      return 'NOVICE FORAGER (0 / 5)';
+    }
+
+    function selectBackpackFood(foodId) {
+      playUiSound('pop');
+      const bp = getPlayerBackpack(state.activePlayer);
+      bp.foodId = foodId;
+      const food = getFoodMeta(foodId);
+      saveState();
+      showToast(`${state.activePlayer} tracked ration set to: ${food.name} (64x per slot)`);
+    }
+
+    function selectBackpackLevel(levelId) {
+      playUiSound('click');
+      const bp = getPlayerBackpack(state.activePlayer);
+      bp.activeLevel = levelId;
+      saveState();
+    }
+
+    function checkAndCelebrateTierCompletion(player, levelId, previousFilled, newFilled) {
+      const lvl = BACKPACK_LEVELS.find(l => l.id === levelId);
+      if (!lvl) return;
+      if (previousFilled < lvl.slots && newFilled >= lvl.slots) {
+        const bp = getPlayerBackpack(player);
+        const food = getFoodMeta(bp.foodId);
+        const totalCompleted = getPlayerCompletedBackpackTiers(player);
+        if (totalCompleted >= 5) {
+          triggerAchievementFanfare(
+            'ULTIMATE BACKPACKER',
+            `${player} completed all 5 Food Self-Sufficiency Tiers (${food.name})!`,
+            'ULTIMATE BACKPACKER UNLOCKED // +500G',
+            '/assets/achieve-all-unlocked.png'
+          );
+        } else {
+          triggerAchievementFanfare(
+            lvl.shortName + ' COMPLETE',
+            `${player} maxed all ${lvl.slots} slots (${lvl.totalItems.toLocaleString()} ${food.name})!`,
+            `TIER ${levelId} OF 5 UNLOCKED // +100G`,
+            lvl.icon
+          );
+        }
+      }
+    }
+
+    function toggleBackpackSlot(slotIdx) {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+      const currentFilled = bp.levels[lvl.id] || 0;
+      let nextFilled = currentFilled;
+      if (slotIdx < currentFilled) {
+        // Clicking an already-filled slot toggles down to slotIdx
+        nextFilled = slotIdx;
+        playUiSound('click');
+      } else {
+        // Clicking an empty slot fills up through slotIdx + 1
+        nextFilled = Math.min(lvl.slots, slotIdx + 1);
+        playUiSound('coin');
+      }
+      bp.levels[lvl.id] = nextFilled;
+      saveState();
+      checkAndCelebrateTierCompletion(state.activePlayer, lvl.id, currentFilled, nextFilled);
+    }
+
+    function fillNextBackpackSlot() {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+      const currentFilled = bp.levels[lvl.id] || 0;
+      if (currentFilled >= lvl.slots) {
+        playUiSound('amethyst');
+        showToast(`${lvl.shortName} is already maxed out at ${lvl.slots}/${lvl.slots} (64x)!`);
+        return;
+      }
+      playUiSound('coin');
+      const nextFilled = currentFilled + 1;
+      bp.levels[lvl.id] = nextFilled;
+      saveState();
+      checkAndCelebrateTierCompletion(state.activePlayer, lvl.id, currentFilled, nextFilled);
+    }
+
+    function maxAllBackpackSlots() {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+      const currentFilled = bp.levels[lvl.id] || 0;
+      bp.levels[lvl.id] = lvl.slots;
+      saveState();
+      if (currentFilled < lvl.slots) {
+        checkAndCelebrateTierCompletion(state.activePlayer, lvl.id, currentFilled, lvl.slots);
+      } else {
+        playUiSound('levelup');
+        showToast(`${lvl.shortName} verified at 100% capacity (${lvl.totalItems.toLocaleString()} items)!`);
+      }
+    }
+
+    function clearCurrentBackpackLevel() {
+      playUiSound('anvil');
+      const bp = getPlayerBackpack(state.activePlayer);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+      bp.levels[lvl.id] = 0;
+      saveState();
+      showToast(`Reset ${lvl.shortName} slot tracker for ${state.activePlayer}`);
+    }
+
+    function triggerAchievementFanfare(title, subtitle, headerTag = 'ACHIEVEMENT UNLOCKED // +100G', iconUrl = '/assets/anim-achieve.gif') {
+      playUiSound('toast');
+      setTimeout(() => playUiSound('levelup'), 380);
+      const overlay = document.getElementById('achievementFanfareOverlay');
+      if (!overlay) return;
+      document.getElementById('fanfareTitle').textContent = title;
+      document.getElementById('fanfareSubtitle').textContent = subtitle;
+      document.getElementById('fanfareHeaderTag').textContent = headerTag;
+      document.getElementById('fanfareIcon').src = iconUrl;
+      overlay.classList.remove('hidden');
+      clearTimeout(window._fanfareTimer);
+      window._fanfareTimer = setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 6500);
+    }
+
+    function hideAchievementFanfare() {
+      playUiSound('click');
+      const overlay = document.getElementById('achievementFanfareOverlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    function openBedrockScriptModal() {
+      playUiSound('drawer_open');
+      document.getElementById('bedrockScriptModal').classList.remove('hidden');
+    }
+
+    function closeBedrockScriptModal() {
+      playUiSound('drawer_close');
+      document.getElementById('bedrockScriptModal').classList.add('hidden');
+    }
+
+    function copyBedrockScriptCode() {
+      playUiSound('toast');
+      const code = document.getElementById('bedrockScriptCodeBlock').textContent;
+      navigator.clipboard.writeText(code);
+      showToast('Copied Bedrock Script API (@minecraft/server) code to clipboard!');
+    }
+
+    async function simulateLiveWebhookTrigger() {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+      const food = getFoodMeta(bp.foodId);
+      try {
+        const res = await fetch('/api/backpack-webhook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            player: state.activePlayer,
+            levelId: lvl.id,
+            filledSlots: lvl.slots,
+            foodId: bp.foodId
+          })
+        });
+        if (res.ok) {
+          closeBedrockScriptModal();
+          const prev = bp.levels[lvl.id] || 0;
+          bp.levels[lvl.id] = lvl.slots;
+          saveState();
+          checkAndCelebrateTierCompletion(state.activePlayer, lvl.id, Math.min(prev, lvl.slots - 1), lvl.slots);
+          return;
+        }
+      } catch (e) {}
+      closeBedrockScriptModal();
+      maxAllBackpackSlots();
+    }
+
+    function renderBackpackSystem() {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const completedCount = getPlayerCompletedBackpackTiers(state.activePlayer);
+      const activeFood = getFoodMeta(bp.foodId);
+      const activeLvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
+
+      // Update Top Nav Badge
+      const navBadge = document.getElementById('backpackTierBadge');
+      if (navBadge) {
+        navBadge.textContent = completedCount >= 5 ? 'MAX 5/5' : `${completedCount}/5`;
+        navBadge.className = completedCount >= 5
+          ? 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#107C10] text-white border border-white/30 tabular-nums'
+          : 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#107C10] text-white border border-white/20 tabular-nums';
+      }
+
+      const heroNameEl = document.getElementById('backpackHeroPlayerName');
+      const heroRankEl = document.getElementById('backpackHeroRankTitle');
+      if (heroNameEl) heroNameEl.textContent = state.activePlayer;
+      if (heroRankEl) {
+        heroRankEl.textContent = getBackpackRankTitle(completedCount);
+        heroRankEl.className = completedCount >= 5
+          ? 'font-mc-ten text-lg text-[#6BC349] uppercase'
+          : 'font-mc-ten text-lg text-warning uppercase';
+      }
+
+      // 1. Render 5-Tier Overview Strip
+      const stripEl = document.getElementById('backpackTierOverviewStrip');
+      if (stripEl) {
+        stripEl.innerHTML = BACKPACK_LEVELS.map(lvl => {
+          const filled = Math.min(lvl.slots, bp.levels[lvl.id] || 0);
+          const isComplete = filled >= lvl.slots;
+          const isSelected = bp.activeLevel === lvl.id;
+          const pct = Math.round((filled / lvl.slots) * 100);
+          return `
+            <button onclick="selectBackpackLevel(${lvl.id})"
+              class="${isSelected ? 'ore-btn ore-btn-primary' : 'ore-btn'} p-2.5 flex flex-col items-start text-left gap-1.5 w-full">
+              <div class="flex items-center justify-between w-full gap-2">
+                <div class="flex items-center gap-1.5">
+                  <img src="${lvl.icon}" alt="" class="w-5 h-5 pixel-art object-contain" />
+                  <span class="font-mc-ten text-xs text-white uppercase">${lvl.shortName}</span>
+                </div>
+                <span class="font-mojangles text-[10px] px-1.5 py-0.5 ${isComplete ? 'bg-[#107C10] text-white border border-white/30' : 'bg-black/40 text-[#E0E0E0]'} tabular-nums">
+                  ${isComplete ? 'DONE ✓' : `${filled}/${lvl.slots}`}
+                </span>
+              </div>
+              <div class="w-full h-1.5 bg-[#0B0B0C] border border-white/10 overflow-hidden">
+                <div class="h-full ${isComplete ? 'bg-[#6BC349]' : 'bg-[#FFB900]'}" style="width: ${pct}%"></div>
+              </div>
+              <div class="flex items-center justify-between w-full text-[10px] font-mojangles text-white/80 tabular-nums">
+                <span>${(filled * lvl.stackSize).toLocaleString()} / ${lvl.totalItems.toLocaleString()} ITEMS</span>
+                <span>${pct}%</span>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      // 2. Render Tracked Food Selector Grid
+      const foodLabelEl = document.getElementById('backpackActiveFoodLabel');
+      if (foodLabelEl) foodLabelEl.textContent = activeFood.name.toUpperCase();
+      const foodGridEl = document.getElementById('backpackFoodSelectorGrid');
+      if (foodGridEl) {
+        foodGridEl.innerHTML = BACKPACK_FOOD_OPTIONS.map(f => {
+          const selected = f.id === bp.foodId;
+          return `
+            <button onclick="selectBackpackFood('${f.id}')"
+              class="${selected ? 'ore-btn ore-btn-primary' : 'ore-btn'} p-2 flex items-center gap-2 text-left">
+              <img src="${f.icon}" alt="" class="w-5 h-5 pixel-art object-contain shrink-0" />
+              <div class="min-w-0 flex-1">
+                <div class="text-[11px] font-mono font-bold text-white truncate">${f.name}</div>
+                <div class="text-[9px] font-mojangles text-white/75">STACK: 64x</div>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      // 3. Render Realm Backpacker Leaderboard
+      const lbEl = document.getElementById('backpackLeaderboardList');
+      if (lbEl) {
+        const standings = state.crew.map(name => {
+          const pBp = getPlayerBackpack(name);
+          const pFood = getFoodMeta(pBp.foodId);
+          const tiersDone = getPlayerCompletedBackpackTiers(name);
+          const totalItemsStacked = BACKPACK_LEVELS.reduce((sum, lvl) => {
+            const f = Math.min(lvl.slots, pBp.levels[lvl.id] || 0);
+            return sum + f * lvl.stackSize;
+          }, 0);
+          return { name, pFood, tiersDone, totalItemsStacked };
+        }).sort((a, b) => (b.tiersDone - a.tiersDone) || (b.totalItemsStacked - a.totalItemsStacked));
+
+        lbEl.innerHTML = standings.map((entry, idx) => {
+          const isMaster = entry.tiersDone >= 5;
+          return `
+            <div onclick="setActivePlayer('${entry.name.replace(/'/g, "\\'")}')"
+              class="ore-slot p-2.5 flex items-center justify-between gap-2 cursor-pointer hover:border-white/25">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="font-mojangles text-xs text-[#8E8E8E] w-4">${idx + 1}.</span>
+                <img src="${getAvatar(entry.name)}" alt="" class="w-7 h-7 object-cover border border-white/15 pixel-art shrink-0" />
+                <div class="min-w-0">
+                  <div class="text-xs font-mono font-bold text-white flex items-center gap-1.5 truncate">
+                    <span class="truncate">${entry.name}</span>
+                    ${isMaster ? '<span class="px-1.5 py-0.5 text-[9px] font-mojangles bg-[#107C10] text-white border border-white/30">ULTIMATE BACKPACKER 🏆</span>' : ''}
+                  </div>
+                  <div class="text-[10px] font-mojangles text-[#A0A0A0] flex items-center gap-1.5 mt-0.5 tabular-nums">
+                    <img src="${entry.pFood.icon}" alt="" class="w-3.5 h-3.5 pixel-art" />
+                    <span>${entry.totalItemsStacked.toLocaleString()} / 9,472 ITEMS</span>
+                  </div>
+                </div>
+              </div>
+              <span class="px-2 py-1 text-[11px] font-mojangles ${isMaster ? 'bg-[#107C10] text-white border border-white/30' : 'bg-[#1C1C1C] text-warning border border-white/10'} tabular-nums shrink-0">
+                ${entry.tiersDone} / 5 TIERS
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 4. Render Level Selector Buttons
+      const levelTabsEl = document.getElementById('backpackLevelTabs');
+      if (levelTabsEl) {
+        levelTabsEl.innerHTML = BACKPACK_LEVELS.map(lvl => {
+          const active = lvl.id === activeLvl.id;
+          const done = (bp.levels[lvl.id] || 0) >= lvl.slots;
+          return `
+            <button onclick="selectBackpackLevel(${lvl.id})"
+              class="${active ? 'ore-btn ore-btn-primary' : 'ore-btn'} px-2.5 py-1.5 text-xs font-mono uppercase flex items-center gap-1.5">
+              <img src="${lvl.icon}" alt="" class="w-4 h-4 pixel-art object-contain" />
+              <span>Level ${lvl.id}</span>
+              ${done ? '<span class="font-mojangles text-[10px] text-white">✓</span>' : ''}
+            </button>
+          `;
+        }).join('');
+      }
+
+      // 5. Render Active Container Inspector & Interactive .ore-slot Grid
+      const filledSlots = Math.min(activeLvl.slots, bp.levels[activeLvl.id] || 0);
+      const isTierComplete = filledSlots >= activeLvl.slots;
+      const currentItems = filledSlots * activeLvl.stackSize;
+
+      document.getElementById('bpInspectorIcon').src = activeLvl.icon;
+      document.getElementById('bpInspectorTierTag').textContent = activeLvl.tag;
+      const statusBadge = document.getElementById('bpInspectorStatusBadge');
+      if (isTierComplete) {
+        statusBadge.textContent = activeLvl.id === 5 ? 'ULTIMATE BACKPACKER UNLOCKED ✓' : 'LEVEL COMPLETE (MAX 64x) ✓';
+        statusBadge.className = 'bg-[#107C10] px-2 py-0.5 border border-white/30 font-mojangles text-[10px] text-white uppercase';
+      } else {
+        statusBadge.textContent = `IN PROGRESS (${filledSlots}/${activeLvl.slots} SLOTS)`;
+        statusBadge.className = 'ore-slot px-2 py-0.5 font-mojangles text-[10px] text-warning uppercase';
+      }
+      document.getElementById('bpInspectorTitle').textContent = activeLvl.name;
+      document.getElementById('bpInspectorDesc').textContent = activeLvl.desc;
+      document.getElementById('bpInspectorSlotCount').textContent = `${String(filledSlots).padStart(2, '0')} / ${String(activeLvl.slots).padStart(2, '0')}`;
+      document.getElementById('bpInspectorItemTotal').textContent = `${currentItems.toLocaleString()} / ${activeLvl.totalItems.toLocaleString()}`;
+
+      // Redstone Comparator Signal Calculation (0..15)
+      const comparatorSignal = filledSlots === 0 ? 0 : Math.floor(1 + (filledSlots / activeLvl.slots) * 14);
+      const compEl = document.getElementById('bpComparatorSignalLabel');
+      if (compEl) {
+        compEl.textContent = `REDSTONE COMPARATOR SIGNAL: ${String(comparatorSignal).padStart(2, '0')} / 15`;
+        compEl.className = comparatorSignal === 15
+          ? 'font-mojangles text-xs text-[#6BC349]'
+          : 'font-mojangles text-xs text-[#8E8E8E]';
+      }
+
+      const slotsGridEl = document.getElementById('backpackSlotsGrid');
+      if (slotsGridEl) {
+        let slotsHtml = '';
+        for (let i = 0; i < activeLvl.slots; i++) {
+          const isFilled = i < filledSlots;
+          slotsHtml += `
+            <button type="button" onclick="toggleBackpackSlot(${i})"
+              title="Slot #${i + 1}: ${isFilled ? '64x ' + activeFood.name : 'Empty (Click to fill 64x)'}"
+              class="ore-slot aspect-square relative flex flex-col items-center justify-center p-1.5 cursor-pointer select-none ${isFilled ? 'bg-[#1C2A1C] border-[#6BC349]' : 'hover:bg-[#1C1C1C]'}">
+              <span class="absolute top-0.5 left-1 font-mono text-[9px] text-[#8E8E8E] leading-none">${i + 1}</span>
+              ${isFilled ? `
+                <img src="${activeFood.icon}" alt="${activeFood.name}" class="w-7 h-7 pixel-art object-contain" />
+                <span class="absolute bottom-0.5 right-1 font-mojangles text-xs text-white drop-shadow-[1px_1px_0px_#000] leading-none tabular-nums">64</span>
+              ` : `
+                <span class="font-mojangles text-[10px] text-[#3A3A3D]">--</span>
+              `}
+            </button>
+          `;
+        }
+        slotsGridEl.innerHTML = slotsHtml;
+      }
+    }
+
     async function syncFromServer() {
       try {
         const res = await fetch('/api/state');
@@ -2609,6 +3336,9 @@
           state.landmarks = data.landmarks || state.landmarks;
           if (data.privateVaults) {
             state.privateVaults = { ...state.privateVaults, ...data.privateVaults };
+          }
+          if (data.backpackProgress) {
+            state.backpackProgress = { ...state.backpackProgress, ...data.backpackProgress };
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           renderAll();
@@ -2624,7 +3354,7 @@
     // =========================================================
     // AUTO-DETECTING BLUETOOTH GAMEPAD, SAMSUNG DeX & KBM ROVING SPATIAL NAVIGATION
     // =========================================================
-    const TAB_ORDER = ['shared', 'vault', 'gps', 'gallery'];
+    const TAB_ORDER = ['shared', 'vault', 'gps', 'backpack', 'gallery'];
     let lastGamepadBtnState = {};
     let lastAxisMoveTime = 0;
 
@@ -2654,11 +3384,14 @@
     function getVisibleFocusableElements() {
       const modalSignIn = document.getElementById('nodeSignInModal');
       const modalShare = document.getElementById('shareModal');
+      const modalBedrock = document.getElementById('bedrockScriptModal');
       let root = document;
       if (modalSignIn && !modalSignIn.classList.contains('hidden')) {
         root = modalSignIn;
       } else if (modalShare && !modalShare.classList.contains('hidden')) {
         root = modalShare;
+      } else if (modalBedrock && !modalBedrock.classList.contains('hidden')) {
+        root = modalBedrock;
       }
       const candidates = Array.from(root.querySelectorAll('button, input, select, textarea, [tabindex="0"]'));
       return candidates.filter(el => {
@@ -2743,6 +3476,7 @@
       if (e.key === 'Escape') {
         const modalSignIn = document.getElementById('nodeSignInModal');
         const modalShare = document.getElementById('shareModal');
+        const modalBedrock = document.getElementById('bedrockScriptModal');
         if (modalSignIn && !modalSignIn.classList.contains('hidden')) {
           closeNodeSignInModal();
           e.preventDefault();
@@ -2750,6 +3484,11 @@
         }
         if (modalShare && !modalShare.classList.contains('hidden')) {
           closeShareModal();
+          e.preventDefault();
+          return;
+        }
+        if (modalBedrock && !modalBedrock.classList.contains('hidden')) {
+          closeBedrockScriptModal();
           e.preventDefault();
           return;
         }
@@ -2840,8 +3579,10 @@
         if (justPressed(1)) {
           const modalSignIn = document.getElementById('nodeSignInModal');
           const modalShare = document.getElementById('shareModal');
+          const modalBedrock = document.getElementById('bedrockScriptModal');
           if (modalSignIn && !modalSignIn.classList.contains('hidden')) closeNodeSignInModal();
           else if (modalShare && !modalShare.classList.contains('hidden')) closeShareModal();
+          else if (modalBedrock && !modalBedrock.classList.contains('hidden')) closeBedrockScriptModal();
           else if (document.activeElement) document.activeElement.blur();
         }
         // X Button (2) -> Open Sync / Discord Modal
