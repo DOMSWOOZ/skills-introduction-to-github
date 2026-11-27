@@ -466,6 +466,7 @@
 
   <!-- ==================== XBOX GUIDE SHELL HEADER + ORE UI INSPECTOR ==================== -->
   <header class="sticky top-0 z-30 bg-[#181818] border-b border-white/10">
+    <!-- Top Xbox Guide Row: Brand, Solid TPS Tag, Hardware Nav Status & Primary Ore UI Controls (Never wraps awkwardly) -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 min-h-[56px] py-2 flex flex-wrap items-center justify-between gap-3">
       
       <!-- Solid Xbox-style square badge + MinecraftTen title + Realm TPS / Day Tag -->
@@ -476,21 +477,21 @@
         <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-5 w-auto object-contain hidden sm:block" />
         <div class="flex items-center gap-2">
           <span class="font-mc-ten text-lg tracking-wide text-white uppercase leading-none">CHIBI~ZONE</span>
-          <span class="font-mono text-xs text-[#8E8E8E] hidden md:inline">/ REALMS COMMAND</span>
+          <span class="font-mono text-xs text-[#8E8E8E] hidden lg:inline">/ REALMS COMMAND</span>
         </div>
         <!-- Solid Xbox Status Tag (No glow) -->
         <div class="bg-[#107C10] px-2.5 py-1 border border-white/20 flex items-center gap-1.5">
           <span class="font-mojangles text-xs uppercase text-white tabular-nums">DAY <span id="realmDayCounter">537</span> · 20.0 TPS</span>
         </div>
         <!-- Live Hardware Input Mode Indicator (Bluetooth Controller / Samsung DeX / KBM) -->
-        <div id="inputHardwareBadge" class="ore-slot px-2.5 py-1 hidden sm:flex items-center gap-1.5" title="Active Hardware Navigation Mode (Gamepad D-Pad, LB/RB, A/B/X/Y &amp; Arrow Keys supported)">
+        <div id="inputHardwareBadge" class="ore-slot px-2.5 py-1 hidden md:flex items-center gap-1.5" title="Active Hardware Navigation Mode (Gamepad D-Pad, LB/RB, A/B/X/Y &amp; Arrow Keys supported)">
           <span id="inputHardwareDot" class="w-2 h-2 bg-[#6BC349] inline-block"></span>
           <span id="inputHardwareText" class="font-mono text-[10px] uppercase text-[#A0A0A0]">INPUT: KBM / DEX READY</span>
         </div>
       </div>
 
-      <!-- Active Crew Member Switcher + Ore UI Mechanical Controls -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <!-- Active Operator Tile + Ore UI Mechanical Controls (Clean single-line alignment) -->
+      <div class="flex items-center gap-2">
         <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector (Controller: Y)"
           class="ore-btn px-2.5 py-1.5 flex items-center gap-2">
           <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 object-cover bg-[#141415] border border-white/15 pixel-art" />
@@ -500,8 +501,6 @@
           </div>
           <span class="font-mojangles text-[10px] bg-black/40 px-1.5 py-0.5 text-[#E0E0E0] border border-white/10">Y</span>
         </button>
-
-        <div id="crewSelector" class="hidden xl:flex items-center gap-1 bg-[#141415] p-1 border border-white/10"></div>
 
         <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State (Bug Test Mode)"
           class="ore-btn-stone px-2.5 py-1.5 text-xs font-mono font-semibold">
@@ -522,38 +521,46 @@
       </div>
     </div>
 
-    <!-- XBOX HORIZONTAL GUIDE TABS (LB / RB Controller Bumper Support) -->
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 border-t border-white/10 bg-[#141415] overflow-x-auto" role="tablist">
-      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Previous Tab (Gamepad LB)">LB</span>
-      <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
-        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-        <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
-        <span>SHARED QUEST BOARD</span>
-        <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
-      </button>
+    <!-- Dedicated 6-Member Realm Roster Quick-Switch Strip + Xbox Horizontal Guide Tabs -->
+    <div class="border-t border-white/10 bg-[#141415]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2">
+        <!-- Xbox Horizontal Guide Tabs (LB / RB Controller Bumper Support) -->
+        <nav class="flex items-center gap-1 overflow-x-auto" role="tablist">
+          <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Previous Tab (Gamepad LB)">LB</span>
+          <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
+            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+            <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
+            <span>SHARED QUEST BOARD</span>
+            <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
+          </button>
 
-      <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
-        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-        <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
-        <span><span id="vaultOwnerLabel">DOMSWOOZ</span>'S ENDER VAULT</span>
-        <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
-      </button>
+          <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
+            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+            <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
+            <span><span id="vaultOwnerLabel">DOMSWOOZ</span>'S ENDER VAULT</span>
+            <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
+          </button>
 
-      <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
-        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-        <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
-        <span>REALM GPS &amp; SEED MAP</span>
-        <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
-      </button>
+          <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
+            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+            <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
+            <span>REALM GPS &amp; SEED MAP</span>
+            <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
+          </button>
 
-      <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
-        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-        <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
-        <span>CITADEL ARCHIVE</span>
-        <span class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4 SHOTS</span>
-      </button>
-      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Next Tab (Gamepad RB)">RB</span>
-    </nav>
+          <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
+            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+            <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
+            <span>CITADEL ARCHIVE</span>
+            <span class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4 SHOTS</span>
+          </button>
+          <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Next Tab (Gamepad RB)">RB</span>
+        </nav>
+
+        <!-- Compact 6-Member Avatar Dock -->
+        <div id="crewSelector" class="hidden xl:flex items-center gap-1 py-1"></div>
+      </div>
+    </div>
   </header>
 
   <!-- ==================== MAIN WORKSPACE ==================== -->
