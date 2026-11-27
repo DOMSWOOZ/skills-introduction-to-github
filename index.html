@@ -79,64 +79,101 @@
       font-display: swap;
     }
 
+    /* =========================================================
+       AUTHENTIC XBOX FLUENT + MINECRAFT ORE UI DESIGN TOKENS
+       Zero blur. Zero neon glow. Solid stepped elevation.
+       ========================================================= */
     :root {
-      /* 60% Dominant Neutral Canvas & 30% Secondary Elevated Surfaces */
-      --surface-base: #0A0A0C;
-      --surface-raised: #121216;
-      --surface-hover: #1A1A20;
+      /* Xbox Stepped Neutral Ramp (No blue-tinted "AI dark mode" grays) */
+      --xb-canvas: #121212;
+      --xb-surface-1: #1C1C1C;
+      --xb-surface-2: #262626;
+      --xb-surface-3: #303030;
+      --xb-hairline: rgba(255, 255, 255, 0.09);
 
-      --bg-canvas: var(--surface-base);
-      --bg-panel: var(--surface-raised);
-      --bg-hover: var(--surface-hover);
+      /* Minecraft Ore UI Official Palette */
+      --ore-chassis-border: #1E1E1F;
+      --ore-stone-face: #D0D1D4;
+      --ore-stone-light: #FFFFFF;
+      --ore-stone-dark: #58585A;
+      --ore-stone-text: #1E1E1F;
 
-      /* 1px Hairline Structural Borders (Ban Drop Shadows) */
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(255, 255, 255, 0.25);
+      --ore-dark-face: #313233;
+      --ore-dark-light: #48494A;
+      --ore-dark-dark: #1E1E1F;
 
-      /* Strict Contrast Text Hierarchy (~95% / ~65% / ~40%) */
-      --text-primary: rgba(243, 244, 246, 0.95);
-      --text-secondary: rgba(243, 244, 246, 0.65);
-      --text-muted: rgba(243, 244, 246, 0.40);
+      --ore-green-face: #3C8527;
+      --ore-green-hover: #4A9E32;
+      --ore-green-light: #6BC349;
+      --ore-green-dark: #2A641C;
 
-      /* 10% High-Contrast Tactical Emerald Accent */
-      --accent: #10B981;
-      --accent-primary: #10B981;
-      --accent-subtle: rgba(16, 185, 129, 0.10);
-      --accent-border: rgba(16, 185, 129, 0.25);
+      /* Xbox Brand Green (Used strictly for active tabs & status, never glows) */
+      --xb-green: #107C10;
+      --xb-focus-ring: #FFFFFF;
+
+      /* Semantic Aliases Mapped to Authentic Xbox + Ore UI Tokens */
+      --surface-base: var(--xb-canvas);
+      --surface-raised: var(--xb-surface-1);
+      --surface-hover: var(--xb-surface-2);
+
+      --bg-canvas: var(--xb-canvas);
+      --bg-panel: var(--xb-surface-1);
+      --bg-hover: var(--xb-surface-2);
+
+      --border-subtle: var(--xb-hairline);
+      --border-active: rgba(255, 255, 255, 0.28);
+
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0A0;
+      --text-muted: #8E8E8E;
+
+      --accent: #6BC349;
+      --accent-primary: var(--xb-green);
+      --accent-subtle: rgba(16, 124, 16, 0.22);
+      --accent-border: #6BC349;
 
       --warning: #F59E0B;
-      --warning-subtle: rgba(245, 158, 11, 0.10);
-      --warning-border: rgba(245, 158, 11, 0.25);
+      --warning-subtle: rgba(245, 158, 11, 0.14);
+      --warning-border: rgba(245, 158, 11, 0.40);
 
       --danger: #F43F5E;
-      --danger-subtle: rgba(244, 63, 94, 0.10);
-      --danger-border: rgba(244, 63, 94, 0.25);
+      --danger-subtle: rgba(244, 63, 94, 0.14);
+      --danger-border: rgba(244, 63, 94, 0.40);
     }
 
+    /* Global Crisp Rendering */
     * {
       box-sizing: border-box;
-      border-color: var(--border-subtle);
+      border-radius: 0px !important; /* Strict pixel/grid alignment */
+      border-color: var(--xb-hairline);
     }
 
     body {
-      background-color: var(--surface-base);
-      color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
-      -webkit-font-smoothing: antialiased;
+      background-color: var(--xb-canvas);
+      color: #FFFFFF;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Subtle tactical dot matrix background on the primary canvas */
-    .canvas-grid-bg {
-      background-color: var(--surface-base);
-      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-      background-size: 24px 24px;
+    .font-mc-ten, .mc-display-title {
+      font-family: 'MinecraftTen', 'MinecraftFive', sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
-    h1, h2, h3 {
-      letter-spacing: -0.02em;
+    .font-mojangles {
+      font-family: 'Mojangles', 'JetBrains Mono', monospace;
+      font-smooth: never;
+      -webkit-font-smoothing: none;
+    }
+
+    .mc-five-label {
+      font-family: 'MinecraftFive', 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     table, td, th, input[type="number"], .tabular-nums {
@@ -153,100 +190,244 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: #A0A0A0;
     }
 
-    .mc-display-title {
-      font-family: 'MinecraftTen', 'MinecraftFive', 'Inter', sans-serif;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .mc-five-label {
-      font-family: 'MinecraftFive', 'JetBrains Mono', monospace;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .ui-panel {
-      background-color: var(--surface-raised);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-    }
-
-    /* OreUI-inspired tactile bevel header strip (1px top highlight, zero drop-shadow) */
-    .ore-bevel-top {
+    /* =========================================================
+       XBOX CONSOLE CONTAINER (Stepped Card + Top Specular Edge)
+       ========================================================= */
+    .xb-panel, .ui-panel {
+      background-color: var(--xb-surface-1);
+      border: 1px solid var(--xb-hairline);
       border-top: 1px solid rgba(255, 255, 255, 0.14);
     }
 
+    .ore-bevel-top {
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    /* Xbox Guide Tab Item */
+    .xb-tab {
+      position: relative;
+      background: transparent;
+      color: #A0A0A0;
+      font-weight: 600;
+      padding: 10px 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: background-color 80ms linear, color 80ms linear;
+    }
+
+    .xb-tab:hover {
+      background-color: var(--xb-surface-2);
+      color: #FFFFFF;
+    }
+
+    .xb-tab[aria-selected="true"] {
+      color: #FFFFFF;
+      background-color: var(--xb-surface-2);
+    }
+
+    /* Authentic Xbox Active Tab Indicator Bar */
+    .xb-tab[aria-selected="true"]::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 12px;
+      right: 12px;
+      height: 3px;
+      background-color: var(--xb-green);
+    }
+
+    /* =========================================================
+       MINECRAFT ORE UI TACTILE BUTTONS (True 3D Keycap Mechanics)
+       ========================================================= */
+    .ore-btn, .ui-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background-color: var(--ore-dark-face);
+      color: #FFFFFF;
+      border: 2px solid var(--ore-chassis-border);
+      /* Top & Left bevel highlight, Bottom & Right deep lip */
+      box-shadow:
+        inset 2px 2px 0px var(--ore-dark-light),
+        inset -2px -4px 0px var(--ore-dark-dark);
+      padding: 8px 12px 10px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ore-btn:hover, .ui-btn:hover {
+      background-color: #3C3D3F;
+      box-shadow:
+        inset 2px 2px 0px #5A5B5C,
+        inset -2px -4px 0px var(--ore-dark-dark);
+    }
+
+    /* Physical Keycap Press: Bottom lip collapses from 4px to 2px */
+    .ore-btn:active, .ui-btn:active {
+      padding-top: 10px;
+      padding-bottom: 8px;
+      box-shadow:
+        inset 2px 2px 0px var(--ore-dark-dark),
+        inset -2px -2px 0px var(--ore-dark-light);
+    }
+
+    /* Primary Emerald Action Button (Exact Ore UI Green) */
+    .ore-btn-primary, .ui-btn-accent {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--ore-green-face);
+      color: #FFFFFF;
+      border: 2px solid var(--ore-chassis-border);
+      box-shadow:
+        inset 2px 2px 0px var(--ore-green-light),
+        inset -2px -4px 0px var(--ore-green-dark);
+      text-shadow: 0px 2px 0px #1E4713;
+      padding: 8px 14px 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ore-btn-primary:hover, .ui-btn-accent:hover {
+      background-color: var(--ore-green-hover);
+      box-shadow:
+        inset 2px 2px 0px #85D865,
+        inset -2px -4px 0px var(--ore-green-dark);
+    }
+
+    .ore-btn-primary:active, .ui-btn-accent:active {
+      padding-top: 10px;
+      padding-bottom: 8px;
+      box-shadow:
+        inset 2px 2px 0px var(--ore-green-dark),
+        inset -2px -2px 0px var(--ore-green-light);
+    }
+
+    /* Classic Light Stone Button (Ore UI Secondary) */
+    .ore-btn-stone {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background-color: var(--ore-stone-face);
+      color: var(--ore-stone-text);
+      border: 2px solid var(--ore-chassis-border);
+      box-shadow:
+        inset 2px 2px 0px var(--ore-stone-light),
+        inset -2px -4px 0px var(--ore-stone-dark);
+      padding: 8px 12px 10px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ore-btn-stone:hover {
+      background-color: #E2E3E6;
+      box-shadow:
+        inset 2px 2px 0px #FFFFFF,
+        inset -2px -4px 0px var(--ore-stone-dark);
+    }
+
+    .ore-btn-stone:active {
+      padding-top: 10px;
+      padding-bottom: 8px;
+      box-shadow:
+        inset 2px 2px 0px var(--ore-stone-dark),
+        inset -2px -2px 0px var(--ore-stone-light);
+    }
+
+    /* Ore UI Gold / Amber Keycap Button */
+    .ui-btn-warning {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #B45309;
+      color: #FFFFFF;
+      border: 2px solid var(--ore-chassis-border);
+      box-shadow:
+        inset 2px 2px 0px #F59E0B,
+        inset -2px -4px 0px #78350F;
+      text-shadow: 0px 2px 0px #451A03;
+      padding: 8px 14px 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ui-btn-warning:hover {
+      background-color: #D97706;
+      box-shadow:
+        inset 2px 2px 0px #FBBF24,
+        inset -2px -4px 0px #78350F;
+    }
+
+    .ui-btn-warning:active {
+      padding-top: 10px;
+      padding-bottom: 8px;
+      box-shadow:
+        inset 2px 2px 0px #78350F,
+        inset -2px -2px 0px #F59E0B;
+    }
+
+    /* Xbox Controller / Keyboard Focus Ring (Strict 2px Solid White) */
+    .ore-btn:focus-visible,
+    .ore-btn-primary:focus-visible,
+    .ore-btn-stone:focus-visible,
+    .ui-btn:focus-visible,
+    .ui-btn-accent:focus-visible,
+    .ui-btn-warning:focus-visible,
+    .xb-tab:focus-visible,
+    .xb-tile:focus-visible,
+    .ui-input:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--xb-focus-ring) !important;
+      outline-offset: 2px !important;
+      z-index: 10;
+    }
+
+    /* =========================================================
+       RECESSED INVENTORY / TELEMETRY SLOT (Inset Bevel)
+       ========================================================= */
+    .ore-slot {
+      background-color: #141415;
+      border: 2px solid #0B0B0C;
+      box-shadow:
+        inset 2px 2px 0px #09090A,
+        inset -2px -2px 0px #2C2D2F;
+    }
+
     .ui-input {
-      background-color: var(--surface-base);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      color: var(--text-primary);
-      transition: border-color 150ms ease-out, background-color 150ms ease-out;
+      background-color: #141415;
+      border: 2px solid #0B0B0C;
+      box-shadow:
+        inset 2px 2px 0px #09090A,
+        inset -2px -2px 0px #2C2D2F;
+      color: #FFFFFF;
     }
     .ui-input::placeholder {
-      color: var(--text-muted);
+      color: #8E8E8E;
     }
     .ui-input:focus {
-      outline: none;
-      border-color: var(--border-active);
-    }
-
-    .ui-btn {
-      border-radius: 4px;
-      border: 1px solid var(--border-subtle);
-      background-color: var(--surface-base);
-      color: var(--text-primary);
-      transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
-      cursor: pointer;
-    }
-    .ui-btn:hover {
-      background-color: var(--surface-hover);
-      border-color: var(--border-active);
-    }
-    .ui-btn:active {
-      transform: translateY(1px);
-    }
-
-    .ui-btn-accent {
-      border-radius: 4px;
-      border: 1px solid var(--accent-border);
-      background-color: var(--accent-subtle);
-      color: var(--accent);
-      transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
-      cursor: pointer;
-    }
-    .ui-btn-accent:hover {
-      background-color: rgba(16, 185, 129, 0.18);
-      border-color: var(--accent);
-    }
-    .ui-btn-accent:active {
-      transform: translateY(1px);
-    }
-
-    .ui-btn-warning {
-      border-radius: 4px;
-      border: 1px solid var(--warning-border);
-      background-color: var(--warning-subtle);
-      color: var(--warning);
-      transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
-      cursor: pointer;
-    }
-    .ui-btn-warning:hover {
-      background-color: rgba(245, 158, 11, 0.18);
-      border-color: var(--warning);
-    }
-    .ui-btn-warning:active {
-      transform: translateY(1px);
+      outline: 2px solid var(--xb-focus-ring);
+      outline-offset: 1px;
     }
 
     /* Screen Transition Overlay */
     #screenTransitionOverlay {
       pointer-events: none;
       opacity: 0;
-      transition: opacity 160ms ease-out;
+      transition: opacity 140ms linear;
     }
     #screenTransitionOverlay.active {
       opacity: 1;
@@ -257,14 +438,13 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: var(--surface-base);
+      background: var(--xb-canvas);
     }
     ::-webkit-scrollbar-thumb {
-      background: var(--border-subtle);
-      border-radius: 4px;
+      background: var(--xb-surface-3);
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: var(--border-active);
+      background: #48494A;
     }
   </style>
 </head>
@@ -284,88 +464,96 @@
     </div>
   </div>
 
-  <!-- ==================== TOP COMMAND BAR (ORE-UI + PRINCIPAL SYSTEM) ==================== -->
-  <header class="sticky top-0 z-30 bg-surface-raised border-b border-subtle">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+  <!-- ==================== XBOX GUIDE SHELL HEADER + ORE UI INSPECTOR ==================== -->
+  <header class="sticky top-0 z-30 bg-[#181818] border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 min-h-[56px] py-2 flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Brand / Realms Official Logo + Day Ticker -->
-      <div class="flex items-center gap-4">
-        <div class="h-10 px-2 rounded-[4px] bg-surface-base border border-subtle flex items-center justify-center">
-          <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-6 w-auto object-contain" />
+      <!-- Solid Xbox-style square badge + MinecraftTen title + Realm TPS / Day Tag -->
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 bg-[#107C10] flex items-center justify-center border border-white/20 shrink-0">
+          <span class="font-mojangles text-xs text-white leading-none">CZ</span>
         </div>
-        <div class="border-l border-subtle pl-4">
-          <div class="flex items-center gap-2">
-            <h1 class="mc-display-title text-sm text-primary">CHIBI~ZONE COMMAND</h1>
-            <span class="px-2 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-label rounded-[4px] bg-accent-subtle text-accent border border-accent-border tabular-nums flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-[4px] bg-accent"></span>
-              <span>DAY <span id="realmDayCounter">537</span></span>
-            </span>
-          </div>
-          <p class="text-xs text-secondary hidden sm:block mt-0.5">Lakeside Lava-Spire Citadel · Shared Roadmap · Private Ender Vaults</p>
+        <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-5 w-auto object-contain hidden sm:block" />
+        <div class="flex items-center gap-2">
+          <span class="font-mc-ten text-lg tracking-wide text-white uppercase leading-none">CHIBI~ZONE</span>
+          <span class="font-mono text-xs text-[#8E8E8E] hidden md:inline">/ REALMS COMMAND</span>
+        </div>
+        <!-- Solid Xbox Status Tag (No glow) -->
+        <div class="bg-[#107C10] px-2.5 py-1 border border-white/20 flex items-center gap-1.5">
+          <span class="font-mojangles text-xs uppercase text-white tabular-nums">DAY <span id="realmDayCounter">537</span> · 20.0 TPS</span>
+        </div>
+        <!-- Live Hardware Input Mode Indicator (Bluetooth Controller / Samsung DeX / KBM) -->
+        <div id="inputHardwareBadge" class="ore-slot px-2.5 py-1 hidden sm:flex items-center gap-1.5" title="Active Hardware Navigation Mode (Gamepad D-Pad, LB/RB, A/B/X/Y &amp; Arrow Keys supported)">
+          <span id="inputHardwareDot" class="w-2 h-2 bg-[#6BC349] inline-block"></span>
+          <span id="inputHardwareText" class="font-mono text-[10px] uppercase text-[#A0A0A0]">INPUT: KBM / DEX READY</span>
         </div>
       </div>
 
-      <!-- Active Crew Member Switcher + Node Sign-In & Sync Controls -->
+      <!-- Active Crew Member Switcher + Ore UI Mechanical Controls -->
       <div class="flex items-center gap-2 flex-wrap">
-        <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector"
-          class="ui-btn px-2 py-1.5 flex items-center gap-2">
-          <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
+        <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector (Controller: Y)"
+          class="ore-btn px-2.5 py-1.5 flex items-center gap-2">
+          <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 object-cover bg-[#141415] border border-white/15 pixel-art" />
           <div class="text-left pr-1">
-            <div id="headerOperatorBadge" class="text-[10px] font-mono uppercase tracking-label text-secondary leading-none">OPERATOR</div>
-            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-accent leading-tight">DOMSWOOZ</div>
+            <div id="headerOperatorBadge" class="text-[10px] font-mono uppercase tracking-label text-[#A0A0A0] leading-none">OPERATOR</div>
+            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-[#6BC349] leading-tight">DOMSWOOZ</div>
           </div>
+          <span class="font-mojangles text-[10px] bg-black/40 px-1.5 py-0.5 text-[#E0E0E0] border border-white/10">Y</span>
         </button>
 
-        <div id="crewSelector" class="hidden xl:flex items-center gap-1 bg-surface-base p-1.5 rounded-[4px] border border-subtle"></div>
+        <div id="crewSelector" class="hidden xl:flex items-center gap-1 bg-[#141415] p-1 border border-white/10"></div>
 
         <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State (Bug Test Mode)"
-          class="ui-btn px-2.5 py-2 text-xs font-mono text-warning hover:text-primary border-warning-border">
-          Reset Auth (Test)
+          class="ore-btn-stone px-2.5 py-1.5 text-xs font-mono font-semibold">
+          <span>Reset Auth</span>
         </button>
 
         <button onclick="toggleSound()" id="soundToggleBtn" title="Toggle Vanilla Minecraft Audio"
-          class="ui-btn px-2.5 py-2 text-xs font-mono text-secondary hover:text-primary">
+          class="ore-btn px-2.5 py-1.5 text-xs font-mono text-[#E0E0E0]">
           SFX: ON
         </button>
 
-        <button onclick="openShareModal()"
-          class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label flex items-center gap-2">
+        <button onclick="openShareModal()" title="Share &amp; Sync with Discord (Controller: X)"
+          class="ore-btn-primary px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-label flex items-center gap-2">
           <img src="/assets/cloud-sync.png" alt="" class="w-4 h-4 object-contain" />
           <span>Sync / Discord</span>
+          <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">X</span>
         </button>
       </div>
     </div>
 
-    <!-- MAIN NAVIGATION TABS WITH OFFICIAL MINECRAFT ASSETS -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 border-t border-subtle bg-surface-base overflow-x-auto">
-      <button onclick="switchTab('shared')" id="tab-shared"
-        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+    <!-- XBOX HORIZONTAL GUIDE TABS (LB / RB Controller Bumper Support) -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 border-t border-white/10 bg-[#141415] overflow-x-auto" role="tablist">
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Previous Tab (Gamepad LB)">LB</span>
+      <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
         <span>SHARED QUEST BOARD</span>
-        <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">0</span>
+        <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
       </button>
 
-      <button onclick="switchTab('vault')" id="tab-vault"
-        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+      <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
-        <span><span id="vaultOwnerLabel">SWOOZ</span>'S ENDER VAULT</span>
-        <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
+        <span><span id="vaultOwnerLabel">DOMSWOOZ</span>'S ENDER VAULT</span>
+        <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
       </button>
 
-      <button onclick="switchTab('gps')" id="tab-gps"
-        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+      <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
         <span>REALM GPS &amp; SEED MAP</span>
-        <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">0</span>
+        <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
       </button>
 
-      <button onclick="switchTab('gallery')" id="tab-gallery"
-        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+      <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
         <span>CITADEL ARCHIVE</span>
-        <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">4 SHOTS</span>
+        <span class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4 SHOTS</span>
       </button>
-    </div>
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Next Tab (Gamepad RB)">RB</span>
+    </nav>
   </header>
 
   <!-- ==================== MAIN WORKSPACE ==================== -->
@@ -387,18 +575,19 @@
               Vote on upcoming builds with Gold Coin Bounties, claim active tasks across PC, console, and mobile, or switch to your PIN-protected Ender Vault for personal diamond stashes.
             </p>
           </div>
-          <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-subtle">
-            <div>
-              <div class="micro-label">ACTIVE TASKS</div>
-              <div id="heroStatOpen" class="text-base font-mono font-bold text-primary mt-1 tabular-nums">6</div>
+          <!-- Recessed Minecraft Inventory Slots (.ore-slot) -->
+          <div class="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-white/10">
+            <div class="ore-slot p-3">
+              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">ACTIVE TASKS</div>
+              <div id="heroStatOpen" class="font-mojangles text-2xl text-white tabular-nums">6</div>
             </div>
-            <div>
-              <div class="micro-label">COMPLETED BUILDS</div>
-              <div id="heroStatDone" class="text-base font-mono font-bold text-accent mt-1 tabular-nums">2</div>
+            <div class="ore-slot p-3">
+              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">COMPLETED BUILDS</div>
+              <div id="heroStatDone" class="font-mojangles text-2xl text-[#6BC349] tabular-nums">2</div>
             </div>
-            <div>
-              <div class="micro-label">TOTAL BOUNTY VOTES</div>
-              <div id="heroStatVotes" class="text-base font-mono font-bold text-warning mt-1 tabular-nums">18</div>
+            <div class="ore-slot p-3">
+              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">BOUNTY VOTES</div>
+              <div id="heroStatVotes" class="font-mojangles text-2xl text-warning tabular-nums">18</div>
             </div>
           </div>
         </div>
@@ -477,9 +666,12 @@
                 <textarea id="taskNotesInput" rows="2" placeholder="Materials, recipe notes, or strategy..."
                   class="ui-input w-full px-4 py-2 text-xs"></textarea>
               </div>
-              <button type="submit" class="ui-btn-accent w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label flex items-center justify-center gap-2">
-                <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
-                <span>+ Post Quest to Board</span>
+              <button type="submit" class="ore-btn ore-btn-primary w-full mt-1">
+                <span class="flex items-center gap-2 font-mc-ten text-sm uppercase tracking-wider">
+                  <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
+                  <span>+ Post Quest to Board</span>
+                </span>
+                <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
             </form>
           </div>
@@ -2048,10 +2240,12 @@
         const btn = document.getElementById('tab-' + t);
         const view = document.getElementById('view-' + t);
         if (state.activeTab === t) {
-          btn.className = 'px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 border-accent text-primary bg-surface-raised transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2';
+          btn.setAttribute('aria-selected', 'true');
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.remove('hidden');
         } else {
-          btn.className = 'px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 border-transparent text-secondary hover:text-primary transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2';
+          btn.setAttribute('aria-selected', 'false');
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.add('hidden');
         }
       });
@@ -2066,9 +2260,9 @@
       ['all', 'open', 'in_progress', 'done'].forEach(f => {
         const btn = document.getElementById('filter-' + f);
         if (state.filter === f) {
-          btn.className = 'px-4 py-2 text-xs font-medium rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150 ease-out';
+          btn.className = 'ore-btn ore-btn-primary text-xs font-mono uppercase';
         } else {
-          btn.className = 'px-4 py-2 text-xs font-medium rounded-[4px] bg-surface-base text-secondary border border-subtle hover:bg-surface-hover hover:text-primary transition-colors duration-150 ease-out';
+          btn.className = 'ore-btn text-xs font-mono uppercase';
         }
       });
 
@@ -2357,6 +2551,253 @@
     syncFromServer();
 
     renderAll();
+
+    // =========================================================
+    // AUTO-DETECTING BLUETOOTH GAMEPAD, SAMSUNG DeX & KBM ROVING SPATIAL NAVIGATION
+    // =========================================================
+    const TAB_ORDER = ['shared', 'vault', 'gps', 'gallery'];
+    let lastGamepadBtnState = {};
+    let lastAxisMoveTime = 0;
+
+    function setHardwareStatusBadge(mode, label, colorHex = '#6BC349') {
+      const badge = document.getElementById('inputHardwareBadge');
+      const dot = document.getElementById('inputHardwareDot');
+      const text = document.getElementById('inputHardwareText');
+      if (!badge || !dot || !text) return;
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
+      dot.style.backgroundColor = colorHex;
+      text.textContent = label;
+    }
+
+    function detectInitialHardwareEnvironment() {
+      const ua = navigator.userAgent || '';
+      const isDeX = /SamsungBrowser|DeX|SM-/i.test(ua) && window.innerWidth >= 900;
+      const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+      if (isDeX) {
+        setHardwareStatusBadge('dex', 'SAMSUNG DeX // KBM + PAD ACTIVE', '#6BC349');
+      } else if (hasFinePointer) {
+        setHardwareStatusBadge('kbm', 'INPUT: KBM / DEX READY', '#6BC349');
+      }
+    }
+    detectInitialHardwareEnvironment();
+
+    function getVisibleFocusableElements() {
+      const modalSignIn = document.getElementById('nodeSignInModal');
+      const modalShare = document.getElementById('shareModal');
+      let root = document;
+      if (modalSignIn && !modalSignIn.classList.contains('hidden')) {
+        root = modalSignIn;
+      } else if (modalShare && !modalShare.classList.contains('hidden')) {
+        root = modalShare;
+      }
+      const candidates = Array.from(root.querySelectorAll('button, input, select, textarea, [tabindex="0"]'));
+      return candidates.filter(el => {
+        if (el.disabled) return false;
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+    }
+
+    // 2D Spatial Roving Focus (Moves #FFFFFF Xbox Focus Ring in the exact direction of D-Pad / Arrow Key)
+    function moveSpatialFocus(direction) {
+      const items = getVisibleFocusableElements();
+      if (!items.length) return;
+      const current = document.activeElement;
+      if (!current || !items.includes(current)) {
+        items[0].focus();
+        playUiSound('click');
+        return;
+      }
+
+      const curRect = current.getBoundingClientRect();
+      const curX = curRect.left + curRect.width / 2;
+      const curY = curRect.top + curRect.height / 2;
+
+      let bestCandidate = null;
+      let bestScore = Infinity;
+
+      for (const el of items) {
+        if (el === current) continue;
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = cx - curX;
+        const dy = cy - curY;
+
+        if (direction === 'right' && dx <= 6) continue;
+        if (direction === 'left' && dx >= -6) continue;
+        if (direction === 'down' && dy <= 6) continue;
+        if (direction === 'up' && dy >= -6) continue;
+
+        // Weight primary axis distance + orthogonal penalty for natural console grid snapping
+        const primary = (direction === 'left' || direction === 'right') ? Math.abs(dx) : Math.abs(dy);
+        const ortho = (direction === 'left' || direction === 'right') ? Math.abs(dy) : Math.abs(dx);
+        const score = primary + ortho * 2.35;
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestCandidate = el;
+        }
+      }
+
+      // Fallback sequential wrap if no strict directional neighbor found
+      if (!bestCandidate) {
+        const idx = items.indexOf(current);
+        if (direction === 'down' || direction === 'right') {
+          bestCandidate = items[(idx + 1) % items.length];
+        } else {
+          bestCandidate = items[(idx - 1 + items.length) % items.length];
+        }
+      }
+
+      if (bestCandidate) {
+        bestCandidate.focus();
+        bestCandidate.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        playUiSound('click');
+      }
+    }
+
+    function cycleMainTab(delta) {
+      const idx = TAB_ORDER.indexOf(state.activeTab);
+      const nextIdx = (idx + delta + TAB_ORDER.length) % TAB_ORDER.length;
+      switchTab(TAB_ORDER[nextIdx]);
+    }
+
+    // Keyboard & Samsung DeX Arrow / Shortcut Handler
+    window.addEventListener('keydown', (e) => {
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      const isTyping = (tag === 'input' || tag === 'textarea' || tag === 'select');
+
+      if (e.key === 'Escape') {
+        const modalSignIn = document.getElementById('nodeSignInModal');
+        const modalShare = document.getElementById('shareModal');
+        if (modalSignIn && !modalSignIn.classList.contains('hidden')) {
+          closeNodeSignInModal();
+          e.preventDefault();
+          return;
+        }
+        if (modalShare && !modalShare.classList.contains('hidden')) {
+          closeShareModal();
+          e.preventDefault();
+          return;
+        }
+        if (isTyping) {
+          document.activeElement.blur();
+          return;
+        }
+      }
+
+      if (isTyping) return;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setHardwareStatusBadge('kbm', 'INPUT: KEYBOARD / DeX NAV', '#FFFFFF');
+        moveSpatialFocus('right');
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setHardwareStatusBadge('kbm', 'INPUT: KEYBOARD / DeX NAV', '#FFFFFF');
+        moveSpatialFocus('left');
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHardwareStatusBadge('kbm', 'INPUT: KEYBOARD / DeX NAV', '#FFFFFF');
+        moveSpatialFocus('down');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHardwareStatusBadge('kbm', 'INPUT: KEYBOARD / DeX NAV', '#FFFFFF');
+        moveSpatialFocus('up');
+      } else if (e.key === '[' || (e.shiftKey && e.key === 'Q')) {
+        e.preventDefault();
+        cycleMainTab(-1);
+      } else if (e.key === ']' || (e.shiftKey && e.key === 'E')) {
+        e.preventDefault();
+        cycleMainTab(1);
+      }
+    });
+
+    // HTML5 Gamepad API (Xbox / PlayStation / Bluetooth Controller Auto-Detection & 60fps Polling)
+    window.addEventListener('gamepadconnected', (e) => {
+      const gpName = (e.gamepad.id || 'CONTROLLER').split('(')[0].trim().slice(0, 18).toUpperCase();
+      setHardwareStatusBadge('gamepad', `PAD: ${gpName || 'XBOX CONTROLLER'}`, '#107C10');
+      playUiSound('levelup');
+      showToast(`Controller Connected: ${e.gamepad.id} — Use D-Pad/Stick, A, B, X, Y, LB/RB`);
+      const items = getVisibleFocusableElements();
+      if (items.length && (!document.activeElement || document.activeElement === document.body)) {
+        items[0].focus();
+      }
+    });
+
+    window.addEventListener('gamepaddisconnected', () => {
+      setHardwareStatusBadge('kbm', 'INPUT: KBM / DEX READY', '#6BC349');
+      showToast('Controller Disconnected — Switched to KBM / Touch Mode');
+    });
+
+    function pollGamepadLoop() {
+      const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      const gp = pads[0] || pads[1] || pads[2] || pads[3];
+      if (gp) {
+        const now = performance.now();
+        const btn = (idx) => !!(gp.buttons[idx] && gp.buttons[idx].pressed);
+        const justPressed = (idx) => btn(idx) && !lastGamepadBtnState[idx];
+
+        // D-Pad (12=Up, 13=Down, 14=Left, 15=Right)
+        if (justPressed(12)) { setHardwareStatusBadge('gamepad', 'PAD: XBOX / BT ACTIVE', '#107C10'); moveSpatialFocus('up'); }
+        if (justPressed(13)) { setHardwareStatusBadge('gamepad', 'PAD: XBOX / BT ACTIVE', '#107C10'); moveSpatialFocus('down'); }
+        if (justPressed(14)) { setHardwareStatusBadge('gamepad', 'PAD: XBOX / BT ACTIVE', '#107C10'); moveSpatialFocus('left'); }
+        if (justPressed(15)) { setHardwareStatusBadge('gamepad', 'PAD: XBOX / BT ACTIVE', '#107C10'); moveSpatialFocus('right'); }
+
+        // Left Analog Stick (axes[0], axes[1]) with 190ms repeat debounce
+        const ax0 = gp.axes[0] || 0;
+        const ax1 = gp.axes[1] || 0;
+        if (now - lastAxisMoveTime > 190) {
+          if (ax1 < -0.55) { moveSpatialFocus('up'); lastAxisMoveTime = now; }
+          else if (ax1 > 0.55) { moveSpatialFocus('down'); lastAxisMoveTime = now; }
+          else if (ax0 < -0.55) { moveSpatialFocus('left'); lastAxisMoveTime = now; }
+          else if (ax0 > 0.55) { moveSpatialFocus('right'); lastAxisMoveTime = now; }
+        }
+
+        // A Button (0) -> Click focused control
+        if (justPressed(0)) {
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.click();
+          } else {
+            const items = getVisibleFocusableElements();
+            if (items[0]) items[0].focus();
+          }
+        }
+        // B Button (1) -> Close modal or blur input
+        if (justPressed(1)) {
+          const modalSignIn = document.getElementById('nodeSignInModal');
+          const modalShare = document.getElementById('shareModal');
+          if (modalSignIn && !modalSignIn.classList.contains('hidden')) closeNodeSignInModal();
+          else if (modalShare && !modalShare.classList.contains('hidden')) closeShareModal();
+          else if (document.activeElement) document.activeElement.blur();
+        }
+        // X Button (2) -> Open Sync / Discord Modal
+        if (justPressed(2)) {
+          openShareModal();
+        }
+        // Y Button (3) -> Open Crew Node Sign-In Modal
+        if (justPressed(3)) {
+          openNodeSignInModal();
+        }
+        // LB (4) / RB (5) -> Cycle Xbox Horizontal Guide Tabs
+        if (justPressed(4)) {
+          cycleMainTab(-1);
+        }
+        if (justPressed(5)) {
+          cycleMainTab(1);
+        }
+
+        for (let i = 0; i < gp.buttons.length; i++) {
+          lastGamepadBtnState[i] = btn(i);
+        }
+      }
+      requestAnimationFrame(pollGamepadLoop);
+    }
+    requestAnimationFrame(pollGamepadLoop);
   </script>
 </body>
 </html>
