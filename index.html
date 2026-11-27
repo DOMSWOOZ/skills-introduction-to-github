@@ -448,211 +448,193 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col canvas-grid-bg text-primary">
+<body class="min-h-screen flex flex-col">
 
   <!-- ==================== SCREEN TRANSITION SHUTTER OVERLAY ==================== -->
-  <div id="screenTransitionOverlay" class="fixed inset-0 z-50 bg-surface-base/95 flex flex-col items-center justify-center gap-4">
-    <div class="ui-panel p-6 flex flex-col items-center gap-4 max-w-xs w-full text-center border-active">
+  <div id="screenTransitionOverlay" class="fixed inset-0 z-50 bg-[#121212]/95 flex flex-col items-center justify-center gap-4">
+    <div class="xb-panel p-6 flex flex-col items-center gap-4 max-w-xs w-full text-center border-white/25">
       <div class="flex items-center gap-4">
         <img src="/assets/anim-pickaxe.gif" alt="" class="w-8 h-8 pixel-art" />
         <img src="/assets/anim-diamond.gif" alt="" class="w-8 h-8 pixel-art" />
       </div>
-      <div id="transitionLabel" class="mc-display-title text-xs text-accent tracking-wider">LOADING SECTOR...</div>
-      <div class="w-full h-1 bg-surface-base border border-subtle rounded-[4px] overflow-hidden">
-        <div class="h-full bg-accent w-full"></div>
+      <div id="transitionLabel" class="font-mc-ten text-sm text-[#6BC349] tracking-wider uppercase">LOADING SECTOR...</div>
+      <div class="w-full h-2 ore-slot overflow-hidden">
+        <div class="h-full bg-[#107C10] w-full"></div>
       </div>
     </div>
   </div>
 
-  <!-- ==================== XBOX GUIDE SHELL HEADER + ORE UI INSPECTOR ==================== -->
-  <header class="sticky top-0 z-30 bg-[#181818] border-b border-white/10">
-    <!-- Top Xbox Guide Row: Brand, Solid TPS Tag, Hardware Nav Status & Primary Ore UI Controls (Never wraps awkwardly) -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 min-h-[56px] py-2 flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Solid Xbox-style square badge + MinecraftTen title + Realm TPS / Day Tag -->
-      <div class="flex items-center gap-3">
-        <div class="w-7 h-7 bg-[#107C10] flex items-center justify-center border border-white/20 shrink-0">
-          <span class="font-mojangles text-xs text-white leading-none">CZ</span>
-        </div>
-        <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-5 w-auto object-contain hidden sm:block" />
-        <div class="flex items-center gap-2">
-          <span class="font-mc-ten text-lg tracking-wide text-white uppercase leading-none">CHIBI~ZONE</span>
-          <span class="font-mono text-xs text-[#8E8E8E] hidden lg:inline">/ REALMS COMMAND</span>
-        </div>
-        <!-- Solid Xbox Status Tag (No glow) -->
-        <div class="bg-[#107C10] px-2.5 py-1 border border-white/20 flex items-center gap-1.5">
-          <span class="font-mojangles text-xs uppercase text-white tabular-nums">DAY <span id="realmDayCounter">537</span> · 20.0 TPS</span>
-        </div>
-        <!-- Live Hardware Input Mode Indicator (Bluetooth Controller / Samsung DeX / KBM) -->
-        <div id="inputHardwareBadge" class="ore-slot px-2.5 py-1 hidden md:flex items-center gap-1.5" title="Active Hardware Navigation Mode (Gamepad D-Pad, LB/RB, A/B/X/Y &amp; Arrow Keys supported)">
-          <span id="inputHardwareDot" class="w-2 h-2 bg-[#6BC349] inline-block"></span>
-          <span id="inputHardwareText" class="font-mono text-[10px] uppercase text-[#A0A0A0]">INPUT: KBM / DEX READY</span>
-        </div>
+  <!-- ==================== AUTHENTIC XBOX SHELL HEADER ==================== -->
+  <header class="bg-[#181818] border-b border-white/10 px-4 sm:px-6 flex items-center justify-between h-14 sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <!-- Solid Xbox-style square badge -->
+      <div class="w-7 h-7 bg-[#107C10] flex items-center justify-center border border-white/20 shrink-0">
+        <span class="font-mojangles text-xs text-white leading-none">CZ</span>
       </div>
-
-      <!-- Active Operator Tile + Ore UI Mechanical Controls (Clean single-line alignment) -->
-      <div class="flex items-center gap-2">
-        <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector (Controller: Y)"
-          class="ore-btn px-2.5 py-1.5 flex items-center gap-2">
-          <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 object-cover bg-[#141415] border border-white/15 pixel-art" />
-          <div class="text-left pr-1">
-            <div id="headerOperatorBadge" class="text-[10px] font-mono uppercase tracking-label text-[#A0A0A0] leading-none">OPERATOR</div>
-            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-[#6BC349] leading-tight">DOMSWOOZ</div>
-          </div>
-          <span class="font-mojangles text-[10px] bg-black/40 px-1.5 py-0.5 text-[#E0E0E0] border border-white/10">Y</span>
-        </button>
-
-        <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State (Bug Test Mode)"
-          class="ore-btn-stone px-2.5 py-1.5 text-xs font-mono font-semibold">
-          <span>Reset Auth</span>
-        </button>
-
-        <button onclick="toggleSound()" id="soundToggleBtn" title="Toggle Vanilla Minecraft Audio"
-          class="ore-btn px-2.5 py-1.5 text-xs font-mono text-[#E0E0E0]">
-          SFX: ON
-        </button>
-
-        <button onclick="openShareModal()" title="Share &amp; Sync with Discord (Controller: X)"
-          class="ore-btn-primary px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-label flex items-center gap-2">
-          <img src="/assets/cloud-sync.png" alt="" class="w-4 h-4 object-contain" />
-          <span>Sync / Discord</span>
-          <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">X</span>
-        </button>
+      <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-5 w-auto object-contain hidden sm:block" />
+      <span class="font-mc-ten text-lg tracking-wide text-white uppercase leading-none">CHIBI~ZONE</span>
+      <span class="font-mono text-xs text-[#8E8E8E] hidden md:inline">/ REALMS COMMAND</span>
+      <div id="inputHardwareBadge" class="ore-slot px-2 py-1 hidden lg:flex items-center gap-1.5 ml-2" title="Active Hardware Navigation Mode (Gamepad D-Pad, LB/RB, A/B/X/Y &amp; Arrow Keys supported)">
+        <span id="inputHardwareDot" class="w-2 h-2 bg-[#6BC349] inline-block"></span>
+        <span id="inputHardwareText" class="font-mono text-[10px] uppercase text-[#A0A0A0]">INPUT: KBM / DEX READY</span>
       </div>
     </div>
 
-    <!-- Dedicated 6-Member Realm Roster Quick-Switch Strip + Xbox Horizontal Guide Tabs -->
-    <div class="border-t border-white/10 bg-[#141415]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2">
-        <!-- Xbox Horizontal Guide Tabs (LB / RB Controller Bumper Support) -->
-        <nav class="flex items-center gap-1 overflow-x-auto" role="tablist">
-          <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Previous Tab (Gamepad LB)">LB</span>
-          <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
-            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-            <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
-            <span>SHARED QUEST BOARD</span>
-            <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
-          </button>
+    <!-- Xbox Horizontal Guide Tabs (Exact h-full Console Guide Bar) -->
+    <nav class="flex items-center h-full overflow-x-auto" role="tablist">
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block mr-1" title="Previous Tab (Gamepad LB)">LB</span>
+      <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>Quests</span>
+        <span id="sharedCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">6</span>
+      </button>
 
-          <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
-            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-            <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
-            <span><span id="vaultOwnerLabel">DOMSWOOZ</span>'S ENDER VAULT</span>
-            <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
-          </button>
+      <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
+        <span><span id="vaultOwnerLabel">DOMSWOOZ</span> Vault</span>
+        <span id="vaultLockBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums">LOCKED</span>
+      </button>
 
-          <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
-            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-            <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
-            <span>REALM GPS &amp; SEED MAP</span>
-            <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">0</span>
-          </button>
+      <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
+        <span>Realm GPS</span>
+        <span id="gpsCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">5</span>
+      </button>
 
-          <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
-            class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
-            <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
-            <span>CITADEL ARCHIVE</span>
-            <span class="px-2 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4 SHOTS</span>
-          </button>
-          <span class="font-mojangles text-[10px] text-[#8E8E8E] px-2 py-1 bg-[#1C1C1C] border border-white/10 hidden md:inline-block" title="Next Tab (Gamepad RB)">RB</span>
-        </nav>
-
-        <!-- Compact 6-Member Avatar Dock -->
-        <div id="crewSelector" class="hidden xl:flex items-center gap-1 py-1"></div>
-      </div>
-    </div>
+      <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>Archive</span>
+        <span class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4</span>
+      </button>
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block ml-1" title="Next Tab (Gamepad RB)">RB</span>
+    </nav>
   </header>
 
-  <!-- ==================== MAIN WORKSPACE ==================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+  <!-- ==================== PERSISTENT TWO-COLUMN XBOX DASHBOARD + ORE UI INSPECTOR DECK ==================== -->
+  <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-4 grid grid-cols-1 md:grid-cols-12 gap-4">
 
-    <!-- ==================== TAB 1: SHARED CREW QUEST BOARD ==================== -->
-    <section id="view-shared" class="flex flex-col gap-6">
-
-      <!-- AAA HERO BANNER (Using User Selection #5: squad-jump-hero.jpg + Base Snapshot) -->
-      <div class="ui-panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        <div class="lg:col-span-7 p-6 flex flex-col justify-between bg-surface-raised">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <img src="/assets/enchanted-book.png" alt="" class="w-5 h-5 pixel-art" />
-              <span class="micro-label text-accent">ACTIVE REALM EXPEDITION // DAY 537</span>
-            </div>
-            <h2 class="mc-display-title text-lg sm:text-xl text-primary">LAKESIDE LAVA-SPIRE CITADEL &amp; REALM ROADMAP</h2>
-            <p class="text-xs text-secondary mt-2 leading-relaxed max-w-xl">
-              Vote on upcoming builds with Gold Coin Bounties, claim active tasks across PC, console, and mobile, or switch to your PIN-protected Ender Vault for personal diamond stashes.
-            </p>
-          </div>
-          <!-- Recessed Minecraft Inventory Slots (.ore-slot) -->
-          <div class="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-white/10">
-            <div class="ore-slot p-3">
-              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">ACTIVE TASKS</div>
-              <div id="heroStatOpen" class="font-mojangles text-2xl text-white tabular-nums">6</div>
-            </div>
-            <div class="ore-slot p-3">
-              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">COMPLETED BUILDS</div>
-              <div id="heroStatDone" class="font-mojangles text-2xl text-[#6BC349] tabular-nums">2</div>
-            </div>
-            <div class="ore-slot p-3">
-              <div class="font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">BOUNTY VOTES</div>
-              <div id="heroStatVotes" class="font-mojangles text-2xl text-warning tabular-nums">18</div>
-            </div>
-          </div>
+    <!-- LEFT COLUMN (4 COLS): Ore UI Stacked Mechanical Buttons & Active Operator Inspector -->
+    <aside class="md:col-span-4 flex flex-col gap-3">
+      <div class="xb-panel p-3 flex flex-col gap-2">
+        <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
+          <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Server &amp; Operator Controls</span>
+          <span class="font-mono text-[11px] text-[#6BC349]">READY</span>
         </div>
-        <div class="lg:col-span-5 relative min-h-[180px] bg-surface-base border-t lg:border-t-0 lg:border-l border-subtle flex items-center justify-end overflow-hidden">
-          <img src="/assets/squad-jump-hero.jpg" alt="Crew Co-Op Squad" class="w-full h-full object-cover object-center opacity-90" />
-          <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-[#121216]/30 to-transparent"></div>
-          <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-secondary tabular-nums">
-            REALM ROSTER: 2 OPERATORS · 4 MEMBERS
+
+        <!-- Primary Minecraft Emerald Keycap Button: Active Operator / Sign-In Gate -->
+        <button onclick="openNodeSignInModal()" class="ore-btn ore-btn-primary w-full mt-1">
+          <div class="flex items-center gap-2.5">
+            <img id="activePlayerAvatarImg" src="/assets/avatar-domswooz.png" alt="" class="w-6 h-6 object-cover bg-[#141415] border border-white/25 pixel-art" />
+            <div class="text-left">
+              <div id="headerOperatorBadge" class="font-mono text-[10px] uppercase text-white/80 leading-none">OPERATOR</div>
+              <div id="headerActivePlayerName" class="font-mc-ten text-base uppercase text-white leading-tight">DOMSWOOZ</div>
+            </div>
           </div>
+          <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
+        </button>
+
+        <!-- Secondary Stone Keycap Button: Sync / Discord Report & Backup -->
+        <button onclick="openShareModal()" class="ore-btn ore-btn-stone w-full font-semibold">
+          <div class="flex items-center gap-2">
+            <img src="/assets/cloud-sync.png" alt="" class="w-4 h-4 object-contain" />
+            <span class="font-sans text-sm uppercase tracking-tight">Sync / Discord Backup</span>
+          </div>
+          <span class="font-mojangles text-xs bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">X</span>
+        </button>
+
+        <!-- Dark Slate Keycap Row: Audio Toggle & Fresh PIN Reset -->
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="toggleSound()" class="ore-btn w-full">
+            <span id="soundToggleBtn" class="font-sans text-xs text-[#E0E0E0] uppercase">SFX: ON</span>
+            <span class="font-mono text-[11px] text-[#8E8E8E]">AUD</span>
+          </button>
+          <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State" class="ore-btn w-full">
+            <span class="font-sans text-xs text-[#E0E0E0] uppercase">Reset Auth</span>
+            <span class="font-mono text-[11px] text-warning">RST</span>
+          </button>
         </div>
       </div>
+    </aside>
 
-      <!-- Main 12-Col Split: Quest List (8 cols) + Proposal & Crew Huddle (4 cols) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left 8 Cols: Filters + Asset-Driven Task Cards -->
-        <div class="lg:col-span-8 flex flex-col gap-4">
-          <div class="ui-panel p-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-2 flex-wrap">
-              <button onclick="setFilter('all')" id="filter-all" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">All Quests</button>
-              <button onclick="setFilter('open')" id="filter-open" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">Up For Votes</button>
-              <button onclick="setFilter('in_progress')" id="filter-in_progress" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">In Progress</button>
-              <button onclick="setFilter('done')" id="filter-done" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">Completed</button>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="micro-label">Sort:</span>
-              <select id="sortSelect" onchange="renderSharedTasks()" class="ui-input px-2 py-2 text-xs font-mono">
-                <option value="votes">Highest Bounty Votes</option>
-                <option value="newest">Newest Added</option>
-              </select>
-            </div>
+    <!-- RIGHT COLUMN (8 COLS): Xbox Stepped Telemetry & Recessed Inventory Slots -->
+    <section class="md:col-span-8 flex flex-col gap-3">
+      <div class="xb-panel p-4 flex flex-col justify-between h-full">
+        <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-3 mb-3 gap-2">
+          <div>
+            <h2 class="font-mc-ten text-xl uppercase text-white leading-none">Realm Telemetry // Lakeside Citadel</h2>
+            <p class="font-mono text-xs text-[#8E8E8E] mt-1">NODE: US-WEST-01 // BEDROCK DEDICATED · SEED COORDS: 915, 63, -295</p>
           </div>
-
-          <div id="sharedTasksList" class="flex flex-col gap-4"></div>
+          <!-- Solid Xbox Status Tag (No glow) -->
+          <div class="bg-[#107C10] px-2.5 py-1 border border-white/20 flex items-center gap-2">
+            <span class="font-mojangles text-xs uppercase text-white tabular-nums">DAY <span id="realmDayCounter">537</span> // 20.0 TPS</span>
+          </div>
         </div>
 
-        <!-- Right 4 Cols: Propose Task + Crew Huddle Roster (Using User Selection #3: crew-huddle.jpg) -->
-        <div class="lg:col-span-4 flex flex-col gap-6">
+        <!-- Recessed Minecraft Inventory Slots (.ore-slot) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="ore-slot p-3">
+            <span class="block font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">Roster Online</span>
+            <span class="font-mojangles text-2xl text-white tabular-nums">06 / 10</span>
+          </div>
+          <div class="ore-slot p-3">
+            <span class="block font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">Active Quests</span>
+            <span id="heroStatOpen" class="font-mojangles text-2xl text-white tabular-nums">06</span>
+          </div>
+          <div class="ore-slot p-3">
+            <span class="block font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">Builds Done</span>
+            <span id="heroStatDone" class="font-mojangles text-2xl text-[#6BC349] tabular-nums">02</span>
+          </div>
+          <div class="ore-slot p-3">
+            <span class="block font-mono text-[11px] uppercase text-[#8E8E8E] mb-1">Bounty Votes</span>
+            <span id="heroStatVotes" class="font-mojangles text-2xl text-warning tabular-nums">19</span>
+          </div>
+        </div>
+
+        <!-- Recessed 6-Member Realm Roster Quick-Switch Bar -->
+        <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2 flex-wrap">
+          <span class="font-mono text-[11px] uppercase tracking-wider text-[#8E8E8E]">ACTIVE REALM NODES:</span>
+          <div id="crewSelector" class="flex items-center gap-1.5 flex-wrap"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4">
+
+    <!-- ==================== TAB 1: SHARED CREW QUEST BOARD ==================== -->
+    <section id="view-shared" class="flex flex-col gap-4">
+
+      <!-- Main 12-Col Split: Proposal & Crew Huddle Left (4 cols) + Quest Inspector Right (8 cols) matching 2-Col Xbox Dashboard -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+        <!-- Left 4 Cols: Propose Build Card + Crew Huddle Roster -->
+        <div class="md:col-span-4 flex flex-col gap-4">
           
           <!-- Propose Build Card -->
-          <div class="ui-panel overflow-hidden">
-            <div class="p-4 border-b border-subtle bg-surface-base flex items-center justify-between">
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <img src="/assets/recipe-book.png" alt="" class="w-5 h-5 pixel-art" />
-                <span class="micro-label">Propose Build / Quest</span>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Propose Build / Quest</span>
               </div>
-              <span class="text-[11px] font-mono text-secondary">As <strong id="postingAsLabel" class="text-accent">SWOOZ</strong></span>
+              <span class="text-[11px] font-mono text-[#8E8E8E]">NODE: <strong id="postingAsLabel" class="text-[#6BC349]">DOMSWOOZ</strong></span>
             </div>
-            <form onsubmit="handleAddSharedTask(event)" class="p-6 flex flex-col gap-4">
+            <form onsubmit="handleAddSharedTask(event)" class="p-4 flex flex-col gap-3">
               <div>
-                <label class="micro-label block mb-2">Task or Build Title *</label>
+                <label class="micro-label block mb-1.5">Task or Build Title *</label>
                 <input type="text" id="taskTitleInput" required placeholder="e.g. Build Nether Hub Tunnel to Village"
-                  class="ui-input w-full px-4 py-2 text-xs" />
+                  class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono" />
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="micro-label block mb-2">Category</label>
-                  <select id="taskCategoryInput" class="ui-input w-full px-2 py-2 text-xs">
+                  <label class="micro-label block mb-1.5">Category</label>
+                  <select id="taskCategoryInput" class="ore-slot ui-input w-full px-2 py-2 text-xs font-mono">
                     <option value="Architecture">Architecture</option>
                     <option value="Nether / Portal">Nether / Portal</option>
                     <option value="Farming / Bees">Farming / Bees</option>
@@ -663,20 +645,20 @@
                   </select>
                 </div>
                 <div>
-                  <label class="micro-label block mb-2">Coords (X, Y, Z)</label>
+                  <label class="micro-label block mb-1.5">Coords (X, Y, Z)</label>
                   <input type="text" id="taskCoordsInput" placeholder="915, 63, -295"
-                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                    class="ore-slot ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
                 </div>
               </div>
               <div>
-                <label class="micro-label block mb-2">Details / Materials Required</label>
+                <label class="micro-label block mb-1.5">Details / Materials Required</label>
                 <textarea id="taskNotesInput" rows="2" placeholder="Materials, recipe notes, or strategy..."
-                  class="ui-input w-full px-4 py-2 text-xs"></textarea>
+                  class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono"></textarea>
               </div>
               <button type="submit" class="ore-btn ore-btn-primary w-full mt-1">
-                <span class="flex items-center gap-2 font-mc-ten text-sm uppercase tracking-wider">
+                <span class="flex items-center gap-2 font-mc-ten text-base uppercase">
                   <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
-                  <span>+ Post Quest to Board</span>
+                  <span>Post Quest</span>
                 </span>
                 <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
@@ -684,277 +666,317 @@
           </div>
 
           <!-- Crew Huddle Roster Card (Using User Selection #3: crew-huddle.jpg) -->
-          <div class="ui-panel overflow-hidden">
-            <div class="relative h-28 bg-surface-base border-b border-subtle overflow-hidden">
+          <div class="xb-panel overflow-hidden">
+            <div class="relative h-24 bg-[#141415] border-b border-white/10 overflow-hidden">
               <img src="/assets/crew-huddle.jpg" alt="CHIBI~Zone Crew Huddle" class="w-full h-full object-cover object-center opacity-85" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#121216] via-[#121216]/40 to-transparent"></div>
-              <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C]/40 to-transparent"></div>
+              <div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
                 <div>
-                  <span class="micro-label text-accent block">REALM ROSTER</span>
-                  <h3 class="mc-display-title text-xs text-primary">CHIBI~ZONE BUILDERS</h3>
+                  <span class="font-mono text-[10px] uppercase tracking-wider text-[#6BC349] block">REALM ROSTER</span>
+                  <h3 class="font-mc-ten text-sm text-white uppercase">CHIBI~ZONE BUILDERS</h3>
                 </div>
-                <button onclick="openNodeSignInModal()" class="ui-btn px-2.5 py-1 text-[11px] font-mono text-secondary hover:text-primary">
-                  Switch Node
+                <button onclick="openNodeSignInModal()" class="ore-btn px-2.5 py-1 text-[11px] font-mono">
+                  <span>Switch Node</span>
+                  <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">Y</span>
                 </button>
               </div>
             </div>
-            <div class="p-4 flex flex-col gap-2" id="crewStatsList"></div>
+            <div class="p-3 flex flex-col gap-2" id="crewStatsList"></div>
           </div>
 
         </div>
+
+        <!-- Right 8 Cols: Ore UI Filter Keycaps + Quest Slots -->
+        <div class="md:col-span-8 flex flex-col gap-3">
+          <div class="xb-panel p-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="setFilter('all')" id="filter-all" class="ore-btn ore-btn-primary text-xs font-mono uppercase">All Quests</button>
+              <button onclick="setFilter('open')" id="filter-open" class="ore-btn text-xs font-mono uppercase">Up For Votes</button>
+              <button onclick="setFilter('in_progress')" id="filter-in_progress" class="ore-btn text-xs font-mono uppercase">In Progress</button>
+              <button onclick="setFilter('done')" id="filter-done" class="ore-btn text-xs font-mono uppercase">Completed</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="micro-label">Sort:</span>
+              <select id="sortSelect" onchange="renderSharedTasks()" class="ore-slot ui-input px-2.5 py-1.5 text-xs font-mono">
+                <option value="votes">Highest Bounty Votes</option>
+                <option value="newest">Newest Added</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="sharedTasksList" class="flex flex-col gap-3"></div>
+        </div>
+
       </div>
     </section>
 
     <!-- ==================== TAB 2: PRIVATE ENDER VAULT (PIN-LOCKED PER PLAYER) ==================== -->
     <section id="view-vault" class="hidden">
-      <div class="max-w-5xl mx-auto flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         
         <!-- Ender Vault Hero Banner (Using User Selection #2: gold-coins.jpg + ender-chest.png) -->
-        <div class="ui-panel overflow-hidden grid grid-cols-1 md:grid-cols-12">
-          <div class="md:col-span-8 p-6 flex flex-col justify-between">
+        <div class="xb-panel overflow-hidden grid grid-cols-1 md:grid-cols-12">
+          <div class="md:col-span-8 p-5 flex flex-col justify-between">
             <div>
               <div class="flex items-center gap-2 mb-2">
                 <img src="/assets/ender-chest.png" alt="" class="w-5 h-5 pixel-art" />
-                <span class="micro-label text-warning">PERSONAL ENCRYPTED ENDER STASH // EYES ONLY</span>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-warning">AES-256-GCM ENCRYPTED ENDER STASH // EYES ONLY</span>
               </div>
-              <h2 class="mc-display-title text-lg text-primary">
-                <span id="vaultHeaderPlayerName">SWOOZ</span>'S PRIVATE TREASURY &amp; SECRET VAULT
+              <h2 class="font-mc-ten text-xl text-white uppercase">
+                <span id="vaultHeaderPlayerName">DOMSWOOZ</span>'S PRIVATE TREASURY &amp; SECRET VAULT
               </h2>
-              <p class="text-xs text-secondary mt-2 leading-relaxed">
-                Protected by a per-player 4-digit PIN. Store hidden diamond chest coordinates, secret painting entrances, and surprise build blueprints away from the public crew feed.
+              <p class="text-xs text-[#A0A0A0] mt-2 leading-relaxed">
+                Protected by a per-player SHA-256 / AES-256-GCM key. Store hidden diamond chest coordinates, secret painting entrances, and surprise build blueprints away from the public crew feed.
               </p>
             </div>
-            <div id="vaultHeaderControls" class="flex items-center gap-2 mt-4 pt-4 border-t border-subtle"></div>
+            <div id="vaultHeaderControls" class="flex items-center gap-2 mt-4 pt-3 border-t border-white/10"></div>
           </div>
-          <div class="md:col-span-4 relative min-h-[150px] bg-surface-base border-t md:border-t-0 md:border-l border-subtle overflow-hidden flex items-center justify-center">
+          <div class="md:col-span-4 relative min-h-[140px] bg-[#141415] border-t md:border-t-0 md:border-l border-white/10 overflow-hidden flex items-center justify-center">
             <img src="/assets/gold-coins.jpg" alt="Gold Treasury" class="w-full h-full object-cover object-center opacity-90 pixel-art" />
-            <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#1C1C1C] via-transparent to-transparent"></div>
           </div>
         </div>
 
-        <!-- PIN Lock Gate (Uses official AccessDenied graphic + animated diamond) -->
-        <div id="vaultPinGate" class="ui-panel p-6 max-w-md mx-auto w-full text-center"></div>
+        <!-- PIN Lock Gate (Uses official AccessDenied graphic + Ore UI Keycaps) -->
+        <div id="vaultPinGate" class="xb-panel p-6 max-w-md mx-auto w-full text-center"></div>
 
-        <!-- Unlocked Vault Content -->
-        <div id="vaultUnlockedContent" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Unlocked Vault Content (2-Column Xbox Dashboard Split: 4 Cols Form Left + 8 Cols Vault Slots Right) -->
+        <div id="vaultUnlockedContent" class="hidden grid grid-cols-1 md:grid-cols-12 gap-4">
           
-          <!-- Left 7 Cols: Private Items + Secret Painting Reference Preview -->
-          <div class="lg:col-span-7 flex flex-col gap-4">
-            <div id="swoozVaultPreviewCard" class="ui-panel overflow-hidden hidden">
+          <!-- Left 4 Cols: Add Secret Item Form -->
+          <div class="md:col-span-4">
+            <div class="xb-panel overflow-hidden">
+              <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center gap-2">
+                <img src="/assets/ender-chest.png" alt="" class="w-5 h-5 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Log Secret Stash or Goal</span>
+              </div>
+              <form onsubmit="handleAddPrivateTask(event)" class="p-4 flex flex-col gap-3">
+                <div>
+                  <label class="micro-label block mb-1.5">Secret Item / Stash Title *</label>
+                  <input type="text" id="privTitleInput" required placeholder="e.g. Hidden Diamond Chest"
+                    class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-1.5">Secret Coordinates (X, Y, Z)</label>
+                  <input type="text" id="privCoordsInput" placeholder="e.g. X, Y, Z"
+                    class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono tabular-nums" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-1.5">Private Notes / Inventory Tally</label>
+                  <textarea id="privNotesInput" rows="3" placeholder="e.g. 3 Diamonds, 1 Diamond Pickaxe, 1 Enchanted Golden Apple..."
+                    class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono"></textarea>
+                </div>
+                <button type="submit" class="ore-btn ore-btn-primary w-full mt-1">
+                  <span class="font-mc-ten text-base uppercase">Encrypt &amp; Save Stash</span>
+                  <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right 8 Cols: Decrypted Vault Slots + Secret Painting Reference Preview -->
+          <div class="md:col-span-8 flex flex-col gap-3">
+            <div id="swoozVaultPreviewCard" class="xb-panel overflow-hidden hidden">
               <div class="grid grid-cols-1 sm:grid-cols-12">
-                <div class="sm:col-span-5 bg-surface-base border-b sm:border-b-0 sm:border-r border-subtle">
+                <div class="sm:col-span-5 bg-[#141415] border-b sm:border-b-0 sm:border-r border-white/10">
                   <img src="/assets/base-vault-art.jpg" alt="4x2 Classical Ruins Secret Painting Door" class="w-full h-full object-cover" />
                 </div>
                 <div class="sm:col-span-7 p-4 flex flex-col justify-between">
                   <div>
                     <div class="flex items-center gap-2 mb-1">
                       <img src="/assets/first-diamond.png" alt="" class="w-4 h-4 pixel-art" />
-                      <span class="micro-label text-accent">VERIFIED VAULT CAM // AES-256 DECRYPTED</span>
+                      <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">VERIFIED VAULT CAM // AES-256 DECRYPTED</span>
                     </div>
-                    <h3 id="swoozVaultPreviewTitle" class="text-sm font-semibold tracking-tight text-primary"></h3>
-                    <p id="swoozVaultPreviewNotes" class="text-xs text-secondary mt-1"></p>
+                    <h3 id="swoozVaultPreviewTitle" class="font-mc-ten text-base text-white uppercase"></h3>
+                    <p id="swoozVaultPreviewNotes" class="text-xs text-[#A0A0A0] mt-1 leading-relaxed"></p>
                   </div>
-                  <div class="mt-3 pt-2 border-t border-subtle flex items-center justify-between text-[11px] font-mono text-secondary tabular-nums">
-                    <span id="swoozVaultPreviewCoords"></span>
-                    <span class="text-accent">STATUS: CONCEALED</span>
+                  <div class="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mojangles text-white tabular-nums">
+                    <span id="swoozVaultPreviewCoords" class="ore-slot px-2 py-1 text-[#6BC349]"></span>
+                    <span class="bg-[#107C10] px-2 py-0.5 border border-white/20 text-white uppercase">STATUS: CONCEALED</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div id="privateVaultList" class="flex flex-col gap-4"></div>
-          </div>
-
-          <!-- Right 5 Cols: Add Secret Item -->
-          <div class="lg:col-span-5">
-            <div class="ui-panel overflow-hidden">
-              <div class="p-4 border-b border-subtle bg-surface-base flex items-center gap-2">
-                <img src="/assets/ender-chest.png" alt="" class="w-5 h-5 pixel-art" />
-                <span class="micro-label">Log Secret Stash or Personal Goal</span>
-              </div>
-              <form onsubmit="handleAddPrivateTask(event)" class="p-6 flex flex-col gap-4">
-                <div>
-                  <label class="micro-label block mb-2">Secret Item / Stash Title *</label>
-                  <input type="text" id="privTitleInput" required placeholder="e.g. Hidden Diamond Chest behind Painting"
-                    class="ui-input w-full px-4 py-2 text-xs" />
-                </div>
-                <div>
-                  <label class="micro-label block mb-2">Secret Coordinates (X, Y, Z)</label>
-                  <input type="text" id="privCoordsInput" placeholder="e.g. X, Y, Z"
-                    class="ui-input w-full px-4 py-2 text-xs font-mono tabular-nums" />
-                </div>
-                <div>
-                  <label class="micro-label block mb-2">Private Notes / Inventory Tally</label>
-                  <textarea id="privNotesInput" rows="3" placeholder="e.g. 3 Diamonds, 1 Diamond Pickaxe, 1 Enchanted Golden Apple..."
-                    class="ui-input w-full px-4 py-2 text-xs"></textarea>
-                </div>
-                <button type="submit" class="ui-btn-warning w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                  Save to My Private Ender Vault
-                </button>
-              </form>
-            </div>
+            <div id="privateVaultList" class="flex flex-col gap-3"></div>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ==================== TAB 3: REALM GPS & SEED MAP (Using User Selection #4: seed-map-hero.jpg) ==================== -->
-    <section id="view-gps" class="hidden flex flex-col gap-6">
+    <!-- ==================== TAB 3: REALM GPS & SEED MAP (Unified Xbox + Ore UI Inspector) ==================== -->
+    <section id="view-gps" class="hidden flex flex-col gap-4">
       
-      <!-- GPS Hero Banner with User Selection #4 (Alex holding World Map over pixel seed numbers) -->
-      <div class="ui-panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        <div class="lg:col-span-7 p-6 flex flex-col justify-between">
+      <!-- GPS Hero Banner with User Selection #4 + Recessed Coordinate Slots -->
+      <div class="xb-panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-7 p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center gap-2 mb-2">
               <img src="/assets/conduit-128.png" alt="" class="w-5 h-5 object-contain" />
-              <span class="micro-label text-accent">CARTOGRAPHY &amp; NETHER PORTAL CALCULATOR</span>
+              <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">CARTOGRAPHY &amp; NETHER PORTAL CALCULATOR</span>
             </div>
-            <h2 class="mc-display-title text-lg text-primary">REALM GPS &amp; LANDMARK TELEMETRY</h2>
-            <p class="text-xs text-secondary mt-2 leading-relaxed">
-              Every Overworld coordinate logged below automatically computes its exact <code class="font-mono text-accent">÷ 8</code> Nether Portal link coordinate so your portals never cross-link by accident.
+            <h2 class="font-mc-ten text-xl text-white uppercase">REALM GPS &amp; LANDMARK TELEMETRY</h2>
+            <p class="text-xs text-[#A0A0A0] mt-2 leading-relaxed">
+              Every Overworld coordinate logged below automatically computes its exact <span class="font-mojangles text-[#6BC349]">÷ 8</span> Nether Portal link coordinate in recessed inventory slots so your portals never cross-link.
             </p>
           </div>
-          <div class="mt-4 pt-4 border-t border-subtle flex flex-wrap items-center gap-6 text-xs font-mono tabular-nums">
-            <div><span class="text-secondary">MAIN CITADEL:</span> <strong class="text-accent">915, 63, -295</strong></div>
-            <div><span class="text-secondary">NETHER TARGET:</span> <strong class="text-primary">X: 114, Z: -37</strong></div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/10">
+            <div class="ore-slot p-2.5">
+              <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">MAIN CITADEL (OW)</span>
+              <span class="font-mojangles text-lg text-[#6BC349] tabular-nums">915, 63, -295</span>
+            </div>
+            <div class="ore-slot p-2.5">
+              <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">NETHER HUB TARGET</span>
+              <span class="font-mojangles text-lg text-white tabular-nums">X: 114, Z: -37</span>
+            </div>
+            <div class="ore-slot p-2.5 col-span-2 sm:col-span-1">
+              <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">RATIO SCALE</span>
+              <span class="font-mojangles text-lg text-warning tabular-nums">1 : 8 BLOCKS</span>
+            </div>
           </div>
         </div>
-        <div class="lg:col-span-5 relative min-h-[170px] bg-surface-base border-t lg:border-t-0 lg:border-l border-subtle overflow-hidden">
+        <div class="lg:col-span-5 relative min-h-[160px] bg-[#141415] border-t lg:border-t-0 lg:border-l border-white/10 overflow-hidden">
           <img src="/assets/seed-map-hero.jpg" alt="Alex World Map & Seed Coordinates" class="w-full h-full object-cover object-center opacity-95" />
-          <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-[#121216]/25 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-[#1C1C1C] via-[#1C1C1C]/25 to-transparent"></div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-8 flex flex-col gap-4">
-          <div class="ui-panel overflow-hidden">
-            <div class="p-4 border-b border-subtle flex items-center justify-between">
-              <span class="micro-label">Verified Realm Coordinates Directory</span>
-              <span class="text-[11px] font-mono text-secondary tabular-nums">1 Nether Block = 8 Overworld Blocks</span>
+      <!-- 2-Column Xbox Dashboard Split: Left 4 Cols Form + Right 8 Cols Coordinate Inspector -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        
+        <!-- Left 4 Cols: Log New Landmark Form -->
+        <div class="md:col-span-4">
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Log New Landmark Coordinate</span>
+              <span class="font-mojangles text-[11px] text-[#6BC349]">GPS</span>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-subtle bg-surface-base">
-                    <th class="p-4 micro-label">Landmark</th>
-                    <th class="p-4 micro-label">Dimension</th>
-                    <th class="p-4 micro-label">X / Y / Z</th>
-                    <th class="p-4 micro-label">Nether Link (X / Z)</th>
-                    <th class="p-4 micro-label">Logged By</th>
-                    <th class="p-4 micro-label text-right">Copy</th>
-                  </tr>
-                </thead>
-                <tbody id="gpsTableBody" class="divide-y divide-subtle text-xs"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-4">
-          <div class="ui-panel p-6">
-            <span class="micro-label block mb-4">Log New Landmark Coordinate</span>
-            <form onsubmit="handleAddLandmark(event)" class="flex flex-col gap-4">
+            <form onsubmit="handleAddLandmark(event)" class="p-4 flex flex-col gap-3">
               <div>
-                <label class="micro-label block mb-2">Landmark Name *</label>
+                <label class="micro-label block mb-1.5">Landmark Name *</label>
                 <input type="text" id="gpsNameInput" required placeholder="e.g. Ruined Portal / Village Trading Hall"
-                  class="ui-input w-full px-4 py-2 text-xs" />
+                  class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono" />
               </div>
               <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="micro-label block mb-2">X *</label>
+                  <label class="micro-label block mb-1.5">X *</label>
                   <input type="number" id="gpsXInput" required placeholder="915"
-                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                    class="ore-slot ui-input w-full px-2 py-2 text-xs font-mojangles tabular-nums" />
                 </div>
                 <div>
-                  <label class="micro-label block mb-2">Y *</label>
+                  <label class="micro-label block mb-1.5">Y *</label>
                   <input type="number" id="gpsYInput" required placeholder="63"
-                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                    class="ore-slot ui-input w-full px-2 py-2 text-xs font-mojangles tabular-nums" />
                 </div>
                 <div>
-                  <label class="micro-label block mb-2">Z *</label>
+                  <label class="micro-label block mb-1.5">Z *</label>
                   <input type="number" id="gpsZInput" required placeholder="-295"
-                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                    class="ore-slot ui-input w-full px-2 py-2 text-xs font-mojangles tabular-nums" />
                 </div>
               </div>
               <div>
-                <label class="micro-label block mb-2">Dimension</label>
-                <select id="gpsDimInput" class="ui-input w-full px-2 py-2 text-xs">
+                <label class="micro-label block mb-1.5">Dimension</label>
+                <select id="gpsDimInput" class="ore-slot ui-input w-full px-2 py-2 text-xs font-mono">
                   <option value="Overworld">Overworld</option>
                   <option value="Nether">The Nether</option>
                   <option value="End">The End</option>
                 </select>
               </div>
               <div>
-                <label class="micro-label block mb-2">Notes</label>
+                <label class="micro-label block mb-1.5">Notes</label>
                 <input type="text" id="gpsNotesInput" placeholder="e.g. Connected via Panama Canal boat tunnel"
-                  class="ui-input w-full px-4 py-2 text-xs" />
+                  class="ore-slot ui-input w-full px-3 py-2 text-xs font-mono" />
               </div>
-              <button type="submit" class="ui-btn-accent w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                + Save Coordinate
+              <button type="submit" class="ore-btn ore-btn-primary w-full mt-1">
+                <span class="font-mc-ten text-base uppercase">+ Save Coordinate</span>
+                <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
             </form>
           </div>
         </div>
+
+        <!-- Right 8 Cols: Verified Realm Coordinates Directory -->
+        <div class="md:col-span-8 flex flex-col gap-3">
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Verified Realm Coordinates Directory</span>
+              <span class="bg-[#107C10] px-2 py-0.5 border border-white/20 font-mojangles text-[11px] text-white uppercase">AUTO NETHER ÷ 8</span>
+            </div>
+            <div id="gpsTableBody" class="p-3 flex flex-col gap-2.5"></div>
+          </div>
+        </div>
+
       </div>
     </section>
 
     <!-- ==================== TAB 4: CITADEL ARCHIVE & GALLERY ==================== -->
-    <section id="view-gallery" class="hidden flex flex-col gap-6">
-      <div class="ui-panel p-6 flex flex-wrap items-center justify-between gap-4">
+    <section id="view-gallery" class="hidden flex flex-col gap-4">
+      <div class="xb-panel p-4 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span class="micro-label text-accent">ARCHITECTURAL RECONNAISSANCE // DAY 214 → DAY 537</span>
-          <h2 class="mc-display-title text-lg text-primary mt-1">LAKESIDE LAVA-SPIRE CITADEL ARCHIVE</h2>
-          <p class="text-xs text-secondary mt-1">From a 2-heart dirt hallway to a 4-story cliffside fortress with a Y=96 glass water elevator, Panama Canal boat tunnel, and cathedral rose window.</p>
+          <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">ARCHITECTURAL RECONNAISSANCE // DAY 214 → DAY 537</span>
+          <h2 class="font-mc-ten text-xl text-white uppercase mt-0.5">LAKESIDE LAVA-SPIRE CITADEL ARCHIVE</h2>
+          <p class="text-xs text-[#A0A0A0] mt-1">From a 2-heart dirt hallway to a 4-story cliffside fortress with a Y=96 glass water elevator, Panama Canal boat tunnel, and cathedral rose window.</p>
+        </div>
+        <div class="bg-[#107C10] px-2.5 py-1 border border-white/20">
+          <span class="font-mojangles text-xs uppercase text-white">04 VERIFIED CAPTURES</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="ui-panel overflow-hidden flex flex-col">
-          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="xb-panel p-3 flex flex-col gap-3">
+          <div class="h-64 ore-slot overflow-hidden relative">
             <img src="/assets/base-day.jpg" alt="Cathedral Rose Window Wing" class="w-full h-full object-cover" />
-            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">XYZ: 895, 63, -312</span>
+            <div class="absolute top-3 left-3 bg-[#107C10] px-2.5 py-1 border border-white/20">
+              <span class="font-mojangles text-xs text-white tabular-nums">XYZ: 895, 63, -312</span>
+            </div>
           </div>
-          <div class="p-4">
-            <div class="micro-label">EAST WING FACADE // BY CHIBIZANIMUS &amp; SWOOZ</div>
-            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Recessed Cathedral Circular Window &amp; Stepped Gable Peak</h3>
-            <p class="text-xs text-secondary mt-1">Carved directly into the twin mountain spires overlooking the turquoise river lagoon and natural lava cascade.</p>
+          <div class="ore-slot p-3">
+            <div class="font-mono text-[11px] uppercase text-[#8E8E8E]">EAST WING FACADE // BY CHIBIZANIMUS &amp; DOMSWOOZ</div>
+            <h3 class="font-mc-ten text-base text-white uppercase mt-1">Recessed Cathedral Circular Window &amp; Stepped Gable Peak</h3>
+            <p class="text-xs text-[#A0A0A0] mt-1">Carved directly into the twin mountain spires overlooking the turquoise river lagoon and natural lava cascade.</p>
           </div>
         </div>
 
-        <div class="ui-panel overflow-hidden flex flex-col">
-          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+        <div class="xb-panel p-3 flex flex-col gap-3">
+          <div class="h-64 ore-slot overflow-hidden relative">
             <img src="/assets/base-night-lava.jpg" alt="Lava Waterfall Night View" class="w-full h-full object-cover" />
-            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-warning tabular-nums">XYZ: 915, 63, -318</span>
+            <div class="absolute top-3 left-3 bg-[#141415] px-2.5 py-1 border border-warning-border">
+              <span class="font-mojangles text-xs text-warning tabular-nums">XYZ: 915, 63, -318</span>
+            </div>
           </div>
-          <div class="p-4">
-            <div class="micro-label">NORTH LAGOON APPROACH // NIGHT RECON</div>
-            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Natural Lava Cascade &amp; 4-Tier Glass Water-Level Entrance</h3>
-            <p class="text-xs text-secondary mt-1">The landmark lava flow that inspired the base location, paired with the oxidized copper door entrance and overhanging tree terrace.</p>
+          <div class="ore-slot p-3">
+            <div class="font-mono text-[11px] uppercase text-[#8E8E8E]">NORTH LAGOON APPROACH // NIGHT RECON</div>
+            <h3 class="font-mc-ten text-base text-white uppercase mt-1">Natural Lava Cascade &amp; 4-Tier Glass Water-Level Entrance</h3>
+            <p class="text-xs text-[#A0A0A0] mt-1">The landmark lava flow that inspired the base location, paired with the oxidized copper door entrance and overhanging tree terrace.</p>
           </div>
         </div>
 
-        <div class="ui-panel overflow-hidden flex flex-col">
-          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+        <div class="xb-panel p-3 flex flex-col gap-3">
+          <div class="h-64 ore-slot overflow-hidden relative">
             <img src="/assets/base-summit-night.jpg" alt="Summit View to Village" class="w-full h-full object-cover" />
-            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">XYZ: 913, 96, -291</span>
+            <div class="absolute top-3 left-3 bg-[#107C10] px-2.5 py-1 border border-white/20">
+              <span class="font-mojangles text-xs text-white tabular-nums">XYZ: 913, 96, -291</span>
+            </div>
           </div>
-          <div class="p-4">
-            <div class="micro-label">Y=96 SUMMIT OVERLOOK // WATER ELEVATOR TOP</div>
-            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Torch-Lit Highway to the Horizon Village</h3>
-            <p class="text-xs text-secondary mt-1">Looking down from the Stone Brick summit landing across the crop peninsula toward the lit village settlement in the distance.</p>
+          <div class="ore-slot p-3">
+            <div class="font-mono text-[11px] uppercase text-[#8E8E8E]">Y=96 SUMMIT OVERLOOK // WATER ELEVATOR TOP</div>
+            <h3 class="font-mc-ten text-base text-white uppercase mt-1">Torch-Lit Highway to the Horizon Village</h3>
+            <p class="text-xs text-[#A0A0A0] mt-1">Looking down from the Stone Brick summit landing across the crop peninsula toward the lit village settlement in the distance.</p>
           </div>
         </div>
 
-        <div class="ui-panel overflow-hidden flex flex-col">
-          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+        <div class="xb-panel p-3 flex flex-col gap-3">
+          <div class="h-64 ore-slot overflow-hidden relative">
             <img src="/assets/base-vault-art.jpg" alt="Classical Ruins Gallery Wall" class="w-full h-full object-cover" />
-            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">LEVEL Y=75 GALLERY</span>
+            <div class="absolute top-3 left-3 bg-[#107C10] px-2.5 py-1 border border-white/20">
+              <span class="font-mojangles text-xs text-white tabular-nums">LEVEL Y=75 GALLERY</span>
+            </div>
           </div>
-          <div class="p-4">
-            <div class="micro-label">INTERIOR ARCHITECTURE // LEVEL Y=75</div>
-            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">4x2 Classical Ruins Canvas with Gallery Spotlight Torches</h3>
-            <p class="text-xs text-secondary mt-1">Flush gallery wall installation on the Y=75 observation floor overlooking the 4x4 glass floor skylight and ZombieGuy's Deepslate terrace above.</p>
+          <div class="ore-slot p-3">
+            <div class="font-mono text-[11px] uppercase text-[#8E8E8E]">INTERIOR ARCHITECTURE // LEVEL Y=75</div>
+            <h3 class="font-mc-ten text-base text-white uppercase mt-1">4x2 Classical Ruins Canvas with Gallery Spotlight Torches</h3>
+            <p class="text-xs text-[#A0A0A0] mt-1">Flush gallery wall installation on the Y=75 observation floor overlooking the 4x4 glass floor skylight and Deepslate rooftop terrace.</p>
           </div>
         </div>
       </div>
@@ -964,71 +986,75 @@
 
   <!-- ==================== CREW NODE SIGN-IN MODAL (Using User Selection #1: network-signin.jpg) ==================== -->
   <div id="nodeSignInModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-    <div class="ui-panel max-w-xl w-full overflow-hidden border-active">
-      <div class="relative h-48 bg-surface-base border-b border-subtle overflow-hidden">
+    <div class="xb-panel max-w-xl w-full overflow-hidden border-white/25">
+      <div class="relative h-44 bg-[#141415] border-b border-white/10 overflow-hidden">
         <img src="/assets/network-signin.jpg" alt="Minecraft Realm Node Network" class="w-full h-full object-cover object-center" />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#121216] via-[#121216]/35 to-transparent"></div>
-        <button onclick="closeNodeSignInModal()" class="absolute top-3 right-3 px-2.5 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-xs font-mono text-secondary hover:text-primary">
-          [ESC / CLOSE]
+        <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C]/40 to-transparent"></div>
+        <button onclick="closeNodeSignInModal()" class="ore-btn absolute top-3 right-3 px-2.5 py-1 text-xs font-mono">
+          <span>CLOSE</span>
+          <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">B</span>
         </button>
-        <div class="absolute bottom-3 left-6 right-6 flex items-end justify-between">
+        <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
           <div>
-            <span class="micro-label text-accent">REALM OPERATOR TERMINAL</span>
-            <h3 class="mc-display-title text-base text-primary mt-0.5">SELECT YOUR CREW NODE IDENTITY</h3>
+            <span class="font-mono text-[10px] uppercase tracking-wider text-[#6BC349]">REALM OPERATOR TERMINAL</span>
+            <h3 class="font-mc-ten text-lg text-white uppercase mt-0.5">SELECT YOUR CREW NODE IDENTITY</h3>
           </div>
-          <img src="/assets/anim-friends.gif" alt="" class="w-10 h-10 object-contain rounded-[4px] bg-surface-base/80 p-1 border border-subtle" />
+          <img src="/assets/anim-friends.gif" alt="" class="w-10 h-10 object-contain ore-slot p-1" />
         </div>
       </div>
 
-      <div class="p-6 flex flex-col gap-4 max-h-[78vh] overflow-y-auto">
-        <!-- Auth Mode Switcher: Method 1 (Xbox/Discord Gamertag Verify) vs Method 2 (Cryptographic PIN / Node Select) -->
-        <div class="grid grid-cols-2 gap-2 p-1 bg-surface-base rounded-[4px] border border-subtle">
+      <div class="p-5 flex flex-col gap-4 max-h-[78vh] overflow-y-auto">
+        <!-- Auth Mode Switcher: Method 1 (Realm Roster & PIN Lock) vs Method 2 (Xbox / Discord OAuth2 Gate) -->
+        <div class="grid grid-cols-2 gap-2">
           <button onclick="setSignInTab('nodes')" id="signin-tab-nodes"
-            class="py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150">
-            1. Realm Roster &amp; PIN Lock
+            class="ore-btn ore-btn-primary text-xs font-mono uppercase">
+            <span>1. Realm Roster &amp; PIN</span>
+            <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">LB</span>
           </button>
           <button onclick="setSignInTab('oauth')" id="signin-tab-oauth"
-            class="py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150">
-            2. Verify Xbox / Discord
+            class="ore-btn text-xs font-mono uppercase">
+            <span>2. Xbox / Discord OAuth</span>
+            <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">RB</span>
           </button>
         </div>
 
         <!-- TAB A: REALM ROSTER NODES (Locked accounts require PIN or OAuth verification) -->
         <div id="signInNodesPanel" class="flex flex-col gap-4">
-          <p class="text-xs text-secondary">
+          <p class="text-xs text-[#A0A0A0]">
             Each Realm member's account is locked to their identity. Selecting a PIN-protected Operator/Member requires their confidential PIN (or verified Xbox/Discord Gamertag).
           </p>
-          <div id="modalCrewNodeGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+          <div id="modalCrewNodeGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
 
           <!-- Inline PIN Prompt when switching into a locked Crew Node -->
-          <div id="nodeSwitchPinGate" class="hidden ui-panel p-4 bg-surface-base border-warning-border flex flex-col gap-3">
+          <div id="nodeSwitchPinGate" class="hidden xb-panel p-4 bg-[#141415] border-warning-border flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <span class="micro-label text-warning">AUTHENTICATE NODE: <span id="targetSwitchNodeName" class="text-primary"></span></span>
-              <button onclick="cancelNodeSwitchPin()" class="text-[11px] font-mono text-secondary hover:text-primary">[CANCEL]</button>
+              <span class="font-mono text-[11px] uppercase tracking-wider text-warning">AUTHENTICATE NODE: <span id="targetSwitchNodeName" class="text-white"></span></span>
+              <button onclick="cancelNodeSwitchPin()" class="ore-btn px-2 py-0.5 text-[10px] font-mono">CANCEL</button>
             </div>
             <form onsubmit="confirmNodeSwitchPin(event)" class="flex items-center gap-2">
               <input type="password" id="nodeSwitchPinInput" maxlength="8" required placeholder="Enter Node PIN..."
-                class="ui-input flex-1 px-3 py-2 text-xs font-mono tracking-widest tabular-nums" />
-              <button type="submit" class="ui-btn-warning px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
-                Verify &amp; Switch
+                class="ore-slot ui-input flex-1 px-3 py-2 text-xs font-mojangles tracking-widest tabular-nums" />
+              <button type="submit" class="ore-btn ore-btn-primary px-4 py-2 text-xs font-mono uppercase">
+                <span>Verify</span>
+                <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">A</span>
               </button>
             </form>
           </div>
 
-          <div class="pt-4 border-t border-subtle flex items-center justify-between gap-3">
-            <input type="text" id="newCrewModalInput" placeholder="Add Realm Member Gamertag..." class="ui-input flex-1 px-4 py-2 text-xs font-mono" />
-            <button onclick="addCrewFromModal()" class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
-              + Register Member
+          <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <input type="text" id="newCrewModalInput" placeholder="Add Realm Member Gamertag..." class="ore-slot ui-input flex-1 px-3 py-2 text-xs font-mono" />
+            <button onclick="addCrewFromModal()" class="ore-btn ore-btn-stone px-3 py-2 text-xs font-mono font-semibold uppercase">
+              <span>+ Register</span>
             </button>
           </div>
         </div>
 
         <!-- TAB B: CRYPTOGRAPHIC OAUTH2 + XBOX LIVE XSTS IDENTITY GATE (/api/auth/login -> /api/auth/callback) -->
         <div id="signInOAuthPanel" class="hidden flex flex-col gap-4">
-          <div class="xb-panel p-5 bg-[#141415] flex flex-col gap-4">
+          <div class="xb-panel p-4 bg-[#141415] flex flex-col gap-4">
             <div class="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
-                <span class="micro-label text-[#6BC349]">SERVER-SIDE PKCE + XBOX LIVE XSTS HANDSHAKE</span>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">SERVER-SIDE PKCE + XBOX LIVE XSTS HANDSHAKE</span>
                 <h4 class="font-mc-ten text-base text-white uppercase mt-0.5">XBOX CONSOLE &amp; DISCORD OAUTH2 GATE</h4>
               </div>
               <span id="oauthSessionStatusPill" class="px-2.5 py-1 text-[10px] font-mojangles bg-[#1C1C1C] text-[#A0A0A0] border border-white/10 uppercase">
@@ -1106,27 +1132,32 @@
 
   <!-- ==================== SHARE / DISCORD EXPORT MODAL ==================== -->
   <div id="shareModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-    <div class="ui-panel max-w-lg w-full overflow-hidden border-active">
-      <div class="p-4 border-b border-subtle bg-surface-base flex items-center justify-between">
+    <div class="xb-panel max-w-lg w-full overflow-hidden border-white/25">
+      <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img src="/assets/cloud-sync.png" alt="" class="w-5 h-5 object-contain" />
-          <span class="micro-label">Share &amp; Sync With CHIBI~Zone Discord</span>
+          <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">Share &amp; Sync With CHIBI~Zone Discord</span>
         </div>
-        <button onclick="closeShareModal()" class="text-xs font-mono text-secondary hover:text-primary">[ESC]</button>
+        <button onclick="closeShareModal()" class="ore-btn px-2 py-1 text-xs font-mono">
+          <span>CLOSE</span>
+          <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">B</span>
+        </button>
       </div>
-      <div class="p-6 flex flex-col gap-6 text-xs">
-        <div>
-          <label class="micro-label block mb-2">1. Copy Discord Status Report (Paste in #general)</label>
-          <p class="text-secondary mb-4">Generates a formatted markdown summary of all active Shared Quests, Bounty Votes, and GPS Coordinates (excludes private Ender Vaults!).</p>
-          <button onclick="copyDiscordSummary()" class="ui-btn-accent w-full py-2.5 px-4 font-mono font-semibold uppercase tracking-label">
-            Copy Formatted Discord Report
+      <div class="p-5 flex flex-col gap-5 text-xs">
+        <div class="ore-slot p-4 flex flex-col gap-3">
+          <label class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349] block">1. Copy Discord Status Report (Paste in #general)</label>
+          <p class="text-[#A0A0A0]">Generates a formatted markdown summary of all active Shared Quests, Bounty Votes, and GPS Coordinates (excludes private Ender Vaults!).</p>
+          <button onclick="copyDiscordSummary()" class="ore-btn ore-btn-primary w-full">
+            <span class="font-mc-ten text-base uppercase">Copy Formatted Discord Report</span>
+            <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
           </button>
         </div>
-        <div class="border-t border-subtle pt-4">
-          <label class="micro-label block mb-2">2. Export / Share Live Board Snapshot URL</label>
-          <p class="text-secondary mb-4">Generates a shareable link containing the latest shared tasks, votes, and GPS coordinates so anyone on mobile, console, or PC loads the updated state.</p>
-          <button onclick="copyShareableUrl()" class="ui-btn w-full py-2.5 px-4 font-mono font-medium">
-            Copy Sync Link with Current Board State
+        <div class="ore-slot p-4 flex flex-col gap-3">
+          <label class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0] block">2. Export / Share Live Board Snapshot URL</label>
+          <p class="text-[#A0A0A0]">Generates a shareable link containing the latest shared tasks, votes, and GPS coordinates so anyone on mobile, console, or PC loads the updated state.</p>
+          <button onclick="copyShareableUrl()" class="ore-btn ore-btn-stone w-full font-semibold">
+            <span class="font-sans text-sm uppercase tracking-tight">Copy Sync Link with Current Board State</span>
+            <span class="font-mojangles text-xs bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">X</span>
           </button>
         </div>
       </div>
@@ -1134,7 +1165,8 @@
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 ui-panel border-accent-border text-primary px-4 py-2.5 text-xs font-mono flex items-center gap-2">
+  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 xb-panel bg-[#181818] border-white/25 text-white px-4 py-2.5 text-xs font-mono flex items-center gap-2">
+    <div class="w-2.5 h-2.5 bg-[#107C10] border border-white/30"></div>
     <img src="/assets/anim-diamond.gif" alt="" class="w-4 h-4 pixel-art" />
     <span id="toastText"></span>
   </div>
@@ -1669,13 +1701,13 @@
       const oauthPanel = document.getElementById('signInOAuthPanel');
 
       if (tab === 'oauth') {
-        oauthBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150';
-        nodesBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150';
+        oauthBtn.className = 'ore-btn ore-btn-primary text-xs font-mono uppercase';
+        nodesBtn.className = 'ore-btn text-xs font-mono uppercase';
         oauthPanel.classList.remove('hidden');
         nodesPanel.classList.add('hidden');
       } else {
-        nodesBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150';
-        oauthBtn.className = 'py-2 px-3 text-xs font-mono font-semibold rounded-[4px] text-secondary hover:text-primary border border-transparent transition-colors duration-150';
+        nodesBtn.className = 'ore-btn ore-btn-primary text-xs font-mono uppercase';
+        oauthBtn.className = 'ore-btn text-xs font-mono uppercase';
         nodesPanel.classList.remove('hidden');
         oauthPanel.classList.add('hidden');
       }
@@ -1798,30 +1830,26 @@
 
         let lockTag = '';
         if (verifiedInfo) {
-          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-accent-subtle text-accent border border-accent-border">${verifiedInfo.method} ✓</span>`;
+          lockTag = `<span class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#107C10] text-white border border-white/20">${verifiedInfo.method} ✓</span>`;
         } else if (hasPin) {
-          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-warning-subtle text-warning border border-warning-border">PIN LOCKED</span>`;
+          lockTag = `<span class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-warning border border-warning-border">PIN LOCKED</span>`;
         } else {
-          lockTag = `<span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] bg-surface-raised text-secondary border border-subtle">1ST ENTRY</span>`;
+          lockTag = `<span class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-[#A0A0A0] border border-white/10">1ST ENTRY</span>`;
         }
 
         return `
           <button onclick="requestSwitchPlayer('${name.replace(/'/g, "\\'")}', true);"
-            class="p-3 rounded-[4px] border text-left flex items-center gap-3 transition-colors duration-150 ease-out ${
-              active
-                ? 'bg-accent-subtle border-accent text-primary'
-                : 'bg-surface-base border-subtle hover:bg-surface-hover hover:border-active text-primary'
-            }">
-            <img src="${getAvatar(name)}" alt="${name}" class="w-11 h-11 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
+            class="${active ? 'ore-btn ore-btn-primary' : 'ore-btn'} p-3 text-left flex items-center gap-3 w-full">
+            <img src="${getAvatar(name)}" alt="${name}" class="w-10 h-10 object-cover bg-[#141415] border border-white/20 pixel-art shrink-0" />
             <div class="flex-1 min-w-0">
               <div class="text-xs font-mono font-bold truncate flex items-center justify-between gap-1">
-                <span class="truncate">${name}</span>
+                <span class="truncate text-white">${name}</span>
                 ${lockTag}
               </div>
-              <div class="text-[10px] font-mono ${role === 'Operator' ? 'text-accent' : 'text-secondary'} mt-0.5 uppercase tracking-label">
+              <div class="text-[10px] font-mono ${active ? 'text-white/90' : (role === 'Operator' ? 'text-[#6BC349]' : 'text-[#A0A0A0]')} mt-0.5 uppercase">
                 ${role} ${active ? '· [ACTIVE]' : ''}
               </div>
-              <div class="text-[11px] font-mono text-muted mt-0.5 tabular-nums">${completed} Quests Completed</div>
+              <div class="text-[11px] font-mojangles ${active ? 'text-white/80' : 'text-[#8E8E8E]'} mt-0.5 tabular-nums">${completed} Quests Done</div>
             </div>
           </button>
         `;
@@ -2233,14 +2261,10 @@
         const hasPin = !!(state.privateVaults[name]?.pinHash);
         const verified = !!deviceAuth.verifiedAccounts[name];
         return `<button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}')"
-          class="px-2.5 py-1 text-xs font-mono rounded-[4px] transition-colors duration-150 ease-out active:translate-y-[1px] flex items-center gap-1.5 ${
-            active
-              ? 'bg-accent-subtle text-accent border border-accent-border font-semibold'
-              : 'text-secondary hover:text-primary hover:bg-surface-hover border border-transparent'
-          }">
-          <img src="${getAvatar(name)}" alt="" class="w-4 h-4 rounded-[4px] object-cover pixel-art" />
+          class="${active ? 'ore-btn ore-btn-primary' : 'ore-btn'} px-2.5 py-1 text-xs font-mono flex items-center gap-1.5">
+          <img src="${getAvatar(name)}" alt="" class="w-4 h-4 object-cover pixel-art" />
           <span>${name}</span>
-          ${verified ? '<span class="text-[9px] text-accent">✓</span>' : (hasPin ? '<span class="text-[9px] text-warning">🔒</span>' : '')}
+          ${verified ? '<span class="text-[10px] font-mojangles text-white">✓</span>' : (hasPin ? '<span class="text-[10px] text-warning">🔒</span>' : '')}
         </button>`;
       }).join('');
 
@@ -2252,20 +2276,20 @@
       const doneCount = state.sharedTasks.filter(t => t.status === 'done').length;
       const totalVotes = state.sharedTasks.reduce((acc, t) => acc + t.votes.length, 0);
 
-      document.getElementById('sharedCountBadge').textContent = openCount + ' OPEN';
-      document.getElementById('gpsCountBadge').textContent = state.landmarks.length;
-      document.getElementById('heroStatOpen').textContent = openCount;
-      document.getElementById('heroStatDone').textContent = doneCount;
-      document.getElementById('heroStatVotes').textContent = totalVotes;
+      document.getElementById('sharedCountBadge').textContent = String(openCount).padStart(2, '0');
+      document.getElementById('gpsCountBadge').textContent = String(state.landmarks.length).padStart(2, '0');
+      document.getElementById('heroStatOpen').textContent = String(openCount).padStart(2, '0');
+      document.getElementById('heroStatDone').textContent = String(doneCount).padStart(2, '0');
+      document.getElementById('heroStatVotes').textContent = String(totalVotes).padStart(2, '0');
 
       const isUnlocked = !!unlockedVaults[state.activePlayer];
       const lockBadge = document.getElementById('vaultLockBadge');
       if (isUnlocked) {
-        lockBadge.textContent = 'UNLOCKED';
-        lockBadge.className = 'px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-accent-subtle text-accent border border-accent-border';
+        lockBadge.textContent = 'OPEN';
+        lockBadge.className = 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#107C10] text-white border border-white/20 tabular-nums';
       } else {
-        lockBadge.textContent = 'PIN LOCKED';
-        lockBadge.className = 'px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border';
+        lockBadge.textContent = 'LOCKED';
+        lockBadge.className = 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums';
       }
 
       ['shared', 'vault', 'gps', 'gallery'].forEach(t => {
@@ -2273,11 +2297,11 @@
         const view = document.getElementById('view-' + t);
         if (state.activeTab === t) {
           btn.setAttribute('aria-selected', 'true');
-          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
+          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.remove('hidden');
         } else {
           btn.setAttribute('aria-selected', 'false');
-          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
+          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.add('hidden');
         }
       });
@@ -2315,7 +2339,7 @@
 
       const container = document.getElementById('sharedTasksList');
       if (list.length === 0) {
-        container.innerHTML = `<div class="ui-panel p-6 text-center text-xs text-secondary">No quests match this filter yet. Post a new build quest on the right!</div>`;
+        container.innerHTML = `<div class="xb-panel p-6 text-center text-xs text-[#A0A0A0]">No quests match this filter yet. Post a new build quest in the left inspector!</div>`;
         return;
       }
 
@@ -2327,58 +2351,59 @@
 
         let statusBadge = '';
         let actionLabel = '';
+        let actionBtnClass = 'ore-btn';
         if (isDone) {
-          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-accent-subtle text-accent border border-accent-border">COMPLETED ${t.claimedBy ? 'BY ' + t.claimedBy : ''}</span>`;
+          statusBadge = `<span class="bg-[#107C10] px-2 py-0.5 border border-white/20 font-mojangles text-[11px] uppercase text-white">COMPLETED ${t.claimedBy ? 'BY ' + t.claimedBy : ''}</span>`;
           actionLabel = 'Reopen';
+          actionBtnClass = 'ore-btn';
         } else if (isProg) {
-          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-warning-subtle text-warning border border-warning-border">ACTIVE: ${t.claimedBy || 'CREW'}</span>`;
+          statusBadge = `<span class="ore-slot px-2 py-0.5 font-mojangles text-[11px] uppercase text-warning">ACTIVE: ${t.claimedBy || 'CREW'}</span>`;
           actionLabel = 'Complete Quest';
+          actionBtnClass = 'ore-btn ore-btn-primary';
         } else {
-          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-surface-base text-secondary border border-subtle">OPEN BOUNTY</span>`;
+          statusBadge = `<span class="ore-slot px-2 py-0.5 font-mojangles text-[11px] uppercase text-[#A0A0A0]">OPEN BOUNTY</span>`;
           actionLabel = 'Claim Quest';
+          actionBtnClass = 'ore-btn ore-btn-stone';
         }
 
         return `
-          <div class="ui-panel ore-bevel-top hover:border-active p-4 transition-colors duration-150 ease-out flex items-start gap-4 ${isDone ? 'opacity-75' : ''}">
+          <div class="xb-panel p-3.5 flex items-start gap-3.5 ${isDone ? 'opacity-75' : ''}">
             
-            <!-- Gold Coin Bounty Upvote Button (Using User Selection #2: gold-coins.jpg) -->
+            <!-- Gold Coin Bounty Upvote Keycap (Using User Selection #2: gold-coins.jpg) -->
             <button onclick="toggleVote('${t.id}')" title="Upvote Bounty as ${state.activePlayer}"
-              class="flex flex-col items-center justify-center min-w-[58px] py-2 px-2 rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px] ${
-                hasVoted
-                  ? 'bg-warning-subtle text-warning border-warning-border'
-                  : 'bg-surface-base text-secondary border-subtle hover:bg-surface-hover hover:text-primary'
-              }">
-              <img src="/assets/gold-coins.jpg" alt="Bounty" class="w-8 h-6 object-cover rounded-[2px] border border-subtle mb-1 pixel-art" />
-              <span class="text-xs font-mono font-bold tabular-nums">${t.votes.length}</span>
-              <span class="text-[9px] font-mono uppercase tracking-label">BOUNTY</span>
+              class="${hasVoted ? 'ore-btn ore-btn-primary' : 'ore-btn'} flex flex-col items-center justify-center min-w-[64px] py-2 px-2">
+              <img src="/assets/gold-coins.jpg" alt="Bounty" class="w-9 h-6 object-cover border border-white/20 mb-1 pixel-art" />
+              <span class="font-mojangles text-base text-white tabular-nums leading-none">${String(t.votes.length).padStart(2, '0')}</span>
+              <span class="text-[9px] font-mono uppercase tracking-wider text-white/80 mt-0.5">BOUNTY</span>
             </button>
 
-            <!-- Quest Details -->
+            <!-- Quest Details & Recessed Coordinate Slot -->
             <div class="flex-1 min-w-0">
               <div class="flex flex-wrap items-center gap-2 mb-2">
                 ${statusBadge}
-                <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-base text-secondary border border-subtle flex items-center gap-1.5">
+                <span class="ore-slot px-2 py-0.5 text-[11px] font-mono text-[#E0E0E0] flex items-center gap-1.5">
                   <img src="${catIcon}" alt="" class="w-3.5 h-3.5 object-contain pixel-art" />
                   <span>${t.category}</span>
                 </span>
-                <button onclick="copyCoords('${t.coords}')" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-base text-secondary border border-subtle hover:text-primary transition-colors duration-150 ease-out tabular-nums">
+                <button onclick="copyCoords('${t.coords}')" class="ore-slot px-2 py-0.5 text-[11px] font-mojangles text-[#6BC349] hover:text-white tabular-nums cursor-pointer">
                   XYZ: ${t.coords}
                 </button>
               </div>
-              <h3 class="text-sm font-semibold tracking-tight text-primary ${isDone ? 'line-through text-secondary' : ''}">${t.title}</h3>
-              ${t.notes ? `<p class="text-xs text-secondary mt-2 leading-relaxed">${t.notes}</p>` : ''}
-              <div class="flex flex-wrap items-center justify-between gap-2 mt-4 pt-2 border-t border-subtle text-[11px] text-muted font-mono">
+              <h3 class="font-mc-ten text-base text-white uppercase ${isDone ? 'line-through text-[#8E8E8E]' : ''}">${t.title}</h3>
+              ${t.notes ? `<p class="text-xs text-[#A0A0A0] mt-1.5 leading-relaxed">${t.notes}</p>` : ''}
+              <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2.5 border-t border-white/10 text-[11px] text-[#8E8E8E] font-mono">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span>Bounty Backers:</span>
-                  <span class="text-secondary">${t.votes.length ? t.votes.join(', ') : 'None yet'}</span>
+                  <span>BACKERS:</span>
+                  <span class="text-[#E0E0E0]">${t.votes.length ? t.votes.join(', ') : 'None yet'}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <button onclick="cycleStatus('${t.id}')" class="ui-btn px-3 py-1 text-xs font-sans font-medium flex items-center gap-1.5">
+                  <button onclick="cycleStatus('${t.id}')" class="${actionBtnClass} px-3 py-1 text-xs font-mono uppercase flex items-center gap-2">
                     <img src="/assets/anim-pickaxe.gif" alt="" class="w-3.5 h-3.5 pixel-art" />
                     <span>${actionLabel}</span>
+                    <span class="font-mojangles text-[10px] bg-black/25 px-1 text-white">A</span>
                   </button>
                   <button onclick="deleteSharedTask('${t.id}')" title="Delete Quest"
-                    class="px-2 py-1 text-xs text-muted hover:text-danger transition-colors duration-150 ease-out">✕</button>
+                    class="ore-btn px-2 py-1 text-xs text-[#8E8E8E] hover:text-danger">✕</button>
                 </div>
               </div>
             </div>
@@ -2399,23 +2424,23 @@
         const verified = deviceAuth.verifiedAccounts[name];
 
         return `
-          <div class="bg-surface-base border border-subtle rounded-[4px] p-3 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-3 min-w-0">
-              <img src="${getAvatar(name)}" alt="${name}" class="w-8 h-8 rounded-[4px] object-cover bg-surface-raised border border-subtle pixel-art" />
+          <div class="ore-slot p-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${getAvatar(name)}" alt="${name}" class="w-8 h-8 object-cover bg-[#1C1C1C] border border-white/15 pixel-art shrink-0" />
               <div class="min-w-0">
-                <div class="text-xs font-mono font-semibold text-primary flex items-center gap-1.5 truncate">
+                <div class="text-xs font-mono font-bold text-white flex items-center gap-1.5 truncate">
                   <span class="truncate">${name}</span>
-                  <span class="px-1.5 py-0.5 text-[9px] font-mono rounded-[2px] ${role === 'Operator' ? 'bg-accent-subtle text-accent border border-accent-border' : 'bg-surface-raised text-secondary border border-subtle'}">${role.toUpperCase()}</span>
+                  <span class="px-1.5 py-0.5 text-[9px] font-mojangles ${role === 'Operator' ? 'bg-[#107C10] text-white border border-white/20' : 'bg-[#1C1C1C] text-[#A0A0A0] border border-white/10'}">${role.toUpperCase()}</span>
                 </div>
-                <div class="text-[11px] text-secondary mt-0.5 font-mono tabular-nums">
-                  ${completed} Done · ${active} Active ${verified ? `· <span class="text-accent">${verified.method}</span>` : ''}
+                <div class="text-[11px] text-[#A0A0A0] mt-0.5 font-mojangles tabular-nums">
+                  ${String(completed).padStart(2, '0')} DONE · ${String(active).padStart(2, '0')} ACTIVE ${verified ? `· <span class="text-[#6BC349]">${verified.method}</span>` : ''}
                 </div>
               </div>
             </div>
             <button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}'); switchTab('vault');"
-              class="ui-btn px-2.5 py-1.5 text-[11px] font-mono text-secondary hover:text-primary tabular-nums flex items-center gap-1.5 shrink-0">
+              class="ore-btn px-2.5 py-1 text-[11px] font-mojangles tabular-nums flex items-center gap-1.5 shrink-0">
               <img src="/assets/ender-chest.png" alt="" class="w-3.5 h-3.5 pixel-art" />
-              <span>${hasPin ? vaultCount + ' 🔒' : 'SETUP'}</span>
+              <span>${hasPin ? String(vaultCount).padStart(2, '0') + ' 🔒' : 'PIN'}</span>
             </button>
           </div>
         `;
@@ -2434,51 +2459,54 @@
       if (!isUnlocked) {
         contentEl.classList.add('hidden');
         gateEl.classList.remove('hidden');
-        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: AES-256-GCM ENCRYPTED // OPERATOR AUTHENTICATION REQUIRED</span>`;
+        controlsEl.innerHTML = `<span class="ore-slot px-2.5 py-1 text-xs font-mojangles text-warning">STATUS: AES-256-GCM ENCRYPTED // OPERATOR PIN REQUIRED</span>`;
 
         if (!vault.pinHash) {
           gateEl.innerHTML = `
             <img src="/assets/ender-chest.png" alt="Ender Vault" class="w-12 h-12 mx-auto mb-3 pixel-art" />
-            <h3 class="mc-display-title text-sm text-primary">INITIALIZE ${state.activePlayer}'S ENDER VAULT</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Create a confidential 4-to-8 character PIN. Your PIN is hashed with SHA-256 and used as an AES-256-GCM key so nobody else can ever read your vault.</p>
+            <h3 class="font-mc-ten text-lg text-white uppercase">INITIALIZE ${state.activePlayer}'S ENDER VAULT</h3>
+            <p class="text-xs text-[#A0A0A0] mt-2 mb-4">Create a confidential 4-to-8 character PIN. Your PIN is hashed with SHA-256 and used as an AES-256-GCM key so nobody else can ever read your vault.</p>
             <form onsubmit="handleCreateVaultPin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
               <input type="password" id="newPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Create Private PIN"
-                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+                class="ore-slot ui-input px-4 py-2 text-center font-mojangles text-base tracking-widest tabular-nums" />
               <input type="password" id="confirmNewPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Confirm Private PIN"
-                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
-              <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                Initialize Private Ender Vault
+                class="ore-slot ui-input px-4 py-2 text-center font-mojangles text-base tracking-widest tabular-nums" />
+              <button type="submit" class="ore-btn ore-btn-primary w-full">
+                <span class="font-mc-ten text-base uppercase">Initialize Ender Vault</span>
+                <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
             </form>
           `;
         } else if (pendingPinRotation[state.activePlayer]) {
           gateEl.innerHTML = `
             <img src="/assets/ender-chest.png" alt="Set New Private PIN" class="w-12 h-12 mx-auto mb-3 pixel-art" />
-            <div class="inline-block px-2 py-0.5 mb-2 text-[10px] font-mono uppercase tracking-label rounded-[4px] bg-warning-subtle text-warning border border-warning-border">
+            <div class="inline-block ore-slot px-2.5 py-1 mb-2 text-[11px] font-mojangles uppercase text-warning">
               MANDATORY 1ST-LOGIN SECURITY ROTATION
             </div>
-            <h3 class="mc-display-title text-sm text-primary">CREATE YOUR NEW PRIVATE PIN</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Starter PIN verified. Choose and confirm a new personal PIN now to re-encrypt ${state.activePlayer}'s Ender Vault with AES-256-GCM.</p>
+            <h3 class="font-mc-ten text-lg text-white uppercase">CREATE YOUR NEW PRIVATE PIN</h3>
+            <p class="text-xs text-[#A0A0A0] mt-2 mb-4">Starter PIN verified. Choose and confirm a new personal PIN now to re-encrypt ${state.activePlayer}'s Ender Vault with AES-256-GCM.</p>
             <form onsubmit="handleForceRotatePin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
               <input type="password" id="rotateNewPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="New Private PIN (4-8 chars)"
-                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+                class="ore-slot ui-input px-4 py-2 text-center font-mojangles text-base tracking-widest tabular-nums" />
               <input type="password" id="rotateConfirmPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Confirm New Private PIN"
-                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
-              <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                Re-Encrypt &amp; Unlock Vault
+                class="ore-slot ui-input px-4 py-2 text-center font-mojangles text-base tracking-widest tabular-nums" />
+              <button type="submit" class="ore-btn ore-btn-primary w-full">
+                <span class="font-mc-ten text-base uppercase">Re-Encrypt &amp; Unlock Vault</span>
+                <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
             </form>
           `;
         } else {
           gateEl.innerHTML = `
             <img src="/assets/access-denied.png" alt="PIN Locked" class="w-12 h-12 mx-auto mb-3 object-contain" />
-            <h3 class="mc-display-title text-sm text-primary">${state.activePlayer}'S ENDER VAULT IS LOCKED</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Enter ${state.activePlayer}'s confidential PIN to decrypt secret diamond stashes &amp; private coordinates.</p>
-            <form onsubmit="handleUnlockVault(event)" class="flex flex-col gap-4 max-w-xs mx-auto">
+            <h3 class="font-mc-ten text-lg text-white uppercase">${state.activePlayer}'S ENDER VAULT IS LOCKED</h3>
+            <p class="text-xs text-[#A0A0A0] mt-2 mb-4">Enter ${state.activePlayer}'s confidential PIN to decrypt secret diamond stashes &amp; private coordinates.</p>
+            <form onsubmit="handleUnlockVault(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
               <input type="password" id="pinAttemptInput" maxlength="8" autocomplete="current-password" required placeholder="••••"
-                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
-              <button type="submit" class="ui-btn-warning py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                Decrypt &amp; Unlock Vault
+                class="ore-slot ui-input px-4 py-2 text-center font-mojangles text-base tracking-widest tabular-nums" />
+              <button type="submit" class="ore-btn ore-btn-primary w-full">
+                <span class="font-mc-ten text-base uppercase">Decrypt &amp; Unlock Vault</span>
+                <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
               </button>
             </form>
           `;
@@ -2498,36 +2526,37 @@
       }
 
       controlsEl.innerHTML = `
-        <span class="px-2 py-1 text-[10px] font-mono rounded-[4px] bg-accent-subtle text-accent border border-accent-border">AES-256 DECRYPTED</span>
-        <button onclick="openRotatePinGate()" class="ui-btn px-4 py-1.5 text-xs font-mono text-secondary hover:text-primary">Rotate Private PIN</button>
-        <button onclick="lockCurrentVault()" class="px-4 py-1.5 text-xs font-mono bg-danger-subtle text-danger border border-danger-border rounded-[4px] hover:border-danger transition-colors duration-150 ease-out">Lock Ender Vault</button>
+        <span class="bg-[#107C10] px-2.5 py-1 border border-white/20 text-xs font-mojangles text-white uppercase">AES-256 DECRYPTED</span>
+        <button onclick="openRotatePinGate()" class="ore-btn ore-btn-stone px-3 py-1.5 text-xs font-mono font-semibold uppercase">Rotate PIN</button>
+        <button onclick="lockCurrentVault()" class="ore-btn px-3 py-1.5 text-xs font-mono text-warning uppercase">
+          <span>Lock Ender Vault</span>
+          <span class="font-mojangles text-[10px] bg-black/30 px-1 text-white">B</span>
+        </button>
       `;
 
       const listEl = document.getElementById('privateVaultList');
       const items = session.items || [];
       if (items.length === 0) {
-        listEl.innerHTML = `<div class="ui-panel p-6 text-center text-xs text-secondary">Your private Ender Vault is empty. Log your secret diamond stash coordinates or personal goals on the right!</div>`;
+        listEl.innerHTML = `<div class="xb-panel p-6 text-center text-xs text-[#A0A0A0]">Your private Ender Vault is empty. Log your secret diamond stash coordinates or personal goals in the left inspector!</div>`;
         return;
       }
 
       listEl.innerHTML = items.map(item => `
-        <div class="ui-panel ore-bevel-top hover:border-active p-4 transition-colors duration-150 ease-out flex items-start gap-4">
+        <div class="xb-panel p-3.5 flex items-start gap-3.5">
           <button onclick="togglePrivateItem('${item.id}')"
-            class="mt-0.5 w-6 h-6 rounded-[4px] border flex items-center justify-center text-xs font-mono transition-colors duration-150 ease-out ${
-              item.done
-                ? 'bg-accent-subtle border-accent-border text-accent'
-                : 'bg-surface-base border-subtle text-transparent hover:border-active'
-            }">✓</button>
+            class="${item.done ? 'ore-btn ore-btn-primary' : 'ore-btn'} w-8 h-8 flex items-center justify-center text-xs font-mojangles shrink-0">
+            ${item.done ? '✓' : '·'}
+          </button>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border tabular-nums flex items-center gap-1.5">
+              <span class="ore-slot px-2.5 py-1 text-[11px] font-mojangles text-warning tabular-nums flex items-center gap-1.5">
                 <img src="/assets/anim-diamond.gif" alt="" class="w-3.5 h-3.5 pixel-art" />
                 <span>XYZ: ${item.coords}</span>
               </span>
-              <button onclick="deletePrivateItem('${item.id}')" class="text-xs text-muted hover:text-danger transition-colors duration-150 ease-out">✕</button>
+              <button onclick="deletePrivateItem('${item.id}')" class="ore-btn px-2 py-0.5 text-xs text-[#8E8E8E] hover:text-danger">✕</button>
             </div>
-            <h3 class="text-sm font-semibold tracking-tight text-primary mt-2 ${item.done ? 'line-through text-secondary' : ''}">${item.title}</h3>
-            ${item.notes ? `<p class="text-xs text-secondary mt-2 leading-relaxed">${item.notes}</p>` : ''}
+            <h3 class="font-mc-ten text-base text-white uppercase mt-2 ${item.done ? 'line-through text-[#8E8E8E]' : ''}">${item.title}</h3>
+            ${item.notes ? `<p class="text-xs text-[#A0A0A0] mt-1 leading-relaxed">${item.notes}</p>` : ''}
           </div>
         </div>
       `).join('');
@@ -2540,24 +2569,31 @@
         const netherZ = l.dim === 'Overworld' ? Math.round(l.z / 8) : l.z * 8;
         const coordStr = `${l.x}, ${l.y}, ${l.z}`;
         return `
-          <tr class="hover:bg-surface-hover transition-colors duration-150 ease-out">
-            <td class="p-4">
-              <div class="font-semibold text-primary flex items-center gap-2">
+          <div class="ore-slot p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
                 <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
-                <span>${l.name}</span>
+                <span class="font-mc-ten text-base text-white uppercase">${l.name}</span>
+                <span class="bg-[#1C1C1C] px-2 py-0.5 border border-white/10 font-mono text-[10px] uppercase text-[#A0A0A0]">${l.dim}</span>
+                <span class="font-mono text-[10px] text-[#8E8E8E]">BY ${l.addedBy}</span>
               </div>
-              ${l.notes ? `<div class="text-[11px] text-secondary mt-1 pl-6">${l.notes}</div>` : ''}
-            </td>
-            <td class="p-4 font-mono text-secondary">${l.dim}</td>
-            <td class="p-4 font-mono font-semibold text-accent tabular-nums">${coordStr}</td>
-            <td class="p-4 font-mono text-secondary tabular-nums">X: ${netherX}, Z: ${netherZ}</td>
-            <td class="p-4 font-mono text-secondary">${l.addedBy}</td>
-            <td class="p-4 text-right">
-              <button onclick="copyCoords('${coordStr}')" class="ui-btn px-2.5 py-1 text-[11px] font-mono text-secondary hover:text-primary">
-                Copy
+              ${l.notes ? `<div class="text-xs text-[#A0A0A0] mt-1 leading-relaxed">${l.notes}</div>` : ''}
+            </div>
+            <div class="flex items-center gap-2 flex-wrap shrink-0">
+              <div class="bg-[#1C1C1C] border border-white/10 px-2.5 py-1.5 text-left">
+                <span class="block font-mono text-[9px] uppercase text-[#8E8E8E]">OVERWORLD XYZ</span>
+                <span class="font-mojangles text-sm text-[#6BC349] tabular-nums">${coordStr}</span>
+              </div>
+              <div class="bg-[#1C1C1C] border border-white/10 px-2.5 py-1.5 text-left">
+                <span class="block font-mono text-[9px] uppercase text-[#8E8E8E]">NETHER LINK</span>
+                <span class="font-mojangles text-sm text-white tabular-nums">X: ${netherX}, Z: ${netherZ}</span>
+              </div>
+              <button onclick="copyCoords('${coordStr}')" class="ore-btn ore-btn-stone px-3 py-2 text-xs font-mono font-semibold uppercase">
+                <span>Copy</span>
+                <span class="font-mojangles text-[10px] bg-black/15 px-1 text-[#1E1E1F]">A</span>
               </button>
-            </td>
-          </tr>
+            </div>
+          </div>
         `;
       }).join('');
     }
