@@ -1,0 +1,9 @@
+{
+  "name": "chibi-zone-realm-board",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
