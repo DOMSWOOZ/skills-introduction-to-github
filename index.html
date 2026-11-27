@@ -16,7 +16,8 @@
           fontFamily: {
             sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
-            display: ['MinecraftFive', 'Inter', 'sans-serif'],
+            display: ['MinecraftTen', 'MinecraftFive', 'Inter', 'sans-serif'],
+            five: ['MinecraftFive', 'Inter', 'sans-serif'],
             pixel: ['Mojangles', 'JetBrains Mono', 'monospace'],
           },
           letterSpacing: {
@@ -56,6 +57,13 @@
     }
   </script>
   <style>
+    @font-face {
+      font-family: 'MinecraftTen';
+      src: url('/assets/minecraft-ten.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
     @font-face {
       font-family: 'MinecraftFive';
       src: url('/assets/MinecraftFive.ttf') format('truetype');
@@ -149,8 +157,14 @@
     }
 
     .mc-display-title {
-      font-family: 'MinecraftFive', 'Inter', sans-serif;
+      font-family: 'MinecraftTen', 'MinecraftFive', 'Inter', sans-serif;
       letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .mc-five-label {
+      font-family: 'MinecraftFive', 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
@@ -818,62 +832,50 @@
     const STORAGE_KEY = 'chibi_zone_realm_v2';
     let sfxEnabled = true;
 
-    // Web Audio OreUI Tactile Click Synthesizer (Zero external audio file latency)
-    const audioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)
-      ? new (window.AudioContext || window.webkitAudioContext)()
-      : null;
+    // Authentic Vanilla Minecraft Sound Engine (Extracted directly from vanilla resource_packs/vanilla/sounds/*.fsb)
+    const VANILLA_SFX_FILES = {
+      click: '/assets/sfx-click.mp3',
+      pop: '/assets/sfx-pop.mp3',
+      coin: '/assets/sfx-orb.mp3',
+      levelup: '/assets/sfx-levelup.mp3',
+      toast: '/assets/sfx-toast.mp3',
+      ender_open: '/assets/sfx-enderchest-open.mp3',
+      ender_close: '/assets/sfx-enderchest-close.mp3',
+      drawer_open: '/assets/sfx-drawer-open.mp3',
+      drawer_close: '/assets/sfx-drawer-close.mp3',
+      drawmap: '/assets/sfx-drawmap.mp3',
+      enchant: '/assets/sfx-enchant.mp3',
+      amethyst: '/assets/sfx-amethyst.mp3',
+      anvil: '/assets/sfx-anvil.mp3',
+      deny: '/assets/sfx-deny.mp3',
+      tab: '/assets/sfx-drawer-open.mp3',
+      unlock: '/assets/sfx-enderchest-open.mp3'
+    };
+
+    const sfxPool = {};
+    if (typeof window !== 'undefined') {
+      Object.entries(VANILLA_SFX_FILES).forEach(([key, url]) => {
+        const audio = new Audio(url);
+        audio.preload = 'auto';
+        sfxPool[key] = audio;
+      });
+    }
 
     function playUiSound(type = 'click') {
-      if (!sfxEnabled || !audioCtx) return;
+      if (!sfxEnabled) return;
       try {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        const now = audioCtx.currentTime;
-        if (type === 'tab') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(320, now);
-          osc.frequency.exponentialRampToValueAtTime(580, now + 0.055);
-          gain.gain.setValueAtTime(0.08, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-          osc.start(now);
-          osc.stop(now + 0.065);
-        } else if (type === 'coin') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(880, now);
-          osc.frequency.setValueAtTime(1318.5, now + 0.045);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-          osc.start(now);
-          osc.stop(now + 0.15);
-        } else if (type === 'unlock') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(440, now);
-          osc.frequency.setValueAtTime(659.25, now + 0.06);
-          osc.frequency.setValueAtTime(880, now + 0.12);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-          osc.start(now);
-          osc.stop(now + 0.23);
-        } else {
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(220, now);
-          osc.frequency.exponentialRampToValueAtTime(120, now + 0.03);
-          gain.gain.setValueAtTime(0.05, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-          osc.start(now);
-          osc.stop(now + 0.04);
-        }
+        const src = VANILLA_SFX_FILES[type] || VANILLA_SFX_FILES.click;
+        const base = sfxPool[type] || sfxPool.click;
+        const clip = base ? base.cloneNode() : new Audio(src);
+        clip.volume = type === 'levelup' ? 0.55 : 0.72;
+        clip.play().catch(() => {});
       } catch (e) {}
     }
 
     function toggleSound() {
       sfxEnabled = !sfxEnabled;
       document.getElementById('soundToggleBtn').textContent = sfxEnabled ? 'SFX: ON' : 'SFX: OFF';
-      if (sfxEnabled) playUiSound('coin');
+      if (sfxEnabled) playUiSound('amethyst');
     }
 
     const PLAYER_AVATARS = {
@@ -1131,8 +1133,8 @@
       window._toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
     }
 
-    function triggerScreenTransition(label, callback) {
-      playUiSound('tab');
+    function triggerScreenTransition(label, callback, skipDefaultSound = false) {
+      if (!skipDefaultSound) playUiSound('drawer_open');
       const overlay = document.getElementById('screenTransitionOverlay');
       document.getElementById('transitionLabel').textContent = label;
       overlay.classList.add('active');
@@ -1143,7 +1145,7 @@
     }
 
     function setActivePlayer(name) {
-      playUiSound('click');
+      playUiSound('pop');
       state.activePlayer = name;
       if (!state.privateVaults[name]) {
         state.privateVaults[name] = { pin: null, items: [] };
@@ -1153,13 +1155,13 @@
     }
 
     function openNodeSignInModal() {
-      playUiSound('click');
+      playUiSound('drawer_open');
       renderModalCrewGrid();
       document.getElementById('nodeSignInModal').classList.remove('hidden');
     }
 
     function closeNodeSignInModal() {
-      playUiSound('click');
+      playUiSound('drawer_close');
       document.getElementById('nodeSignInModal').classList.add('hidden');
     }
 
@@ -1203,6 +1205,13 @@
 
     function switchTab(tab) {
       if (state.activeTab === tab) return;
+      const tabSounds = {
+        shared: 'enchant',
+        vault: 'ender_open',
+        gps: 'drawmap',
+        gallery: 'amethyst'
+      };
+      playUiSound(tabSounds[tab] || 'drawer_open');
       const labels = {
         shared: 'LOADING SHARED QUEST BOARD...',
         vault: 'ACCESSING ENDER TREASURY...',
@@ -1212,7 +1221,7 @@
       triggerScreenTransition(labels[tab] || 'SWITCHING SECTOR...', () => {
         state.activeTab = tab;
         saveState();
-      });
+      }, true);
     }
 
     function setFilter(f) {
@@ -1235,18 +1244,20 @@
     }
 
     function cycleStatus(taskId) {
-      playUiSound('unlock');
       const task = state.sharedTasks.find(t => t.id === taskId);
       if (!task) return;
       if (task.status === 'open') {
+        playUiSound('anvil');
         task.status = 'in_progress';
         task.claimedBy = state.activePlayer;
         showToast(state.activePlayer + ' claimed quest: ' + task.title);
       } else if (task.status === 'in_progress') {
+        playUiSound('levelup');
         task.status = 'done';
         if (!task.claimedBy) task.claimedBy = state.activePlayer;
         showToast('Quest Completed: ' + task.title);
       } else {
+        playUiSound('click');
         task.status = 'open';
         task.claimedBy = null;
       }
@@ -1261,7 +1272,7 @@
 
     function handleAddSharedTask(e) {
       e.preventDefault();
-      playUiSound('coin');
+      playUiSound('toast');
       const title = document.getElementById('taskTitleInput').value.trim();
       const category = document.getElementById('taskCategoryInput').value;
       const coords = document.getElementById('taskCoordsInput').value.trim() || 'TBD';
@@ -1301,12 +1312,12 @@
       const input = document.getElementById('pinAttemptInput');
       const vault = getPlayerVault();
       if (input.value === vault.pin) {
-        playUiSound('unlock');
+        playUiSound('ender_open');
         unlockedVaults[state.activePlayer] = true;
         renderAll();
         showToast('Unlocked ' + state.activePlayer + '\'s Ender Vault');
       } else {
-        playUiSound('click');
+        playUiSound('deny');
         showToast('Access Denied: Incorrect PIN (SWOOZ default: 0214)');
         input.value = '';
       }
@@ -1317,10 +1328,11 @@
       const input = document.getElementById('newPinInput');
       const pin = input.value.trim();
       if (pin.length < 4) {
+        playUiSound('deny');
         showToast('Choose at least a 4-digit PIN');
         return;
       }
-      playUiSound('unlock');
+      playUiSound('ender_open');
       const vault = getPlayerVault();
       vault.pin = pin;
       unlockedVaults[state.activePlayer] = true;
@@ -1329,7 +1341,7 @@
     }
 
     function lockCurrentVault() {
-      playUiSound('click');
+      playUiSound('ender_close');
       delete unlockedVaults[state.activePlayer];
       renderAll();
       showToast('Ender Vault Locked');
@@ -1345,7 +1357,7 @@
 
     function handleAddPrivateTask(e) {
       e.preventDefault();
-      playUiSound('coin');
+      playUiSound('enchant');
       const title = document.getElementById('privTitleInput').value.trim();
       const coords = document.getElementById('privCoordsInput').value.trim() || 'CLASSIFIED';
       const notes = document.getElementById('privNotesInput').value.trim();
@@ -1385,7 +1397,7 @@
 
     function handleAddLandmark(e) {
       e.preventDefault();
-      playUiSound('coin');
+      playUiSound('drawmap');
       const name = document.getElementById('gpsNameInput').value.trim();
       const x = parseInt(document.getElementById('gpsXInput').value, 10);
       const y = parseInt(document.getElementById('gpsYInput').value, 10);
@@ -1418,16 +1430,16 @@
     }
 
     function openShareModal() {
-      playUiSound('click');
+      playUiSound('drawer_open');
       document.getElementById('shareModal').classList.remove('hidden');
     }
     function closeShareModal() {
-      playUiSound('click');
+      playUiSound('drawer_close');
       document.getElementById('shareModal').classList.add('hidden');
     }
 
     function copyDiscordSummary() {
-      playUiSound('coin');
+      playUiSound('toast');
       const openTasks = state.sharedTasks
         .filter(t => t.status !== 'done')
         .sort((a, b) => b.votes.length - a.votes.length);
