@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CHIBI~ZONE // REALMS COMMAND CENTER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['MinecraftFive', 'Inter', 'sans-serif'],
+            pixel: ['Mojangles', 'JetBrains Mono', 'monospace'],
+          },
+          letterSpacing: {
+            tight: '-0.02em',
+            label: '0.08em',
+          },
+          colors: {
+            'surface-base': 'var(--surface-base)',
+            'surface-raised': 'var(--surface-raised)',
+            'surface-hover': 'var(--surface-hover)',
+            canvas: 'var(--bg-canvas)',
+            panel: 'var(--bg-panel)',
+            hover: 'var(--bg-hover)',
+            subtle: 'var(--border-subtle)',
+            active: 'var(--border-active)',
+            primary: 'var(--text-primary)',
+            secondary: 'var(--text-secondary)',
+            muted: 'var(--text-muted)',
+            accent: {
+              DEFAULT: 'var(--accent)',
+              subtle: 'var(--accent-subtle)',
+              border: 'var(--accent-border)',
+            },
+            warning: {
+              DEFAULT: 'var(--warning)',
+              subtle: 'var(--warning-subtle)',
+              border: 'var(--warning-border)',
+            },
+            danger: {
+              DEFAULT: 'var(--danger)',
+              subtle: 'var(--danger-subtle)',
+              border: 'var(--danger-border)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: 'MinecraftFive';
+      src: url('/assets/MinecraftFive.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Mojangles';
+      src: url('/assets/Mojangles.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      /* 60% Dominant Neutral Canvas & 30% Secondary Elevated Surfaces */
+      --surface-base: #0A0A0C;
+      --surface-raised: #121216;
+      --surface-hover: #1A1A20;
+
+      --bg-canvas: var(--surface-base);
+      --bg-panel: var(--surface-raised);
+      --bg-hover: var(--surface-hover);
+
+      /* 1px Hairline Structural Borders (Ban Drop Shadows) */
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(255, 255, 255, 0.25);
+
+      /* Strict Contrast Text Hierarchy (~95% / ~65% / ~40%) */
+      --text-primary: rgba(243, 244, 246, 0.95);
+      --text-secondary: rgba(243, 244, 246, 0.65);
+      --text-muted: rgba(243, 244, 246, 0.40);
+
+      /* 10% High-Contrast Tactical Emerald Accent */
+      --accent: #10B981;
+      --accent-primary: #10B981;
+      --accent-subtle: rgba(16, 185, 129, 0.10);
+      --accent-border: rgba(16, 185, 129, 0.25);
+
+      --warning: #F59E0B;
+      --warning-subtle: rgba(245, 158, 11, 0.10);
+      --warning-border: rgba(245, 158, 11, 0.25);
+
+      --danger: #F43F5E;
+      --danger-subtle: rgba(244, 63, 94, 0.10);
+      --danger-border: rgba(244, 63, 94, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      border-color: var(--border-subtle);
+    }
+
+    body {
+      background-color: var(--surface-base);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Subtle tactical dot matrix background on the primary canvas */
+    .canvas-grid-bg {
+      background-color: var(--surface-base);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    h1, h2, h3 {
+      letter-spacing: -0.02em;
+    }
+
+    table, td, th, input[type="number"], .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pixel-art {
+      image-rendering: pixelated;
+    }
+
+    .micro-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .mc-display-title {
+      font-family: 'MinecraftFive', 'Inter', sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .ui-panel {
+      background-color: var(--surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    /* OreUI-inspired tactile bevel header strip (1px top highlight, zero drop-shadow) */
+    .ore-bevel-top {
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .ui-input {
+      background-color: var(--surface-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: var(--text-primary);
+      transition: border-color 150ms ease-out, background-color 150ms ease-out;
+    }
+    .ui-input::placeholder {
+      color: var(--text-muted);
+    }
+    .ui-input:focus {
+      outline: none;
+      border-color: var(--border-active);
+    }
+
+    .ui-btn {
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--surface-base);
+      color: var(--text-primary);
+      transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
+      cursor: pointer;
+    }
+    .ui-btn:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--border-active);
+    }
+    .ui-btn:active {
+      transform: translateY(1px);
+    }
+
+    .ui-btn-accent {
+      border-radius: 4px;
+      border: 1px solid var(--accent-border);
+      background-color: var(--accent-subtle);
+      color: var(--accent);
+      transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+      cursor: pointer;
+    }
+    .ui-btn-accent:hover {
+      background-color: rgba(16, 185, 129, 0.18);
+      border-color: var(--accent);
+    }
+    .ui-btn-accent:active {
+      transform: translateY(1px);
+    }
+
+    .ui-btn-warning {
+      border-radius: 4px;
+      border: 1px solid var(--warning-border);
+      background-color: var(--warning-subtle);
+      color: var(--warning);
+      transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+      cursor: pointer;
+    }
+    .ui-btn-warning:hover {
+      background-color: rgba(245, 158, 11, 0.18);
+      border-color: var(--warning);
+    }
+    .ui-btn-warning:active {
+      transform: translateY(1px);
+    }
+
+    /* Screen Transition Overlay */
+    #screenTransitionOverlay {
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 160ms ease-out;
+    }
+    #screenTransitionOverlay.active {
+      opacity: 1;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--surface-base);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-subtle);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border-active);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col canvas-grid-bg text-primary">
+
+  <!-- ==================== SCREEN TRANSITION SHUTTER OVERLAY ==================== -->
+  <div id="screenTransitionOverlay" class="fixed inset-0 z-50 bg-surface-base/95 flex flex-col items-center justify-center gap-4">
+    <div class="ui-panel p-6 flex flex-col items-center gap-4 max-w-xs w-full text-center border-active">
+      <div class="flex items-center gap-4">
+        <img src="/assets/anim-pickaxe.gif" alt="" class="w-8 h-8 pixel-art" />
+        <img src="/assets/anim-diamond.gif" alt="" class="w-8 h-8 pixel-art" />
+      </div>
+      <div id="transitionLabel" class="mc-display-title text-xs text-accent tracking-wider">LOADING SECTOR...</div>
+      <div class="w-full h-1 bg-surface-base border border-subtle rounded-[4px] overflow-hidden">
+        <div class="h-full bg-accent w-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOP COMMAND BAR (ORE-UI + PRINCIPAL SYSTEM) ==================== -->
+  <header class="sticky top-0 z-30 bg-surface-raised border-b border-subtle">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand / Realms Official Logo + Day Ticker -->
+      <div class="flex items-center gap-4">
+        <div class="h-10 px-2 rounded-[4px] bg-surface-base border border-subtle flex items-center justify-center">
+          <img src="/assets/realms-logo.png" alt="Minecraft Realms" class="h-6 w-auto object-contain" />
+        </div>
+        <div class="border-l border-subtle pl-4">
+          <div class="flex items-center gap-2">
+            <h1 class="mc-display-title text-sm text-primary">CHIBI~ZONE COMMAND</h1>
+            <span class="px-2 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-label rounded-[4px] bg-accent-subtle text-accent border border-accent-border tabular-nums flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-[4px] bg-accent"></span>
+              <span>DAY <span id="realmDayCounter">537</span></span>
+            </span>
+          </div>
+          <p class="text-xs text-secondary hidden sm:block mt-0.5">Lakeside Lava-Spire Citadel · Shared Roadmap · Private Ender Vaults</p>
+        </div>
+      </div>
+
+      <!-- Active Crew Member Switcher + Node Sign-In & Sync Controls -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="openNodeSignInModal()" title="Open Crew Node Network Selector"
+          class="ui-btn px-2 py-1.5 flex items-center gap-2">
+          <img id="activePlayerAvatarImg" src="/assets/avatar-swooz.png" alt="" class="w-6 h-6 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+          <div class="text-left pr-1">
+            <div class="text-[10px] font-mono uppercase tracking-label text-secondary leading-none">OPERATOR</div>
+            <div id="headerActivePlayerName" class="text-xs font-mono font-bold text-accent leading-tight">SWOOZ</div>
+          </div>
+        </button>
+
+        <div id="crewSelector" class="hidden xl:flex items-center gap-1 bg-surface-base p-1.5 rounded-[4px] border border-subtle"></div>
+
+        <button onclick="toggleSound()" id="soundToggleBtn" title="Toggle OreUI Audio Clicks"
+          class="ui-btn px-2.5 py-2 text-xs font-mono text-secondary hover:text-primary">
+          SFX: ON
+        </button>
+
+        <button onclick="openShareModal()"
+          class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label flex items-center gap-2">
+          <img src="/assets/cloud-sync.png" alt="" class="w-4 h-4 object-contain" />
+          <span>Sync / Discord</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN NAVIGATION TABS WITH OFFICIAL MINECRAFT ASSETS -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 border-t border-subtle bg-surface-base overflow-x-auto">
+      <button onclick="switchTab('shared')" id="tab-shared"
+        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>SHARED QUEST BOARD</span>
+        <span id="sharedCountBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">0</span>
+      </button>
+
+      <button onclick="switchTab('vault')" id="tab-vault"
+        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
+        <span><span id="vaultOwnerLabel">SWOOZ</span>'S ENDER VAULT</span>
+        <span id="vaultLockBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border tabular-nums">PIN LOCKED</span>
+      </button>
+
+      <button onclick="switchTab('gps')" id="tab-gps"
+        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
+        <span>REALM GPS &amp; SEED MAP</span>
+        <span id="gpsCountBadge" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">0</span>
+      </button>
+
+      <button onclick="switchTab('gallery')" id="tab-gallery"
+        class="px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>CITADEL ARCHIVE</span>
+        <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-raised border border-subtle tabular-nums">4 SHOTS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== TAB 1: SHARED CREW QUEST BOARD ==================== -->
+    <section id="view-shared" class="flex flex-col gap-6">
+
+      <!-- AAA HERO BANNER (Using User Selection #5: squad-jump-hero.jpg + Base Snapshot) -->
+      <div class="ui-panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-7 p-6 flex flex-col justify-between bg-surface-raised">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <img src="/assets/enchanted-book.png" alt="" class="w-5 h-5 pixel-art" />
+              <span class="micro-label text-accent">ACTIVE REALM EXPEDITION // DAY 537</span>
+            </div>
+            <h2 class="mc-display-title text-lg sm:text-xl text-primary">LAKESIDE LAVA-SPIRE CITADEL &amp; REALM ROADMAP</h2>
+            <p class="text-xs text-secondary mt-2 leading-relaxed max-w-xl">
+              Vote on upcoming builds with Gold Coin Bounties, claim active tasks across PC, console, and mobile, or switch to your PIN-protected Ender Vault for personal diamond stashes.
+            </p>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-subtle">
+            <div>
+              <div class="micro-label">ACTIVE TASKS</div>
+              <div id="heroStatOpen" class="text-base font-mono font-bold text-primary mt-1 tabular-nums">6</div>
+            </div>
+            <div>
+              <div class="micro-label">COMPLETED BUILDS</div>
+              <div id="heroStatDone" class="text-base font-mono font-bold text-accent mt-1 tabular-nums">2</div>
+            </div>
+            <div>
+              <div class="micro-label">TOTAL BOUNTY VOTES</div>
+              <div id="heroStatVotes" class="text-base font-mono font-bold text-warning mt-1 tabular-nums">18</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-5 relative min-h-[180px] bg-surface-base border-t lg:border-t-0 lg:border-l border-subtle flex items-center justify-end overflow-hidden">
+          <img src="/assets/squad-jump-hero.jpg" alt="Crew Co-Op Squad" class="w-full h-full object-cover object-center opacity-90" />
+          <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-[#121216]/30 to-transparent"></div>
+          <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-secondary tabular-nums">
+            CREW ONLINE: 4 OPERATORS
+          </div>
+        </div>
+      </div>
+
+      <!-- Main 12-Col Split: Quest List (8 cols) + Proposal & Crew Huddle (4 cols) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left 8 Cols: Filters + Asset-Driven Task Cards -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+          <div class="ui-panel p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="setFilter('all')" id="filter-all" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">All Quests</button>
+              <button onclick="setFilter('open')" id="filter-open" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">Up For Votes</button>
+              <button onclick="setFilter('in_progress')" id="filter-in_progress" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">In Progress</button>
+              <button onclick="setFilter('done')" id="filter-done" class="px-4 py-2 text-xs font-medium rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px]">Completed</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="micro-label">Sort:</span>
+              <select id="sortSelect" onchange="renderSharedTasks()" class="ui-input px-2 py-2 text-xs font-mono">
+                <option value="votes">Highest Bounty Votes</option>
+                <option value="newest">Newest Added</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="sharedTasksList" class="flex flex-col gap-4"></div>
+        </div>
+
+        <!-- Right 4 Cols: Propose Task + Crew Huddle Roster (Using User Selection #3: crew-huddle.jpg) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+          
+          <!-- Propose Build Card -->
+          <div class="ui-panel overflow-hidden">
+            <div class="p-4 border-b border-subtle bg-surface-base flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/recipe-book.png" alt="" class="w-5 h-5 pixel-art" />
+                <span class="micro-label">Propose Build / Quest</span>
+              </div>
+              <span class="text-[11px] font-mono text-secondary">As <strong id="postingAsLabel" class="text-accent">SWOOZ</strong></span>
+            </div>
+            <form onsubmit="handleAddSharedTask(event)" class="p-6 flex flex-col gap-4">
+              <div>
+                <label class="micro-label block mb-2">Task or Build Title *</label>
+                <input type="text" id="taskTitleInput" required placeholder="e.g. Build Nether Hub Tunnel to Village"
+                  class="ui-input w-full px-4 py-2 text-xs" />
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="micro-label block mb-2">Category</label>
+                  <select id="taskCategoryInput" class="ui-input w-full px-2 py-2 text-xs">
+                    <option value="Architecture">Architecture</option>
+                    <option value="Nether / Portal">Nether / Portal</option>
+                    <option value="Farming / Bees">Farming / Bees</option>
+                    <option value="Mining / Gear">Mining / Gear</option>
+                    <option value="Taming / Mobs">Taming / Mobs</option>
+                    <option value="Redstone">Redstone</option>
+                    <option value="Exploration">Exploration</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="micro-label block mb-2">Coords (X, Y, Z)</label>
+                  <input type="text" id="taskCoordsInput" placeholder="915, 63, -295"
+                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                </div>
+              </div>
+              <div>
+                <label class="micro-label block mb-2">Details / Materials Required</label>
+                <textarea id="taskNotesInput" rows="2" placeholder="Materials, recipe notes, or strategy..."
+                  class="ui-input w-full px-4 py-2 text-xs"></textarea>
+              </div>
+              <button type="submit" class="ui-btn-accent w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label flex items-center justify-center gap-2">
+                <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
+                <span>+ Post Quest to Board</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Crew Huddle Roster Card (Using User Selection #3: crew-huddle.jpg) -->
+          <div class="ui-panel overflow-hidden">
+            <div class="relative h-28 bg-surface-base border-b border-subtle overflow-hidden">
+              <img src="/assets/crew-huddle.jpg" alt="CHIBI~Zone Crew Huddle" class="w-full h-full object-cover object-center opacity-85" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#121216] via-[#121216]/40 to-transparent"></div>
+              <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                <div>
+                  <span class="micro-label text-accent block">REALM ROSTER</span>
+                  <h3 class="mc-display-title text-xs text-primary">CHIBI~ZONE BUILDERS</h3>
+                </div>
+                <button onclick="openNodeSignInModal()" class="ui-btn px-2.5 py-1 text-[11px] font-mono text-secondary hover:text-primary">
+                  Switch Node
+                </button>
+              </div>
+            </div>
+            <div class="p-4 flex flex-col gap-2" id="crewStatsList"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: PRIVATE ENDER VAULT (PIN-LOCKED PER PLAYER) ==================== -->
+    <section id="view-vault" class="hidden">
+      <div class="max-w-5xl mx-auto flex flex-col gap-6">
+        
+        <!-- Ender Vault Hero Banner (Using User Selection #2: gold-coins.jpg + ender-chest.png) -->
+        <div class="ui-panel overflow-hidden grid grid-cols-1 md:grid-cols-12">
+          <div class="md:col-span-8 p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <img src="/assets/ender-chest.png" alt="" class="w-5 h-5 pixel-art" />
+                <span class="micro-label text-warning">PERSONAL ENCRYPTED ENDER STASH // EYES ONLY</span>
+              </div>
+              <h2 class="mc-display-title text-lg text-primary">
+                <span id="vaultHeaderPlayerName">SWOOZ</span>'S PRIVATE TREASURY &amp; SECRET VAULT
+              </h2>
+              <p class="text-xs text-secondary mt-2 leading-relaxed">
+                Protected by a per-player 4-digit PIN. Store hidden diamond chest coordinates, secret painting entrances, and surprise build blueprints away from the public crew feed.
+              </p>
+            </div>
+            <div id="vaultHeaderControls" class="flex items-center gap-2 mt-4 pt-4 border-t border-subtle"></div>
+          </div>
+          <div class="md:col-span-4 relative min-h-[150px] bg-surface-base border-t md:border-t-0 md:border-l border-subtle overflow-hidden flex items-center justify-center">
+            <img src="/assets/gold-coins.jpg" alt="Gold Treasury" class="w-full h-full object-cover object-center opacity-90 pixel-art" />
+            <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-transparent to-transparent"></div>
+          </div>
+        </div>
+
+        <!-- PIN Lock Gate (Uses official AccessDenied graphic + animated diamond) -->
+        <div id="vaultPinGate" class="ui-panel p-6 max-w-md mx-auto w-full text-center"></div>
+
+        <!-- Unlocked Vault Content -->
+        <div id="vaultUnlockedContent" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left 7 Cols: Private Items + Secret Painting Reference Preview -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            <div id="swoozVaultPreviewCard" class="ui-panel overflow-hidden hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-12">
+                <div class="sm:col-span-5 bg-surface-base border-b sm:border-b-0 sm:border-r border-subtle">
+                  <img src="/assets/base-vault-art.jpg" alt="4x2 Classical Ruins Secret Painting Door" class="w-full h-full object-cover" />
+                </div>
+                <div class="sm:col-span-7 p-4 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <img src="/assets/first-diamond.png" alt="" class="w-4 h-4 pixel-art" />
+                      <span class="micro-label text-accent">VERIFIED VAULT CAM // Y=75</span>
+                    </div>
+                    <h3 class="text-sm font-semibold tracking-tight text-primary">4x2 Classical Ruins Painting Entrance</h3>
+                    <p class="text-xs text-secondary mt-1">
+                      Walk straight through the left side of the canvas (past the "SMILE :) YOU ARE ON SWOOZ CAM" signs) to access the hidden chest. Click the right side to use the hidden Crafting Table.
+                    </p>
+                  </div>
+                  <div class="mt-3 pt-2 border-t border-subtle flex items-center justify-between text-[11px] font-mono text-secondary tabular-nums">
+                    <span>LOCATION: 910, 75, -287</span>
+                    <span class="text-accent">STATUS: CONCEALED</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="privateVaultList" class="flex flex-col gap-4"></div>
+          </div>
+
+          <!-- Right 5 Cols: Add Secret Item -->
+          <div class="lg:col-span-5">
+            <div class="ui-panel overflow-hidden">
+              <div class="p-4 border-b border-subtle bg-surface-base flex items-center gap-2">
+                <img src="/assets/ender-chest.png" alt="" class="w-5 h-5 pixel-art" />
+                <span class="micro-label">Log Secret Stash or Personal Goal</span>
+              </div>
+              <form onsubmit="handleAddPrivateTask(event)" class="p-6 flex flex-col gap-4">
+                <div>
+                  <label class="micro-label block mb-2">Secret Item / Stash Title *</label>
+                  <input type="text" id="privTitleInput" required placeholder="e.g. Hidden Diamond Chest behind Painting"
+                    class="ui-input w-full px-4 py-2 text-xs" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-2">Secret Coordinates (X, Y, Z)</label>
+                  <input type="text" id="privCoordsInput" placeholder="e.g. 910, 75, -287"
+                    class="ui-input w-full px-4 py-2 text-xs font-mono tabular-nums" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-2">Private Notes / Inventory Tally</label>
+                  <textarea id="privNotesInput" rows="3" placeholder="e.g. 3 Diamonds, 1 Diamond Pickaxe, 1 Enchanted Golden Apple..."
+                    class="ui-input w-full px-4 py-2 text-xs"></textarea>
+                </div>
+                <button type="submit" class="ui-btn-warning w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                  Save to My Private Ender Vault
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: REALM GPS & SEED MAP (Using User Selection #4: seed-map-hero.jpg) ==================== -->
+    <section id="view-gps" class="hidden flex flex-col gap-6">
+      
+      <!-- GPS Hero Banner with User Selection #4 (Alex holding World Map over pixel seed numbers) -->
+      <div class="ui-panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-7 p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <img src="/assets/conduit-128.png" alt="" class="w-5 h-5 object-contain" />
+              <span class="micro-label text-accent">CARTOGRAPHY &amp; NETHER PORTAL CALCULATOR</span>
+            </div>
+            <h2 class="mc-display-title text-lg text-primary">REALM GPS &amp; LANDMARK TELEMETRY</h2>
+            <p class="text-xs text-secondary mt-2 leading-relaxed">
+              Every Overworld coordinate logged below automatically computes its exact <code class="font-mono text-accent">÷ 8</code> Nether Portal link coordinate so your portals never cross-link by accident.
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-subtle flex flex-wrap items-center gap-6 text-xs font-mono tabular-nums">
+            <div><span class="text-secondary">MAIN CITADEL:</span> <strong class="text-accent">915, 63, -295</strong></div>
+            <div><span class="text-secondary">NETHER TARGET:</span> <strong class="text-primary">X: 114, Z: -37</strong></div>
+          </div>
+        </div>
+        <div class="lg:col-span-5 relative min-h-[170px] bg-surface-base border-t lg:border-t-0 lg:border-l border-subtle overflow-hidden">
+          <img src="/assets/seed-map-hero.jpg" alt="Alex World Map & Seed Coordinates" class="w-full h-full object-cover object-center opacity-95" />
+          <div class="absolute inset-0 bg-gradient-to-r from-[#121216] via-[#121216]/25 to-transparent"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+          <div class="ui-panel overflow-hidden">
+            <div class="p-4 border-b border-subtle flex items-center justify-between">
+              <span class="micro-label">Verified Realm Coordinates Directory</span>
+              <span class="text-[11px] font-mono text-secondary tabular-nums">1 Nether Block = 8 Overworld Blocks</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-subtle bg-surface-base">
+                    <th class="p-4 micro-label">Landmark</th>
+                    <th class="p-4 micro-label">Dimension</th>
+                    <th class="p-4 micro-label">X / Y / Z</th>
+                    <th class="p-4 micro-label">Nether Link (X / Z)</th>
+                    <th class="p-4 micro-label">Logged By</th>
+                    <th class="p-4 micro-label text-right">Copy</th>
+                  </tr>
+                </thead>
+                <tbody id="gpsTableBody" class="divide-y divide-subtle text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4">
+          <div class="ui-panel p-6">
+            <span class="micro-label block mb-4">Log New Landmark Coordinate</span>
+            <form onsubmit="handleAddLandmark(event)" class="flex flex-col gap-4">
+              <div>
+                <label class="micro-label block mb-2">Landmark Name *</label>
+                <input type="text" id="gpsNameInput" required placeholder="e.g. Ruined Portal / Village Trading Hall"
+                  class="ui-input w-full px-4 py-2 text-xs" />
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="micro-label block mb-2">X *</label>
+                  <input type="number" id="gpsXInput" required placeholder="915"
+                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-2">Y *</label>
+                  <input type="number" id="gpsYInput" required placeholder="63"
+                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                </div>
+                <div>
+                  <label class="micro-label block mb-2">Z *</label>
+                  <input type="number" id="gpsZInput" required placeholder="-295"
+                    class="ui-input w-full px-2 py-2 text-xs font-mono tabular-nums" />
+                </div>
+              </div>
+              <div>
+                <label class="micro-label block mb-2">Dimension</label>
+                <select id="gpsDimInput" class="ui-input w-full px-2 py-2 text-xs">
+                  <option value="Overworld">Overworld</option>
+                  <option value="Nether">The Nether</option>
+                  <option value="End">The End</option>
+                </select>
+              </div>
+              <div>
+                <label class="micro-label block mb-2">Notes</label>
+                <input type="text" id="gpsNotesInput" placeholder="e.g. Connected via Panama Canal boat tunnel"
+                  class="ui-input w-full px-4 py-2 text-xs" />
+              </div>
+              <button type="submit" class="ui-btn-accent w-full py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                + Save Coordinate
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: CITADEL ARCHIVE & GALLERY ==================== -->
+    <section id="view-gallery" class="hidden flex flex-col gap-6">
+      <div class="ui-panel p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="micro-label text-accent">ARCHITECTURAL RECONNAISSANCE // DAY 214 → DAY 537</span>
+          <h2 class="mc-display-title text-lg text-primary mt-1">LAKESIDE LAVA-SPIRE CITADEL ARCHIVE</h2>
+          <p class="text-xs text-secondary mt-1">From a 2-heart dirt hallway to a 4-story cliffside fortress with a Y=96 glass water elevator, Panama Canal boat tunnel, and cathedral rose window.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="ui-panel overflow-hidden flex flex-col">
+          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+            <img src="/assets/base-day.jpg" alt="Cathedral Rose Window Wing" class="w-full h-full object-cover" />
+            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">XYZ: 895, 63, -312</span>
+          </div>
+          <div class="p-4">
+            <div class="micro-label">EAST WING FACADE // BY CHIBIZANIMUS &amp; SWOOZ</div>
+            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Recessed Cathedral Circular Window &amp; Stepped Gable Peak</h3>
+            <p class="text-xs text-secondary mt-1">Carved directly into the twin mountain spires overlooking the turquoise river lagoon and natural lava cascade.</p>
+          </div>
+        </div>
+
+        <div class="ui-panel overflow-hidden flex flex-col">
+          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+            <img src="/assets/base-night-lava.jpg" alt="Lava Waterfall Night View" class="w-full h-full object-cover" />
+            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-warning tabular-nums">XYZ: 915, 63, -318</span>
+          </div>
+          <div class="p-4">
+            <div class="micro-label">NORTH LAGOON APPROACH // NIGHT RECON</div>
+            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Natural Lava Cascade &amp; 4-Tier Glass Water-Level Entrance</h3>
+            <p class="text-xs text-secondary mt-1">The landmark lava flow that inspired the base location, paired with the oxidized copper door entrance and overhanging tree terrace.</p>
+          </div>
+        </div>
+
+        <div class="ui-panel overflow-hidden flex flex-col">
+          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+            <img src="/assets/base-summit-night.jpg" alt="Summit View to Village" class="w-full h-full object-cover" />
+            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">XYZ: 913, 96, -291</span>
+          </div>
+          <div class="p-4">
+            <div class="micro-label">Y=96 SUMMIT OVERLOOK // WATER ELEVATOR TOP</div>
+            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">Torch-Lit Highway to the Horizon Village</h3>
+            <p class="text-xs text-secondary mt-1">Looking down from the Stone Brick summit landing across the crop peninsula toward the lit village settlement in the distance.</p>
+          </div>
+        </div>
+
+        <div class="ui-panel overflow-hidden flex flex-col">
+          <div class="h-64 bg-surface-base border-b border-subtle overflow-hidden relative">
+            <img src="/assets/base-vault-art.jpg" alt="Classical Ruins Gallery Wall" class="w-full h-full object-cover" />
+            <span class="absolute top-3 left-3 px-2 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-[11px] font-mono text-accent tabular-nums">LEVEL Y=75 GALLERY</span>
+          </div>
+          <div class="p-4">
+            <div class="micro-label">INTERIOR ARCHITECTURE // LEVEL Y=75</div>
+            <h3 class="text-sm font-semibold tracking-tight text-primary mt-1">4x2 Classical Ruins Canvas with Gallery Spotlight Torches</h3>
+            <p class="text-xs text-secondary mt-1">Flush gallery wall installation on the Y=75 observation floor overlooking the 4x4 glass floor skylight and ZombieGuy's Deepslate terrace above.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== CREW NODE SIGN-IN MODAL (Using User Selection #1: network-signin.jpg) ==================== -->
+  <div id="nodeSignInModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="ui-panel max-w-xl w-full overflow-hidden border-active">
+      <div class="relative h-48 bg-surface-base border-b border-subtle overflow-hidden">
+        <img src="/assets/network-signin.jpg" alt="Minecraft Realm Node Network" class="w-full h-full object-cover object-center" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[#121216] via-[#121216]/35 to-transparent"></div>
+        <button onclick="closeNodeSignInModal()" class="absolute top-3 right-3 px-2.5 py-1 rounded-[4px] bg-surface-base/90 border border-subtle text-xs font-mono text-secondary hover:text-primary">
+          [ESC / CLOSE]
+        </button>
+        <div class="absolute bottom-3 left-6 right-6 flex items-end justify-between">
+          <div>
+            <span class="micro-label text-accent">REALM OPERATOR TERMINAL</span>
+            <h3 class="mc-display-title text-base text-primary mt-0.5">SELECT YOUR CREW NODE IDENTITY</h3>
+          </div>
+          <img src="/assets/anim-friends.gif" alt="" class="w-10 h-10 object-contain rounded-[4px] bg-surface-base/80 p-1 border border-subtle" />
+        </div>
+      </div>
+
+      <div class="p-6 flex flex-col gap-4">
+        <p class="text-xs text-secondary">
+          Tap your Gamertag node below to vote on builds, claim tasks, or unlock your personal PIN-protected Ender Vault.
+        </p>
+        <div id="modalCrewNodeGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        <div class="pt-4 border-t border-subtle flex items-center justify-between gap-3">
+          <input type="text" id="newCrewModalInput" placeholder="New Crew Gamertag..." class="ui-input flex-1 px-4 py-2 text-xs font-mono" />
+          <button onclick="addCrewFromModal()" class="ui-btn-accent px-4 py-2 text-xs font-mono font-semibold uppercase tracking-label">
+            + Register Node
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SHARE / DISCORD EXPORT MODAL ==================== -->
+  <div id="shareModal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="ui-panel max-w-lg w-full overflow-hidden border-active">
+      <div class="p-4 border-b border-subtle bg-surface-base flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img src="/assets/cloud-sync.png" alt="" class="w-5 h-5 object-contain" />
+          <span class="micro-label">Share &amp; Sync With CHIBI~Zone Discord</span>
+        </div>
+        <button onclick="closeShareModal()" class="text-xs font-mono text-secondary hover:text-primary">[ESC]</button>
+      </div>
+      <div class="p-6 flex flex-col gap-6 text-xs">
+        <div>
+          <label class="micro-label block mb-2">1. Copy Discord Status Report (Paste in #general)</label>
+          <p class="text-secondary mb-4">Generates a formatted markdown summary of all active Shared Quests, Bounty Votes, and GPS Coordinates (excludes private Ender Vaults!).</p>
+          <button onclick="copyDiscordSummary()" class="ui-btn-accent w-full py-2.5 px-4 font-mono font-semibold uppercase tracking-label">
+            Copy Formatted Discord Report
+          </button>
+        </div>
+        <div class="border-t border-subtle pt-4">
+          <label class="micro-label block mb-2">2. Export / Share Live Board Snapshot URL</label>
+          <p class="text-secondary mb-4">Generates a shareable link containing the latest shared tasks, votes, and GPS coordinates so anyone on mobile, console, or PC loads the updated state.</p>
+          <button onclick="copyShareableUrl()" class="ui-btn w-full py-2.5 px-4 font-mono font-medium">
+            Copy Sync Link with Current Board State
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 ui-panel border-accent-border text-primary px-4 py-2.5 text-xs font-mono flex items-center gap-2">
+    <img src="/assets/anim-diamond.gif" alt="" class="w-4 h-4 pixel-art" />
+    <span id="toastText"></span>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'chibi_zone_realm_v2';
+    let sfxEnabled = true;
+
+    // Web Audio OreUI Tactile Click Synthesizer (Zero external audio file latency)
+    const audioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)
+      ? new (window.AudioContext || window.webkitAudioContext)()
+      : null;
+
+    function playUiSound(type = 'click') {
+      if (!sfxEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'tab') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(580, now + 0.055);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.start(now);
+          osc.stop(now + 0.065);
+        } else if (type === 'coin') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.setValueAtTime(1318.5, now + 0.045);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'unlock') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.06);
+          osc.frequency.setValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.23);
+        } else {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(120, now + 0.03);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        }
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      sfxEnabled = !sfxEnabled;
+      document.getElementById('soundToggleBtn').textContent = sfxEnabled ? 'SFX: ON' : 'SFX: OFF';
+      if (sfxEnabled) playUiSound('coin');
+    }
+
+    const PLAYER_AVATARS = {
+      'SWOOZ': '/assets/avatar-swooz.png',
+      'CHIBI~Zane': '/assets/avatar-chibi.png',
+      'ZombieGuy': '/assets/avatar-zombie.png',
+      '47.salamanders': '/assets/avatar-salamander.png'
+    };
+
+    const CATEGORY_ICONS = {
+      'Architecture': '/assets/workbench.png',
+      'Nether / Portal': '/assets/conduit-128.png',
+      'Farming / Bees': '/assets/water-block.png',
+      'Mining / Gear': '/assets/first-diamond.png',
+      'Taming / Mobs': '/assets/zombie-128.png',
+      'Redstone': '/assets/anvil.png',
+      'Exploration': '/assets/enchanted-book.png'
+    };
+
+    function getAvatar(name) {
+      return PLAYER_AVATARS[name] || '/assets/creeper-128.png';
+    }
+
+    function getCategoryIcon(cat) {
+      return CATEGORY_ICONS[cat] || '/assets/chest.png';
+    }
+
+    const DEFAULT_STATE = {
+      activePlayer: 'SWOOZ',
+      activeTab: 'shared',
+      filter: 'all',
+      crew: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy', '47.salamanders'],
+      sharedTasks: [
+        {
+          id: 't-elevator-glass',
+          title: 'Finish Glass Enclosure at Top of Water Elevator (Y=63 to Y=96)',
+          category: 'Architecture',
+          coords: '913, 90, -294',
+          notes: 'Smelted sand into glass blocks and sealed the top spire shaft up to the Y=96 summit landing.',
+          status: 'done',
+          createdBy: 'SWOOZ',
+          claimedBy: 'SWOOZ',
+          votes: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy'],
+          createdAt: 1732630000000
+        },
+        {
+          id: 't-beekeeping',
+          title: 'Beekeeping & Campfire Smoke Setup for Both Natural Bee Nests',
+          category: 'Farming / Bees',
+          coords: '902, 67, -342',
+          notes: 'Placed campfires with oak trapdoor grates under both natural bee nests and planted rose bushes in front. Shear for 3 Honeycomb when slots drip gold!',
+          status: 'done',
+          createdBy: 'SWOOZ',
+          claimedBy: 'SWOOZ',
+          votes: ['SWOOZ', 'CHIBI~Zane'],
+          createdAt: 1732631000000
+        },
+        {
+          id: 't-ruined-portal',
+          title: 'Capture Lava & Activate the Half-Built (Ruined) Nether Portal',
+          category: 'Nether / Portal',
+          coords: 'TBD',
+          notes: 'Mine out any glowing Crying Obsidian from the portal frame with a Diamond Pickaxe, replace with regular Obsidian, and light with Flint & Steel.',
+          status: 'open',
+          createdBy: 'SWOOZ',
+          claimedBy: null,
+          votes: ['SWOOZ', 'CHIBI~Zane', 'ZombieGuy'],
+          createdAt: 1732632000000
+        },
+        {
+          id: 't-soul-sand',
+          title: 'Soul Sand "Bubble Rocket" Upgrade for the Y=96 Water Elevator',
+          category: 'Architecture',
+          coords: '911, 66, -294',
+          notes: 'Once Nether Portal is active, grab 1 Soul Sand and use the Kelp trick to convert the water column into a 1-second bubble rocket that refills oxygen.',
+          status: 'open',
+          createdBy: 'SWOOZ',
+          claimedBy: null,
+          votes: ['SWOOZ', 'ZombieGuy'],
+          createdAt: 1732633000000
+        },
+        {
+          id: 't-enchanting',
+          title: 'Craft Enchanting Table & Library in the Grand Circular Window Room',
+          category: 'Mining / Gear',
+          coords: '900, 69, -290',
+          notes: 'Needs 2 Diamonds + 4 Obsidian + 1 Book (3 Paper + 1 Leather). Set up on the hardwood oak floor by ChibiZANIMUS\'s cathedral rose window.',
+          status: 'open',
+          createdBy: 'SWOOZ',
+          claimedBy: null,
+          votes: ['SWOOZ', 'CHIBI~Zane'],
+          createdAt: 1732634000000
+        },
+        {
+          id: 't-rob-zombie',
+          title: 'Rescue & Tame "Rob Zombie IV" (Zombie Horse) Before Sunrise',
+          category: 'Taming / Mobs',
+          coords: '900, 69, -297',
+          notes: 'Use Sword/Bow (not Spear sweep!) to take out the zombie rider, Lead the Zombie Horse to a shaded fence post under a roof before dawn so he never burns.',
+          status: 'in_progress',
+          createdBy: 'SWOOZ',
+          claimedBy: 'SWOOZ',
+          votes: ['SWOOZ', 'ZombieGuy', '47.salamanders'],
+          createdAt: 1732635000000
+        },
+        {
+          id: 't-deepslate-trim',
+          title: 'Mine Extra Deepslate for Elevator & Rooftop Terrace Finishing Touches',
+          category: 'Architecture',
+          coords: '916, 79, -297',
+          notes: 'Grab extra Cobbled Deepslate on next mining run to polish the transition around ZombieGuy\'s Deepslate Tile terrace.',
+          status: 'open',
+          createdBy: 'ZombieGuy',
+          claimedBy: null,
+          votes: ['ZombieGuy', 'SWOOZ'],
+          createdAt: 1732636000000
+        },
+        {
+          id: 't-world-mapping',
+          title: 'Full Realm Scope Tour & Cartography Map Wall (Main Base, Village, Outposts)',
+          category: 'Exploration',
+          coords: '912, 68, -291',
+          notes: 'Use Cartography Table and Empty Maps to map the Original Home Base, the lit Village road, and the South Deep Mine Outpost.',
+          status: 'open',
+          createdBy: 'SWOOZ',
+          claimedBy: null,
+          votes: ['SWOOZ', 'CHIBI~Zane'],
+          createdAt: 1732637000000
+        }
+      ],
+      landmarks: [
+        {
+          id: 'l-fortress',
+          name: 'Lakeside Lava-Spire Fortress (Main Mountain Base)',
+          dim: 'Overworld',
+          x: 915, y: 63, z: -295,
+          notes: '4-story excavated cliff citadel, Panama Canal boat tunnel, Y=96 glass water elevator & circular window wing.',
+          addedBy: 'SWOOZ'
+        },
+        {
+          id: 'l-summit',
+          name: 'Fortress Summit Overlook & Elevator Top',
+          dim: 'Overworld',
+          x: 913, y: 96, z: -291,
+          notes: 'Top Stone Brick landing overlooking the torch-lit highway to the Village and ocean channel.',
+          addedBy: 'SWOOZ'
+        },
+        {
+          id: 'l-beehives',
+          name: 'Twin Natural Beehives & Campfire Apiary',
+          dim: 'Overworld',
+          x: 902, y: 67, z: -342,
+          notes: '2 natural Bee Nests with campfires & oak trapdoor grates installed.',
+          addedBy: 'SWOOZ'
+        },
+        {
+          id: 'l-canal',
+          name: 'Panama Canal Boat Tunnel Entrance',
+          dim: 'Overworld',
+          x: 945, y: 61, z: -298,
+          notes: 'Connects front dock lagoon through the ridge to the lava waterfall side toward Original Base.',
+          addedBy: 'SWOOZ'
+        },
+        {
+          id: 'l-deepmine',
+          name: 'First Excavated Outpost & Deep Staircase Mine',
+          dim: 'Overworld',
+          x: 934, y: 55, z: 232,
+          notes: '525 blocks South. Features the faux-floor torch stairwell and sprawling Granite cavern.',
+          addedBy: 'SWOOZ'
+        }
+      ],
+      privateVaults: {
+        'SWOOZ': {
+          pin: '0214',
+          items: [
+            {
+              id: 'p-diamond-vault',
+              title: 'Mario-64 Secret Painting Diamond Vault & Lore Signs',
+              coords: '910, 75, -287',
+              notes: 'Hidden behind the 4x2 Classical Ruins painting (with 4 gallery torches above). Left side walks through open signs ("SMILE :) YOU ARE ON SWOOZ CAM") to hidden chest containing 3 Diamonds & 1 Diamond Pickaxe. Right side hides embedded Crafting Table.',
+              done: true
+            },
+            {
+              id: 'p-god-apple',
+              title: 'Relocate Enchanted Golden Apple & 5 Nautilus Shells to Secret Vault',
+              coords: '910, 75, -287',
+              notes: 'Move the Enchanted Golden Apple from downstairs Chest 4 up into the secret painting chest so nobody accidentally eats it!',
+              done: false
+            },
+            {
+              id: 'p-relocate-vault',
+              title: 'Optional: Build Secondary Decoy / Deeper Vault Room',
+              coords: 'TBD',
+              notes: 'Consider adding a second hidden stash room on another floor in case anyone ever discovers the Y=75 painting.',
+              done: false
+            }
+          ]
+        },
+        'CHIBI~Zane': { pin: null, items: [] },
+        'ZombieGuy': { pin: null, items: [] },
+        '47.salamanders': { pin: null, items: [] }
+      }
+    };
+
+    let state = loadState();
+    let unlockedVaults = {};
+
+    function loadState() {
+      if (window.location.hash && window.location.hash.startsWith('#sync=')) {
+        try {
+          const encoded = window.location.hash.replace('#sync=', '');
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+          const existing = localStorage.getItem(STORAGE_KEY);
+          const local = existing ? JSON.parse(existing) : DEFAULT_STATE;
+          local.sharedTasks = decoded.sharedTasks || local.sharedTasks;
+          local.landmarks = decoded.landmarks || local.landmarks;
+          local.crew = decoded.crew || local.crew;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
+          history.replaceState(null, '', window.location.pathname);
+          setTimeout(() => showToast('Synced shared board from crew link!'), 300);
+          return local;
+        } catch (e) {}
+      }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      try {
+        const parsed = JSON.parse(raw);
+        return { ...DEFAULT_STATE, ...parsed, privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) } };
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          crew: state.crew,
+          sharedTasks: state.sharedTasks,
+          landmarks: state.landmarks,
+          privateVaults: state.privateVaults
+        })
+      }).catch(() => {});
+      renderAll();
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastText').textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
+    }
+
+    function triggerScreenTransition(label, callback) {
+      playUiSound('tab');
+      const overlay = document.getElementById('screenTransitionOverlay');
+      document.getElementById('transitionLabel').textContent = label;
+      overlay.classList.add('active');
+      setTimeout(() => {
+        if (callback) callback();
+        setTimeout(() => overlay.classList.remove('active'), 120);
+      }, 140);
+    }
+
+    function setActivePlayer(name) {
+      playUiSound('click');
+      state.activePlayer = name;
+      if (!state.privateVaults[name]) {
+        state.privateVaults[name] = { pin: null, items: [] };
+      }
+      saveState();
+      showToast('Active Operator Node: ' + name);
+    }
+
+    function openNodeSignInModal() {
+      playUiSound('click');
+      renderModalCrewGrid();
+      document.getElementById('nodeSignInModal').classList.remove('hidden');
+    }
+
+    function closeNodeSignInModal() {
+      playUiSound('click');
+      document.getElementById('nodeSignInModal').classList.add('hidden');
+    }
+
+    function renderModalCrewGrid() {
+      const grid = document.getElementById('modalCrewNodeGrid');
+      grid.innerHTML = state.crew.map(name => {
+        const active = name === state.activePlayer;
+        const completed = state.sharedTasks.filter(t => t.status === 'done' && (t.claimedBy === name || t.createdBy === name)).length;
+        return `
+          <button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}'); closeNodeSignInModal();"
+            class="p-3 rounded-[4px] border text-left flex items-center gap-3 transition-colors duration-150 ease-out ${
+              active
+                ? 'bg-accent-subtle border-accent text-primary'
+                : 'bg-surface-base border-subtle hover:bg-surface-hover hover:border-active text-primary'
+            }">
+            <img src="${getAvatar(name)}" alt="${name}" class="w-10 h-10 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-mono font-bold truncate flex items-center gap-1.5">
+                <span>${name}</span>
+                ${active ? '<span class="text-[10px] text-accent">[CONNECTED]</span>' : ''}
+              </div>
+              <div class="text-[11px] font-mono text-secondary mt-0.5 tabular-nums">${completed} Quests Completed</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function addCrewFromModal() {
+      const input = document.getElementById('newCrewModalInput');
+      const clean = input.value.trim();
+      if (!clean) return;
+      if (!state.crew.includes(clean)) state.crew.push(clean);
+      if (!state.privateVaults[clean]) state.privateVaults[clean] = { pin: null, items: [] };
+      state.activePlayer = clean;
+      input.value = '';
+      saveState();
+      closeNodeSignInModal();
+      showToast('Registered new crew node: ' + clean);
+    }
+
+    function switchTab(tab) {
+      if (state.activeTab === tab) return;
+      const labels = {
+        shared: 'LOADING SHARED QUEST BOARD...',
+        vault: 'ACCESSING ENDER TREASURY...',
+        gps: 'CALIBRATING REALM GPS...',
+        gallery: 'OPENING CITADEL ARCHIVE...'
+      };
+      triggerScreenTransition(labels[tab] || 'SWITCHING SECTOR...', () => {
+        state.activeTab = tab;
+        saveState();
+      });
+    }
+
+    function setFilter(f) {
+      playUiSound('click');
+      state.filter = f;
+      saveState();
+    }
+
+    function toggleVote(taskId) {
+      playUiSound('coin');
+      const task = state.sharedTasks.find(t => t.id === taskId);
+      if (!task) return;
+      const idx = task.votes.indexOf(state.activePlayer);
+      if (idx >= 0) {
+        task.votes.splice(idx, 1);
+      } else {
+        task.votes.push(state.activePlayer);
+      }
+      saveState();
+    }
+
+    function cycleStatus(taskId) {
+      playUiSound('unlock');
+      const task = state.sharedTasks.find(t => t.id === taskId);
+      if (!task) return;
+      if (task.status === 'open') {
+        task.status = 'in_progress';
+        task.claimedBy = state.activePlayer;
+        showToast(state.activePlayer + ' claimed quest: ' + task.title);
+      } else if (task.status === 'in_progress') {
+        task.status = 'done';
+        if (!task.claimedBy) task.claimedBy = state.activePlayer;
+        showToast('Quest Completed: ' + task.title);
+      } else {
+        task.status = 'open';
+        task.claimedBy = null;
+      }
+      saveState();
+    }
+
+    function deleteSharedTask(taskId) {
+      if (!confirm('Remove this quest from the shared board?')) return;
+      state.sharedTasks = state.sharedTasks.filter(t => t.id !== taskId);
+      saveState();
+    }
+
+    function handleAddSharedTask(e) {
+      e.preventDefault();
+      playUiSound('coin');
+      const title = document.getElementById('taskTitleInput').value.trim();
+      const category = document.getElementById('taskCategoryInput').value;
+      const coords = document.getElementById('taskCoordsInput').value.trim() || 'TBD';
+      const notes = document.getElementById('taskNotesInput').value.trim();
+      if (!title) return;
+
+      state.sharedTasks.unshift({
+        id: 't-' + Date.now(),
+        title,
+        category,
+        coords,
+        notes,
+        status: 'open',
+        createdBy: state.activePlayer,
+        claimedBy: null,
+        votes: [state.activePlayer],
+        createdAt: Date.now()
+      });
+
+      document.getElementById('taskTitleInput').value = '';
+      document.getElementById('taskCoordsInput').value = '';
+      document.getElementById('taskNotesInput').value = '';
+      saveState();
+      showToast('Posted Quest to Shared Board!');
+    }
+
+    function getPlayerVault() {
+      const p = state.activePlayer;
+      if (!state.privateVaults[p]) {
+        state.privateVaults[p] = { pin: null, items: [] };
+      }
+      return state.privateVaults[p];
+    }
+
+    function handleUnlockVault(e) {
+      e.preventDefault();
+      const input = document.getElementById('pinAttemptInput');
+      const vault = getPlayerVault();
+      if (input.value === vault.pin) {
+        playUiSound('unlock');
+        unlockedVaults[state.activePlayer] = true;
+        renderAll();
+        showToast('Unlocked ' + state.activePlayer + '\'s Ender Vault');
+      } else {
+        playUiSound('click');
+        showToast('Access Denied: Incorrect PIN (SWOOZ default: 0214)');
+        input.value = '';
+      }
+    }
+
+    function handleCreateVaultPin(e) {
+      e.preventDefault();
+      const input = document.getElementById('newPinInput');
+      const pin = input.value.trim();
+      if (pin.length < 4) {
+        showToast('Choose at least a 4-digit PIN');
+        return;
+      }
+      playUiSound('unlock');
+      const vault = getPlayerVault();
+      vault.pin = pin;
+      unlockedVaults[state.activePlayer] = true;
+      saveState();
+      showToast('Initialized Ender Vault PIN for ' + state.activePlayer + '!');
+    }
+
+    function lockCurrentVault() {
+      playUiSound('click');
+      delete unlockedVaults[state.activePlayer];
+      renderAll();
+      showToast('Ender Vault Locked');
+    }
+
+    function changeCurrentVaultPin() {
+      const next = prompt('Enter new 4-digit PIN for ' + state.activePlayer + ':');
+      if (!next || next.trim().length < 4) return;
+      getPlayerVault().pin = next.trim();
+      saveState();
+      showToast('Updated PIN for ' + state.activePlayer);
+    }
+
+    function handleAddPrivateTask(e) {
+      e.preventDefault();
+      playUiSound('coin');
+      const title = document.getElementById('privTitleInput').value.trim();
+      const coords = document.getElementById('privCoordsInput').value.trim() || 'CLASSIFIED';
+      const notes = document.getElementById('privNotesInput').value.trim();
+      if (!title) return;
+
+      const vault = getPlayerVault();
+      vault.items.unshift({
+        id: 'p-' + Date.now(),
+        title,
+        coords,
+        notes,
+        done: false
+      });
+
+      document.getElementById('privTitleInput').value = '';
+      document.getElementById('privCoordsInput').value = '';
+      document.getElementById('privNotesInput').value = '';
+      saveState();
+      showToast('Saved to ' + state.activePlayer + '\'s Ender Vault!');
+    }
+
+    function togglePrivateItem(id) {
+      playUiSound('coin');
+      const vault = getPlayerVault();
+      const item = vault.items.find(i => i.id === id);
+      if (item) {
+        item.done = !item.done;
+        saveState();
+      }
+    }
+
+    function deletePrivateItem(id) {
+      const vault = getPlayerVault();
+      vault.items = vault.items.filter(i => i.id !== id);
+      saveState();
+    }
+
+    function handleAddLandmark(e) {
+      e.preventDefault();
+      playUiSound('coin');
+      const name = document.getElementById('gpsNameInput').value.trim();
+      const x = parseInt(document.getElementById('gpsXInput').value, 10);
+      const y = parseInt(document.getElementById('gpsYInput').value, 10);
+      const z = parseInt(document.getElementById('gpsZInput').value, 10);
+      const dim = document.getElementById('gpsDimInput').value;
+      const notes = document.getElementById('gpsNotesInput').value.trim();
+
+      state.landmarks.unshift({
+        id: 'l-' + Date.now(),
+        name,
+        dim,
+        x, y, z,
+        notes,
+        addedBy: state.activePlayer
+      });
+
+      document.getElementById('gpsNameInput').value = '';
+      document.getElementById('gpsXInput').value = '';
+      document.getElementById('gpsYInput').value = '';
+      document.getElementById('gpsZInput').value = '';
+      document.getElementById('gpsNotesInput').value = '';
+      saveState();
+      showToast('Landmark logged to Realm GPS!');
+    }
+
+    function copyCoords(text) {
+      playUiSound('click');
+      navigator.clipboard.writeText(text);
+      showToast('Copied coordinates: ' + text);
+    }
+
+    function openShareModal() {
+      playUiSound('click');
+      document.getElementById('shareModal').classList.remove('hidden');
+    }
+    function closeShareModal() {
+      playUiSound('click');
+      document.getElementById('shareModal').classList.add('hidden');
+    }
+
+    function copyDiscordSummary() {
+      playUiSound('coin');
+      const openTasks = state.sharedTasks
+        .filter(t => t.status !== 'done')
+        .sort((a, b) => b.votes.length - a.votes.length);
+      const doneTasks = state.sharedTasks.filter(t => t.status === 'done');
+
+      let md = `### CHIBI~Zone Realm Command Board (Day 537)\n`;
+      md += `**Active Priorities (Voted by Crew):**\n`;
+      openTasks.forEach((t, i) => {
+        const statusTag = t.status === 'in_progress' ? `*[${t.claimedBy} on it]*` : `**${t.votes.length} votes**`;
+        md += `${i + 1}. **${t.title}** (${t.coords}) — ${statusTag}\n`;
+      });
+      md += `\n**Recently Completed (${doneTasks.length}):**\n`;
+      doneTasks.slice(0, 5).forEach(t => {
+        md += `- ~~${t.title}~~ *(by ${t.claimedBy || t.createdBy})*\n`;
+      });
+      md += `\n**Key Realm Coordinates:**\n`;
+      state.landmarks.slice(0, 5).forEach(l => {
+        md += `- **${l.name}:** \`${l.x}, ${l.y}, ${l.z}\`\n`;
+      });
+
+      navigator.clipboard.writeText(md);
+      showToast('Copied Discord markdown report! Paste into #general');
+    }
+
+    function copyShareableUrl() {
+      playUiSound('coin');
+      const payload = {
+        crew: state.crew,
+        sharedTasks: state.sharedTasks,
+        landmarks: state.landmarks
+      };
+      const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const url = window.location.origin + window.location.pathname + '#sync=' + b64;
+      navigator.clipboard.writeText(url);
+      showToast('Copied shareable sync link to clipboard!');
+    }
+
+    function renderAll() {
+      document.getElementById('activePlayerAvatarImg').src = getAvatar(state.activePlayer);
+      document.getElementById('headerActivePlayerName').textContent = state.activePlayer;
+
+      const crewEl = document.getElementById('crewSelector');
+      crewEl.innerHTML = state.crew.map(name => {
+        const active = name === state.activePlayer;
+        return `<button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}')"
+          class="px-2.5 py-1 text-xs font-mono rounded-[4px] transition-colors duration-150 ease-out active:translate-y-[1px] flex items-center gap-1.5 ${
+            active
+              ? 'bg-accent-subtle text-accent border border-accent-border font-semibold'
+              : 'text-secondary hover:text-primary hover:bg-surface-hover border border-transparent'
+          }">
+          <img src="${getAvatar(name)}" alt="" class="w-4 h-4 rounded-[4px] object-cover" />
+          <span>${name}</span>
+        </button>`;
+      }).join('');
+
+      document.getElementById('postingAsLabel').textContent = state.activePlayer;
+      document.getElementById('vaultOwnerLabel').textContent = state.activePlayer;
+      document.getElementById('vaultHeaderPlayerName').textContent = state.activePlayer;
+
+      const openCount = state.sharedTasks.filter(t => t.status !== 'done').length;
+      const doneCount = state.sharedTasks.filter(t => t.status === 'done').length;
+      const totalVotes = state.sharedTasks.reduce((acc, t) => acc + t.votes.length, 0);
+
+      document.getElementById('sharedCountBadge').textContent = openCount + ' OPEN';
+      document.getElementById('gpsCountBadge').textContent = state.landmarks.length;
+      document.getElementById('heroStatOpen').textContent = openCount;
+      document.getElementById('heroStatDone').textContent = doneCount;
+      document.getElementById('heroStatVotes').textContent = totalVotes;
+
+      const isUnlocked = !!unlockedVaults[state.activePlayer];
+      const lockBadge = document.getElementById('vaultLockBadge');
+      if (isUnlocked) {
+        lockBadge.textContent = 'UNLOCKED';
+        lockBadge.className = 'px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-accent-subtle text-accent border border-accent-border';
+      } else {
+        lockBadge.textContent = 'PIN LOCKED';
+        lockBadge.className = 'px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border';
+      }
+
+      ['shared', 'vault', 'gps', 'gallery'].forEach(t => {
+        const btn = document.getElementById('tab-' + t);
+        const view = document.getElementById('view-' + t);
+        if (state.activeTab === t) {
+          btn.className = 'px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 border-accent text-primary bg-surface-raised transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2';
+          view.classList.remove('hidden');
+        } else {
+          btn.className = 'px-4 py-2.5 text-xs font-semibold tracking-tight border-b-2 border-transparent text-secondary hover:text-primary transition-colors duration-150 ease-out whitespace-nowrap flex items-center gap-2';
+          view.classList.add('hidden');
+        }
+      });
+
+      renderSharedTasks();
+      renderCrewStats();
+      renderPrivateVault();
+      renderGpsTable();
+    }
+
+    function renderSharedTasks() {
+      ['all', 'open', 'in_progress', 'done'].forEach(f => {
+        const btn = document.getElementById('filter-' + f);
+        if (state.filter === f) {
+          btn.className = 'px-4 py-2 text-xs font-medium rounded-[4px] bg-surface-hover text-primary border border-active transition-colors duration-150 ease-out';
+        } else {
+          btn.className = 'px-4 py-2 text-xs font-medium rounded-[4px] bg-surface-base text-secondary border border-subtle hover:bg-surface-hover hover:text-primary transition-colors duration-150 ease-out';
+        }
+      });
+
+      const sortBy = document.getElementById('sortSelect').value;
+      let list = [...state.sharedTasks];
+      if (state.filter !== 'all') {
+        list = list.filter(t => t.status === state.filter);
+      }
+
+      list.sort((a, b) => {
+        if (state.filter === 'all' && (a.status === 'done') !== (b.status === 'done')) {
+          return a.status === 'done' ? 1 : -1;
+        }
+        if (sortBy === 'votes') return b.votes.length - a.votes.length;
+        if (sortBy === 'newest') return b.createdAt - a.createdAt;
+        return b.votes.length - a.votes.length;
+      });
+
+      const container = document.getElementById('sharedTasksList');
+      if (list.length === 0) {
+        container.innerHTML = `<div class="ui-panel p-6 text-center text-xs text-secondary">No quests match this filter yet. Post a new build quest on the right!</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(t => {
+        const hasVoted = t.votes.includes(state.activePlayer);
+        const isDone = t.status === 'done';
+        const isProg = t.status === 'in_progress';
+        const catIcon = getCategoryIcon(t.category);
+
+        let statusBadge = '';
+        let actionLabel = '';
+        if (isDone) {
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-accent-subtle text-accent border border-accent-border">COMPLETED ${t.claimedBy ? 'BY ' + t.claimedBy : ''}</span>`;
+          actionLabel = 'Reopen';
+        } else if (isProg) {
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-warning-subtle text-warning border border-warning-border">ACTIVE: ${t.claimedBy || 'CREW'}</span>`;
+          actionLabel = 'Complete Quest';
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-mono uppercase rounded-[4px] bg-surface-base text-secondary border border-subtle">OPEN BOUNTY</span>`;
+          actionLabel = 'Claim Quest';
+        }
+
+        return `
+          <div class="ui-panel ore-bevel-top hover:border-active p-4 transition-colors duration-150 ease-out flex items-start gap-4 ${isDone ? 'opacity-75' : ''}">
+            
+            <!-- Gold Coin Bounty Upvote Button (Using User Selection #2: gold-coins.jpg) -->
+            <button onclick="toggleVote('${t.id}')" title="Upvote Bounty as ${state.activePlayer}"
+              class="flex flex-col items-center justify-center min-w-[58px] py-2 px-2 rounded-[4px] border transition-colors duration-150 ease-out active:translate-y-[1px] ${
+                hasVoted
+                  ? 'bg-warning-subtle text-warning border-warning-border'
+                  : 'bg-surface-base text-secondary border-subtle hover:bg-surface-hover hover:text-primary'
+              }">
+              <img src="/assets/gold-coins.jpg" alt="Bounty" class="w-8 h-6 object-cover rounded-[2px] border border-subtle mb-1 pixel-art" />
+              <span class="text-xs font-mono font-bold tabular-nums">${t.votes.length}</span>
+              <span class="text-[9px] font-mono uppercase tracking-label">BOUNTY</span>
+            </button>
+
+            <!-- Quest Details -->
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                ${statusBadge}
+                <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-base text-secondary border border-subtle flex items-center gap-1.5">
+                  <img src="${catIcon}" alt="" class="w-3.5 h-3.5 object-contain pixel-art" />
+                  <span>${t.category}</span>
+                </span>
+                <button onclick="copyCoords('${t.coords}')" class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-surface-base text-secondary border border-subtle hover:text-primary transition-colors duration-150 ease-out tabular-nums">
+                  XYZ: ${t.coords}
+                </button>
+              </div>
+              <h3 class="text-sm font-semibold tracking-tight text-primary ${isDone ? 'line-through text-secondary' : ''}">${t.title}</h3>
+              ${t.notes ? `<p class="text-xs text-secondary mt-2 leading-relaxed">${t.notes}</p>` : ''}
+              <div class="flex flex-wrap items-center justify-between gap-2 mt-4 pt-2 border-t border-subtle text-[11px] text-muted font-mono">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span>Bounty Backers:</span>
+                  <span class="text-secondary">${t.votes.length ? t.votes.join(', ') : 'None yet'}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="cycleStatus('${t.id}')" class="ui-btn px-3 py-1 text-xs font-sans font-medium flex items-center gap-1.5">
+                    <img src="/assets/anim-pickaxe.gif" alt="" class="w-3.5 h-3.5 pixel-art" />
+                    <span>${actionLabel}</span>
+                  </button>
+                  <button onclick="deleteSharedTask('${t.id}')" title="Delete Quest"
+                    class="px-2 py-1 text-xs text-muted hover:text-danger transition-colors duration-150 ease-out">✕</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCrewStats() {
+      const el = document.getElementById('crewStatsList');
+      el.innerHTML = state.crew.map(name => {
+        const completed = state.sharedTasks.filter(t => t.status === 'done' && (t.claimedBy === name || t.createdBy === name)).length;
+        const active = state.sharedTasks.filter(t => t.status === 'in_progress' && t.claimedBy === name).length;
+        const vaultCount = (state.privateVaults[name]?.items || []).length;
+        const hasPin = !!(state.privateVaults[name]?.pin);
+
+        return `
+          <div class="bg-surface-base border border-subtle rounded-[4px] p-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="${getAvatar(name)}" alt="${name}" class="w-8 h-8 rounded-[4px] object-cover bg-surface-raised border border-subtle" />
+              <div class="min-w-0">
+                <div class="text-xs font-mono font-semibold text-primary flex items-center gap-1.5 truncate">
+                  <span>${name}</span>
+                  ${name === state.activePlayer ? '<span class="text-[10px] text-accent">[YOU]</span>' : ''}
+                </div>
+                <div class="text-[11px] text-secondary mt-0.5 font-mono tabular-nums">
+                  ${completed} Done · ${active} Active
+                </div>
+              </div>
+            </div>
+            <button onclick="setActivePlayer('${name.replace(/'/g, "\\'")}'); switchTab('vault');"
+              class="ui-btn px-2.5 py-1.5 text-[11px] font-mono text-secondary hover:text-primary tabular-nums flex items-center gap-1.5 shrink-0">
+              <img src="/assets/ender-chest.png" alt="" class="w-3.5 h-3.5 pixel-art" />
+              <span>${hasPin ? vaultCount : 'PIN'}</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPrivateVault() {
+      const vault = getPlayerVault();
+      const isUnlocked = !!unlockedVaults[state.activePlayer];
+      const gateEl = document.getElementById('vaultPinGate');
+      const contentEl = document.getElementById('vaultUnlockedContent');
+      const controlsEl = document.getElementById('vaultHeaderControls');
+      const swoozPreview = document.getElementById('swoozVaultPreviewCard');
+
+      if (!isUnlocked) {
+        contentEl.classList.add('hidden');
+        gateEl.classList.remove('hidden');
+        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: ENCRYPTED // ENTER OPERATOR PIN BELOW</span>`;
+
+        if (!vault.pin) {
+          gateEl.innerHTML = `
+            <img src="/assets/ender-chest.png" alt="Ender Vault" class="w-12 h-12 mx-auto mb-3 pixel-art" />
+            <h3 class="mc-display-title text-sm text-primary">INITIALIZE ${state.activePlayer}'S ENDER VAULT</h3>
+            <p class="text-xs text-secondary mt-2 mb-4">Set a 4-digit PIN so only ${state.activePlayer} can view or add secret stashes, coordinates, and personal builds.</p>
+            <form onsubmit="handleCreateVaultPin(event)" class="flex flex-col gap-4 max-w-xs mx-auto">
+              <input type="password" id="newPinInput" maxlength="8" required placeholder="Create 4-Digit PIN"
+                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+              <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                Create Private Ender Vault
+              </button>
+            </form>
+          `;
+        } else {
+          gateEl.innerHTML = `
+            <img src="/assets/access-denied.png" alt="PIN Locked" class="w-12 h-12 mx-auto mb-3 object-contain" />
+            <h3 class="mc-display-title text-sm text-primary">${state.activePlayer}'S ENDER VAULT IS LOCKED</h3>
+            <p class="text-xs text-secondary mt-2 mb-4">Enter ${state.activePlayer}'s 4-digit PIN to decrypt secret diamond stashes &amp; private coordinates.${state.activePlayer === 'SWOOZ' ? ' <br/><span class="text-[11px] font-mono text-muted">(SWOOZ default PIN: 0214)</span>' : ''}</p>
+            <form onsubmit="handleUnlockVault(event)" class="flex flex-col gap-4 max-w-xs mx-auto">
+              <input type="password" id="pinAttemptInput" maxlength="8" required placeholder="••••"
+                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+              <button type="submit" class="ui-btn-warning py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                Decrypt &amp; Unlock Vault
+              </button>
+            </form>
+          `;
+        }
+        return;
+      }
+
+      gateEl.classList.add('hidden');
+      contentEl.classList.remove('hidden');
+      if (state.activePlayer === 'SWOOZ') {
+        swoozPreview.classList.remove('hidden');
+      } else {
+        swoozPreview.classList.add('hidden');
+      }
+
+      controlsEl.innerHTML = `
+        <button onclick="changeCurrentVaultPin()" class="ui-btn px-4 py-1.5 text-xs font-mono text-secondary hover:text-primary">Change PIN</button>
+        <button onclick="lockCurrentVault()" class="px-4 py-1.5 text-xs font-mono bg-danger-subtle text-danger border border-danger-border rounded-[4px] hover:border-danger transition-colors duration-150 ease-out">Lock Ender Vault</button>
+      `;
+
+      const listEl = document.getElementById('privateVaultList');
+      if (vault.items.length === 0) {
+        listEl.innerHTML = `<div class="ui-panel p-6 text-center text-xs text-secondary">Your private Ender Vault is empty. Log your secret diamond stash coordinates or personal goals on the right!</div>`;
+        return;
+      }
+
+      listEl.innerHTML = vault.items.map(item => `
+        <div class="ui-panel ore-bevel-top hover:border-active p-4 transition-colors duration-150 ease-out flex items-start gap-4">
+          <button onclick="togglePrivateItem('${item.id}')"
+            class="mt-0.5 w-6 h-6 rounded-[4px] border flex items-center justify-center text-xs font-mono transition-colors duration-150 ease-out ${
+              item.done
+                ? 'bg-accent-subtle border-accent-border text-accent'
+                : 'bg-surface-base border-subtle text-transparent hover:border-active'
+            }">✓</button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2 py-0.5 text-[11px] font-mono rounded-[4px] bg-warning-subtle text-warning border border-warning-border tabular-nums flex items-center gap-1.5">
+                <img src="/assets/anim-diamond.gif" alt="" class="w-3.5 h-3.5 pixel-art" />
+                <span>XYZ: ${item.coords}</span>
+              </span>
+              <button onclick="deletePrivateItem('${item.id}')" class="text-xs text-muted hover:text-danger transition-colors duration-150 ease-out">✕</button>
+            </div>
+            <h3 class="text-sm font-semibold tracking-tight text-primary mt-2 ${item.done ? 'line-through text-secondary' : ''}">${item.title}</h3>
+            ${item.notes ? `<p class="text-xs text-secondary mt-2 leading-relaxed">${item.notes}</p>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderGpsTable() {
+      const tbody = document.getElementById('gpsTableBody');
+      tbody.innerHTML = state.landmarks.map(l => {
+        const netherX = l.dim === 'Overworld' ? Math.round(l.x / 8) : l.x * 8;
+        const netherZ = l.dim === 'Overworld' ? Math.round(l.z / 8) : l.z * 8;
+        const coordStr = `${l.x}, ${l.y}, ${l.z}`;
+        return `
+          <tr class="hover:bg-surface-hover transition-colors duration-150 ease-out">
+            <td class="p-4">
+              <div class="font-semibold text-primary flex items-center gap-2">
+                <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
+                <span>${l.name}</span>
+              </div>
+              ${l.notes ? `<div class="text-[11px] text-secondary mt-1 pl-6">${l.notes}</div>` : ''}
+            </td>
+            <td class="p-4 font-mono text-secondary">${l.dim}</td>
+            <td class="p-4 font-mono font-semibold text-accent tabular-nums">${coordStr}</td>
+            <td class="p-4 font-mono text-secondary tabular-nums">X: ${netherX}, Z: ${netherZ}</td>
+            <td class="p-4 font-mono text-secondary">${l.addedBy}</td>
+            <td class="p-4 text-right">
+              <button onclick="copyCoords('${coordStr}')" class="ui-btn px-2.5 py-1 text-[11px] font-mono text-secondary hover:text-primary">
+                Copy
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function syncFromServer() {
+      try {
+        const res = await fetch('/api/state');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && !data.empty && data.sharedTasks) {
+          state.crew = data.crew || state.crew;
+          state.sharedTasks = data.sharedTasks || state.sharedTasks;
+          state.landmarks = data.landmarks || state.landmarks;
+          if (data.privateVaults) {
+            state.privateVaults = { ...state.privateVaults, ...data.privateVaults };
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          renderAll();
+        }
+      } catch (e) {}
+    }
+    setInterval(syncFromServer, 5000);
+    syncFromServer();
+
+    renderAll();
+  </script>
+</body>
+</html>
