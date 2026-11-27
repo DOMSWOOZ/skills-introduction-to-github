@@ -1051,6 +1051,7 @@
       privateVaults: {
         'SWOOZ': {
           pin: '0214',
+          mustChangePin: true,
           items: [
             {
               id: 'p-diamond-vault',
@@ -1075,14 +1076,15 @@
             }
           ]
         },
-        'CHIBI~Zane': { pin: null, items: [] },
-        'ZombieGuy': { pin: null, items: [] },
-        '47.salamanders': { pin: null, items: [] }
+        'CHIBI~Zane': { pin: null, mustChangePin: false, items: [] },
+        'ZombieGuy': { pin: null, mustChangePin: false, items: [] },
+        '47.salamanders': { pin: null, mustChangePin: false, items: [] }
       }
     };
 
     let state = loadState();
     let unlockedVaults = {};
+    let pendingPinRotation = {};
 
     function loadState() {
       if (window.location.hash && window.location.hash.startsWith('#sync=')) {
@@ -1104,7 +1106,11 @@
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
       try {
         const parsed = JSON.parse(raw);
-        return { ...DEFAULT_STATE, ...parsed, privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) } };
+        const mergedVaults = { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) };
+        if (mergedVaults['SWOOZ'] && mergedVaults['SWOOZ'].pin === '0214' && mergedVaults['SWOOZ'].mustChangePin === undefined) {
+          mergedVaults['SWOOZ'].mustChangePin = true;
+        }
+        return { ...DEFAULT_STATE, ...parsed, privateVaults: mergedVaults };
       } catch (e) {
         return JSON.parse(JSON.stringify(DEFAULT_STATE));
       }
@@ -1312,29 +1318,73 @@
       const input = document.getElementById('pinAttemptInput');
       const vault = getPlayerVault();
       if (input.value === vault.pin) {
+        if (vault.mustChangePin || vault.pin === '0214') {
+          playUiSound('amethyst');
+          pendingPinRotation[state.activePlayer] = true;
+          renderAll();
+          showToast('First login verified — create your new private PIN');
+          return;
+        }
         playUiSound('ender_open');
         unlockedVaults[state.activePlayer] = true;
         renderAll();
         showToast('Unlocked ' + state.activePlayer + '\'s Ender Vault');
       } else {
         playUiSound('deny');
-        showToast('Access Denied: Incorrect PIN (SWOOZ default: 0214)');
+        showToast('Access Denied: Incorrect PIN');
         input.value = '';
       }
+    }
+
+    function handleForceRotatePin(e) {
+      e.preventDefault();
+      const nextPin = document.getElementById('rotateNewPinInput').value.trim();
+      const confirmPin = document.getElementById('rotateConfirmPinInput').value.trim();
+      const vault = getPlayerVault();
+      if (nextPin.length < 4) {
+        playUiSound('deny');
+        showToast('PIN must be at least 4 digits');
+        return;
+      }
+      if (nextPin === vault.pin || nextPin === '0214') {
+        playUiSound('deny');
+        showToast('New PIN must be different from the initial starter PIN');
+        return;
+      }
+      if (nextPin !== confirmPin) {
+        playUiSound('deny');
+        showToast('PIN entries do not match');
+        return;
+      }
+      playUiSound('ender_open');
+      vault.pin = nextPin;
+      vault.mustChangePin = false;
+      delete pendingPinRotation[state.activePlayer];
+      unlockedVaults[state.activePlayer] = true;
+      saveState();
+      showToast('Private PIN updated & Ender Vault unlocked!');
     }
 
     function handleCreateVaultPin(e) {
       e.preventDefault();
       const input = document.getElementById('newPinInput');
+      const confirmInput = document.getElementById('confirmNewPinInput');
       const pin = input.value.trim();
+      const confirmPin = confirmInput ? confirmInput.value.trim() : pin;
       if (pin.length < 4) {
         playUiSound('deny');
         showToast('Choose at least a 4-digit PIN');
         return;
       }
+      if (pin !== confirmPin) {
+        playUiSound('deny');
+        showToast('PIN entries do not match');
+        return;
+      }
       playUiSound('ender_open');
       const vault = getPlayerVault();
       vault.pin = pin;
+      vault.mustChangePin = false;
       unlockedVaults[state.activePlayer] = true;
       saveState();
       showToast('Initialized Ender Vault PIN for ' + state.activePlayer + '!');
@@ -1343,16 +1393,16 @@
     function lockCurrentVault() {
       playUiSound('ender_close');
       delete unlockedVaults[state.activePlayer];
+      delete pendingPinRotation[state.activePlayer];
       renderAll();
       showToast('Ender Vault Locked');
     }
 
-    function changeCurrentVaultPin() {
-      const next = prompt('Enter new 4-digit PIN for ' + state.activePlayer + ':');
-      if (!next || next.trim().length < 4) return;
-      getPlayerVault().pin = next.trim();
-      saveState();
-      showToast('Updated PIN for ' + state.activePlayer);
+    function openRotatePinGate() {
+      playUiSound('amethyst');
+      delete unlockedVaults[state.activePlayer];
+      pendingPinRotation[state.activePlayer] = true;
+      renderAll();
     }
 
     function handleAddPrivateTask(e) {
@@ -1679,18 +1729,38 @@
       if (!isUnlocked) {
         contentEl.classList.add('hidden');
         gateEl.classList.remove('hidden');
-        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: ENCRYPTED // ENTER OPERATOR PIN BELOW</span>`;
+        controlsEl.innerHTML = `<span class="text-xs font-mono text-warning">STATUS: ENCRYPTED // OPERATOR AUTHENTICATION REQUIRED</span>`;
 
         if (!vault.pin) {
           gateEl.innerHTML = `
             <img src="/assets/ender-chest.png" alt="Ender Vault" class="w-12 h-12 mx-auto mb-3 pixel-art" />
             <h3 class="mc-display-title text-sm text-primary">INITIALIZE ${state.activePlayer}'S ENDER VAULT</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Set a 4-digit PIN so only ${state.activePlayer} can view or add secret stashes, coordinates, and personal builds.</p>
-            <form onsubmit="handleCreateVaultPin(event)" class="flex flex-col gap-4 max-w-xs mx-auto">
-              <input type="password" id="newPinInput" maxlength="8" required placeholder="Create 4-Digit PIN"
+            <p class="text-xs text-secondary mt-2 mb-4">Create a confidential 4-to-8 digit PIN so only ${state.activePlayer} can view or add secret stashes, coordinates, and personal builds.</p>
+            <form onsubmit="handleCreateVaultPin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
+              <input type="password" id="newPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Create Private PIN"
+                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+              <input type="password" id="confirmNewPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Confirm Private PIN"
                 class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
               <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
-                Create Private Ender Vault
+                Initialize Private Ender Vault
+              </button>
+            </form>
+          `;
+        } else if (pendingPinRotation[state.activePlayer]) {
+          gateEl.innerHTML = `
+            <img src="/assets/ender-chest.png" alt="Set New Private PIN" class="w-12 h-12 mx-auto mb-3 pixel-art" />
+            <div class="inline-block px-2 py-0.5 mb-2 text-[10px] font-mono uppercase tracking-label rounded-[4px] bg-warning-subtle text-warning border border-warning-border">
+              MANDATORY SECURITY ROTATION
+            </div>
+            <h3 class="mc-display-title text-sm text-primary">CREATE YOUR NEW PRIVATE PIN</h3>
+            <p class="text-xs text-secondary mt-2 mb-4">Starter PIN verified. To keep ${state.activePlayer}'s Ender Vault truly private, choose and confirm a new personal PIN now.</p>
+            <form onsubmit="handleForceRotatePin(event)" class="flex flex-col gap-3 max-w-xs mx-auto">
+              <input type="password" id="rotateNewPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="New Private PIN (4-8 chars)"
+                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+              <input type="password" id="rotateConfirmPinInput" minlength="4" maxlength="8" autocomplete="new-password" required placeholder="Confirm New Private PIN"
+                class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
+              <button type="submit" class="ui-btn-accent py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
+                Save New PIN &amp; Unlock Vault
               </button>
             </form>
           `;
@@ -1698,9 +1768,9 @@
           gateEl.innerHTML = `
             <img src="/assets/access-denied.png" alt="PIN Locked" class="w-12 h-12 mx-auto mb-3 object-contain" />
             <h3 class="mc-display-title text-sm text-primary">${state.activePlayer}'S ENDER VAULT IS LOCKED</h3>
-            <p class="text-xs text-secondary mt-2 mb-4">Enter ${state.activePlayer}'s 4-digit PIN to decrypt secret diamond stashes &amp; private coordinates.${state.activePlayer === 'SWOOZ' ? ' <br/><span class="text-[11px] font-mono text-muted">(SWOOZ default PIN: 0214)</span>' : ''}</p>
+            <p class="text-xs text-secondary mt-2 mb-4">Enter ${state.activePlayer}'s confidential PIN to decrypt secret diamond stashes &amp; private coordinates.</p>
             <form onsubmit="handleUnlockVault(event)" class="flex flex-col gap-4 max-w-xs mx-auto">
-              <input type="password" id="pinAttemptInput" maxlength="8" required placeholder="••••"
+              <input type="password" id="pinAttemptInput" maxlength="8" autocomplete="current-password" required placeholder="••••"
                 class="ui-input px-4 py-2 text-center font-mono text-sm tracking-widest tabular-nums" />
               <button type="submit" class="ui-btn-warning py-2.5 px-4 text-xs font-mono font-semibold uppercase tracking-label">
                 Decrypt &amp; Unlock Vault
@@ -1720,7 +1790,7 @@
       }
 
       controlsEl.innerHTML = `
-        <button onclick="changeCurrentVaultPin()" class="ui-btn px-4 py-1.5 text-xs font-mono text-secondary hover:text-primary">Change PIN</button>
+        <button onclick="openRotatePinGate()" class="ui-btn px-4 py-1.5 text-xs font-mono text-secondary hover:text-primary">Rotate Private PIN</button>
         <button onclick="lockCurrentVault()" class="px-4 py-1.5 text-xs font-mono bg-danger-subtle text-danger border border-danger-border rounded-[4px] hover:border-danger transition-colors duration-150 ease-out">Lock Ender Vault</button>
       `;
 
