@@ -541,9 +541,9 @@
         <span class="px-1.5 py-0.5 text-[11px] font-mojangles bg-black/35 border border-white/20 text-white tabular-nums">4</span>
       </button>
 
-      <!-- OPERATOR-ONLY BACK-END TAB (Hidden for standard Members, visible only to Operators DOMSWOOZ & ChibiZANIMUS) -->
-      <button onclick="switchTab('ops')" id="tab-ops" role="tab" aria-selected="false"
-        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+      <!-- OPERATOR-ONLY BACK-END TAB (Strictly hidden with style.display = 'none' unless active player holds Operator title) -->
+      <button onclick="switchTab('ops')" id="tab-ops" role="tab" aria-selected="false" style="display: none;"
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap items-center gap-2">
         <img src="/assets/anvil.png" alt="" class="w-4 h-4 pixel-art" />
         <span>OPs ONLY</span>
         <span id="opsTabLockBadge" class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-warning border border-warning-border uppercase">ADMIN</span>
@@ -1729,7 +1729,13 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       return REALM_ROSTER_META[name]?.avatar || '/assets/creeper-128.png';
     }
 
+    const FOUNDER_OPERATORS = new Set(['DOMSWOOZ', 'ChibiZANIMUS']);
+
     function getMemberRole(name) {
+      if (FOUNDER_OPERATORS.has(name)) return 'Operator';
+      if (typeof state !== 'undefined' && state?.memberRoles && state.memberRoles[name]) {
+        return state.memberRoles[name];
+      }
       return REALM_ROSTER_META[name]?.role || 'Member';
     }
 
@@ -1802,6 +1808,14 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       activeTab: 'shared',
       filter: 'all',
       crew: ['DOMSWOOZ', 'ChibiZANIMUS', 'BruthaManD', 'JacobParties', 'SallyManDuur', 'GoodScroll6570'],
+      memberRoles: {
+        'DOMSWOOZ': 'Operator',
+        'ChibiZANIMUS': 'Operator',
+        'BruthaManD': 'Member',
+        'JacobParties': 'Member',
+        'SallyManDuur': 'Member',
+        'GoodScroll6570': 'Member'
+      },
       sharedTasks: [
         {
           id: 't-elevator-glass',
@@ -2086,6 +2100,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         return {
           ...DEFAULT_STATE,
           ...parsed,
+          memberRoles: { ...DEFAULT_STATE.memberRoles, ...(parsed.memberRoles || {}) },
           privateVaults: { ...DEFAULT_STATE.privateVaults, ...(parsed.privateVaults || {}) },
           backpackProgress: { ...DEFAULT_STATE.backpackProgress, ...(parsed.backpackProgress || {}) }
         };
@@ -2109,6 +2124,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           crew: state.crew,
+          memberRoles: state.memberRoles,
           sharedTasks: state.sharedTasks,
           landmarks: state.landmarks,
           privateVaults: state.privateVaults,
@@ -2126,6 +2142,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           crew: state.crew,
+          memberRoles: state.memberRoles,
           sharedTasks: state.sharedTasks,
           landmarks: state.landmarks,
           privateVaults: state.privateVaults,
@@ -2868,41 +2885,38 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         lockBadge.className = 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums';
       }
 
-      // Show/hide Operator-only Back-End tab & sidebar shortcut based on active player role
+      // Strictly show/hide Operator-only Back-End tab & sidebar shortcut via inline style.display
+      // (Because .xb-tab has display: inline-flex in CSS, style.display = 'none' guarantees 0% visibility for non-Operators!)
       const isOperator = getMemberRole(state.activePlayer) === 'Operator';
       const opsTabBtn = document.getElementById('tab-ops');
       const opsSidebarBtn = document.getElementById('sidebarOpsShortcutBtn');
+      if (!isOperator && state.activeTab === 'ops') {
+        state.activeTab = 'shared';
+      }
       if (opsTabBtn) {
-        if (isOperator) {
-          opsTabBtn.classList.remove('hidden');
-          opsTabBtn.classList.add('flex');
-        } else {
-          opsTabBtn.classList.add('hidden');
-          opsTabBtn.classList.remove('flex');
-          if (state.activeTab === 'ops') {
-            state.activeTab = 'shared';
-          }
-        }
+        opsTabBtn.style.display = isOperator ? 'inline-flex' : 'none';
       }
       if (opsSidebarBtn) {
-        if (isOperator) {
-          opsSidebarBtn.classList.remove('hidden');
-        } else {
-          opsSidebarBtn.classList.add('hidden');
-        }
+        opsSidebarBtn.style.display = isOperator ? 'inline-flex' : 'none';
       }
 
       ['shared', 'vault', 'gps', 'backpack', 'gallery', 'ops'].forEach(t => {
         const btn = document.getElementById('tab-' + t);
         const view = document.getElementById('view-' + t);
         if (!btn || !view) return;
+        if (t === 'ops' && !isOperator) {
+          btn.setAttribute('aria-selected', 'false');
+          btn.style.display = 'none';
+          view.classList.add('hidden');
+          return;
+        }
         if (state.activeTab === t) {
           btn.setAttribute('aria-selected', 'true');
-          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.remove('hidden');
         } else {
           btn.setAttribute('aria-selected', 'false');
-          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
           view.classList.add('hidden');
         }
       });
@@ -3820,7 +3834,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       }
       updateOpsGeneratedClaimCodePreview();
 
-      // Render Operator Roster Oath & Tier Admin rows
+      // Render Operator Roster Role, Oath & Tier Admin rows
       const adminListEl = document.getElementById('opsRosterAdminList');
       if (adminListEl) {
         adminListEl.innerHTML = state.crew.map(name => {
@@ -3828,13 +3842,19 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
           const pFood = getFoodMeta(pBp.foodId);
           const tiersDone = getPlayerCompletedBackpackTiers(name);
           const locked = isPlayerFoodOathLocked(name);
+          const role = getMemberRole(name);
+          const isFounder = FOUNDER_OPERATORS.has(name);
           return `
-            <div class="ore-slot p-2 flex items-center justify-between gap-2">
+            <div class="ore-slot p-2 flex items-center justify-between gap-2 flex-wrap">
               <div class="flex items-center gap-2 min-w-0">
                 <img src="${getAvatar(name)}" alt="" class="w-6 h-6 object-cover border border-white/15 pixel-art shrink-0" />
                 <div class="min-w-0">
-                  <div class="font-mono text-xs font-bold text-white truncate">${name} <span class="text-[10px] font-mojangles text-[#8E8E8E]">(${tiersDone}/5)</span></div>
-                  <div class="font-mojangles text-[10px] text-[#A0A0A0] flex items-center gap-1">
+                  <div class="font-mono text-xs font-bold text-white truncate flex items-center gap-1.5">
+                    <span>${name}</span>
+                    <span class="px-1.5 py-0.5 text-[9px] font-mojangles ${role === 'Operator' ? 'bg-[#107C10] text-white border border-white/25' : 'bg-[#1C1C1C] text-[#A0A0A0] border border-white/10'} uppercase">${isFounder ? 'FOUNDER OP' : role.toUpperCase()}</span>
+                    <span class="text-[10px] font-mojangles text-[#8E8E8E]">(${tiersDone}/5)</span>
+                  </div>
+                  <div class="font-mojangles text-[10px] text-[#A0A0A0] flex items-center gap-1 mt-0.5">
                     <img src="${pFood.icon}" alt="" class="w-3 h-3 pixel-art" />
                     <span>${pFood.name}</span>
                     <span>${locked ? '🔒 SEALED' : '🔓 OPEN'}</span>
@@ -3842,6 +3862,14 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
                 </div>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
+                ${isFounder ? `
+                  <span class="px-2 py-1 text-[9px] font-mojangles text-[#6BC349] bg-[#141415] border border-white/10 uppercase">PERMANENT OP</span>
+                ` : `
+                  <button type="button" onclick="opsToggleMemberOperatorRole('${name.replace(/'/g, "\\'")}')"
+                    class="${role === 'Operator' ? 'ore-btn text-warning' : 'ore-btn ore-btn-primary'} px-2 py-1 text-[10px] font-mono uppercase">
+                    ${role === 'Operator' ? 'Revoke OP' : 'Grant OP ★'}
+                  </button>
+                `}
                 <button type="button" onclick="opsTogglePlayerOathLock('${name.replace(/'/g, "\\'")}')"
                   class="ore-btn px-2 py-1 text-[10px] font-mono uppercase">
                   ${locked ? 'Unlock Oath' : 'Seal Oath'}
@@ -3883,6 +3911,29 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       handleVerifyInGameClaimCode({ preventDefault: () => {} });
     }
 
+    function opsToggleMemberOperatorRole(player) {
+      if (getMemberRole(state.activePlayer) !== 'Operator') {
+        playUiSound('deny');
+        return;
+      }
+      if (FOUNDER_OPERATORS.has(player)) {
+        playUiSound('amethyst');
+        showToast(`${player} is a permanent Realm Founder Operator!`);
+        return;
+      }
+      if (!state.memberRoles) state.memberRoles = { ...DEFAULT_STATE.memberRoles };
+      const currentRole = getMemberRole(player);
+      const nextRole = currentRole === 'Operator' ? 'Member' : 'Operator';
+      state.memberRoles[player] = nextRole;
+      playUiSound(nextRole === 'Operator' ? 'levelup' : 'anvil');
+      saveState();
+      showToast(
+        nextRole === 'Operator'
+          ? `Granted OPERATOR Title to ${player} (by ${state.activePlayer}) — They can now access OPs ONLY!`
+          : `Revoked OPERATOR Title from ${player} — OPs ONLY tab is now hidden for them.`
+      );
+    }
+
     function opsTogglePlayerOathLock(player) {
       if (getMemberRole(state.activePlayer) !== 'Operator') {
         playUiSound('deny');
@@ -3914,6 +3965,9 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         const data = await res.json();
         if (data && !data.empty && data.sharedTasks) {
           state.crew = data.crew || state.crew;
+          if (data.memberRoles) {
+            state.memberRoles = { ...DEFAULT_STATE.memberRoles, ...data.memberRoles };
+          }
           state.sharedTasks = data.sharedTasks || state.sharedTasks;
           state.landmarks = data.landmarks || state.landmarks;
           if (data.privateVaults) {
