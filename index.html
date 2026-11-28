@@ -1026,17 +1026,20 @@
         <!-- LEFT 4 COLS: Tracked Food Selector, Crew Leaderboard, & Live Bedrock Script API Bridge -->
         <div class="md:col-span-4 flex flex-col gap-4">
 
-          <!-- Tracked Food Item Selector -->
+          <!-- Tracked Food Item Selector (With Character Oath Lock Until 5/5 Completion) -->
           <div class="xb-panel overflow-hidden">
-            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <img src="/assets/golden-apple.png" alt="" class="w-4 h-4 pixel-art" />
-                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">1. Select Tracked Food Supply</span>
+                <img id="backpackOathLockIcon" src="/assets/lock-locked.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">1. Character Ration Oath</span>
               </div>
-              <span id="backpackActiveFoodLabel" class="font-mojangles text-xs text-[#6BC349]">GOLDEN APPLE</span>
+              <span id="backpackActiveFoodLabel" class="font-mojangles text-xs text-[#6BC349]">SPIDER EYES (64x)</span>
             </div>
-            <div class="p-3 flex flex-col gap-2">
-              <p class="text-[11px] text-[#A0A0A0]">Choose the self-sufficiency food ration you are stacking to <span class="font-mojangles text-white">64</span> across your containers:</p>
+            <div class="p-3 flex flex-col gap-2.5">
+              <div id="backpackOathStatusBanner" class="ore-slot p-2.5 flex items-center justify-between gap-2"></div>
+              <p class="text-[11px] text-[#A0A0A0] leading-relaxed">
+                <strong>Endurance Oath Rule:</strong> Once locked in, your chosen <span class="font-mojangles text-white">64x</span> food ration is bound to your character until all <span class="font-mojangles text-[#6BC349]">5 / 5</span> levels (<span class="font-mojangles text-white">9,472</span> items) are completed!
+              </p>
               <div id="backpackFoodSelectorGrid" class="grid grid-cols-2 gap-2"></div>
             </div>
           </div>
@@ -1174,9 +1177,10 @@
         <pre id="bedrockScriptCodeBlock" class="ore-slot p-3 font-mono text-[11px] text-[#E0E0E0] overflow-x-auto leading-relaxed select-all">import { world, system } from "@minecraft/server";
 
 const TRACKED_FOODS = new Set([
+  "minecraft:spider_eye", "minecraft:sweet_berries", "minecraft:cooked_salmon",
   "minecraft:cooked_beef", "minecraft:golden_carrot", "minecraft:baked_potato",
   "minecraft:bread", "minecraft:cooked_porkchop", "minecraft:golden_apple",
-  "minecraft:enchanted_golden_apple", "minecraft:honey_bottle", "minecraft:cooked_salmon"
+  "minecraft:enchanted_golden_apple", "minecraft:dried_kelp"
 ]);
 
 world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
@@ -1417,8 +1421,8 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
   </div>
 
   <script>
-    // Bump to v3_fresh so DOMSWOOZ's PIN and all sessions start completely fresh for testing!
-    const STORAGE_KEY = 'chibi_zone_realm_v3_fresh';
+    // Bump to v4_spider_oath so DOMSWOOZ's Locked Spider Eye Vampire Oath loads immediately!
+    const STORAGE_KEY = 'chibi_zone_realm_v4_spider_oath';
     const DEVICE_AUTH_KEY = 'chibi_zone_device_auth_v3';
     let sfxEnabled = true;
 
@@ -1719,12 +1723,12 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         'GoodScroll6570': { pinHash: null, mustChangePin: false, encryptedPayload: null, itemCount: 0 }
       },
       backpackProgress: {
-        'DOMSWOOZ':       { foodId: 'golden_apple',  activeLevel: 1, levels: { 1: 18, 2: 0, 3: 0, 4: 0, 5: 0 } },
-        'ChibiZANIMUS':   { foodId: 'dream_apple',   activeLevel: 4, levels: { 1: 27, 2: 54, 3: 27, 4: 19, 5: 0 } },
-        'BruthaManD':     { foodId: 'cooked_beef',   activeLevel: 1, levels: { 1: 12, 2: 0, 3: 0, 4: 0, 5: 0 } },
-        'JacobParties':   { foodId: 'golden_carrot', activeLevel: 1, levels: { 1: 9,  2: 0, 3: 0, 4: 0, 5: 0 } },
-        'SallyManDuur':   { foodId: 'honey_bottle',  activeLevel: 1, levels: { 1: 15, 2: 0, 3: 0, 4: 0, 5: 0 } },
-        'GoodScroll6570': { foodId: 'baked_potato',  activeLevel: 1, levels: { 1: 6,  2: 0, 3: 0, 4: 0, 5: 0 } }
+        'DOMSWOOZ':       { foodId: 'spider_eye',    foodLocked: true,  activeLevel: 1, levels: { 1: 18, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'ChibiZANIMUS':   { foodId: 'dream_apple',   foodLocked: true,  activeLevel: 4, levels: { 1: 27, 2: 54, 3: 27, 4: 19, 5: 0 } },
+        'BruthaManD':     { foodId: 'cooked_beef',   foodLocked: true,  activeLevel: 1, levels: { 1: 12, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'JacobParties':   { foodId: 'golden_carrot', foodLocked: true,  activeLevel: 1, levels: { 1: 9,  2: 0, 3: 0, 4: 0, 5: 0 } },
+        'SallyManDuur':   { foodId: 'cooked_salmon', foodLocked: false, activeLevel: 1, levels: { 1: 15, 2: 0, 3: 0, 4: 0, 5: 0 } },
+        'GoodScroll6570': { foodId: 'baked_potato',  foodLocked: false, activeLevel: 1, levels: { 1: 6,  2: 0, 3: 0, 4: 0, 5: 0 } }
       }
     };
 
@@ -1788,12 +1792,14 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
     ];
 
     const BACKPACK_FOOD_OPTIONS = [
-      { id: 'golden_apple',  name: 'Golden Apple',         mcId: 'minecraft:golden_apple',           icon: '/assets/golden-apple.png' },
-      { id: 'dream_apple',   name: 'Enchanted G-Apple',    mcId: 'minecraft:enchanted_golden_apple', icon: '/assets/anim-dream-apple.gif' },
-      { id: 'honey_bottle',  name: 'Apis Honey Ration',    mcId: 'minecraft:honey_bottle',           icon: '/assets/potion-bottle.png' },
-      { id: 'cooked_beef',   name: 'Cooked Steak (64x)',   mcId: 'minecraft:cooked_beef',            icon: '/assets/achieve-bottle.png' },
-      { id: 'golden_carrot', name: 'Golden Carrots (64x)', mcId: 'minecraft:golden_carrot',          icon: '/assets/star-golden.png' },
-      { id: 'baked_potato',  name: 'Baked Potatoes (64x)', mcId: 'minecraft:baked_potato',           icon: '/assets/first-diamond.png' }
+      { id: 'spider_eye',    name: 'Spider Eyes (Vampire)', mcId: 'minecraft:spider_eye',             icon: '/assets/ender-eye.png',        lore: 'Nocturnal Vampire Lord Ration (64x)' },
+      { id: 'sweet_berries', name: 'Blood Briar Berries',   mcId: 'minecraft:sweet_berries',          icon: '/assets/crimson-apple.png',    lore: 'Thorny Blood-Bush Harvest (64x)' },
+      { id: 'golden_carrot', name: 'Golden Carrots (64x)',  mcId: 'minecraft:golden_carrot',          icon: '/assets/star-golden.png',      lore: 'Night-Vision Alchemy Ration (64x)' },
+      { id: 'cooked_salmon', name: 'Spear-Hunted Salmon',   mcId: 'minecraft:cooked_salmon',          icon: '/assets/water-block.png',      lore: 'Panama Canal Spear Catch (64x)' },
+      { id: 'dream_apple',   name: 'Enchanted G-Apple',     mcId: 'minecraft:enchanted_golden_apple', icon: '/assets/anim-dream-apple.gif', lore: 'Immortal Golden Provision (64x)' },
+      { id: 'golden_apple',  name: 'Golden Apple (64x)',    mcId: 'minecraft:golden_apple',           icon: '/assets/golden-apple.png',     lore: 'Gilded Orchard Reserve (64x)' },
+      { id: 'cooked_beef',   name: 'Cooked Steak (64x)',    mcId: 'minecraft:cooked_beef',            icon: '/assets/achieve-bottle.png',   lore: 'Citadel Carnivore Feast (64x)' },
+      { id: 'baked_potato',  name: 'Baked Potatoes (64x)',  mcId: 'minecraft:baked_potato',           icon: '/assets/first-diamond.png',    lore: 'Fortune III Smoker Staple (64x)' }
     ];
 
     let state = loadState();
@@ -2936,7 +2942,8 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       if (!state.backpackProgress) state.backpackProgress = {};
       if (!state.backpackProgress[player]) {
         state.backpackProgress[player] = {
-          foodId: 'golden_apple',
+          foodId: player === 'DOMSWOOZ' ? 'spider_eye' : 'golden_carrot',
+          foodLocked: player === 'DOMSWOOZ',
           activeLevel: 1,
           levels: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
         };
@@ -2944,7 +2951,11 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       const bp = state.backpackProgress[player];
       if (!bp.levels) bp.levels = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
       if (!bp.activeLevel) bp.activeLevel = 1;
-      if (!bp.foodId) bp.foodId = 'golden_apple';
+      if (!bp.foodId) bp.foodId = player === 'DOMSWOOZ' ? 'spider_eye' : 'golden_carrot';
+      if (typeof bp.foodLocked !== 'boolean') {
+        const hasAnyProgress = Object.values(bp.levels).some(v => v > 0);
+        bp.foodLocked = hasAnyProgress;
+      }
       return bp;
     }
 
@@ -2962,6 +2973,23 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       return completed;
     }
 
+    function isPlayerFoodOathLocked(player = state.activePlayer) {
+      const bp = getPlayerBackpack(player);
+      const completed = getPlayerCompletedBackpackTiers(player);
+      // Once 5/5 Ultimate Backpacker is achieved, the oath is fulfilled and unlocked!
+      if (completed >= 5) return false;
+      return !!bp.foodLocked;
+    }
+
+    function lockInPlayerFoodOath() {
+      const bp = getPlayerBackpack(state.activePlayer);
+      const food = getFoodMeta(bp.foodId);
+      playUiSound('anvil');
+      bp.foodLocked = true;
+      saveState();
+      showToast(`OATH SEALED: ${state.activePlayer} is locked to ${food.name} until 5/5 Ultimate Backpacker!`);
+    }
+
     function getBackpackRankTitle(completedTiers) {
       if (completedTiers >= 5) return 'ULTIMATE BACKPACKER (5 / 5)';
       if (completedTiers === 4) return 'SHULKER LOGISTICS MASTER (4 / 5)';
@@ -2972,12 +3000,23 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
     }
 
     function selectBackpackFood(foodId) {
-      playUiSound('pop');
       const bp = getPlayerBackpack(state.activePlayer);
+      const currentFood = getFoodMeta(bp.foodId);
+      if (isPlayerFoodOathLocked(state.activePlayer)) {
+        if (bp.foodId === foodId) {
+          playUiSound('amethyst');
+          showToast(`${state.activePlayer}'s Oath is sealed to ${currentFood.name} until 5/5 completion!`);
+          return;
+        }
+        playUiSound('deny');
+        showToast(`OATH LOCKED: ${state.activePlayer} must finish all 5/5 tiers with ${currentFood.name} first!`);
+        return;
+      }
+      playUiSound('pop');
       bp.foodId = foodId;
       const food = getFoodMeta(foodId);
       saveState();
-      showToast(`${state.activePlayer} tracked ration set to: ${food.name} (64x per slot)`);
+      showToast(`${state.activePlayer} selected ${food.name} — Click "Lock In Oath" or fill a slot to seal!`);
     }
 
     function selectBackpackLevel(levelId) {
@@ -3022,8 +3061,9 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         nextFilled = slotIdx;
         playUiSound('click');
       } else {
-        // Clicking an empty slot fills up through slotIdx + 1
+        // Clicking an empty slot fills up through slotIdx + 1 and automatically seals the Character Ration Oath!
         nextFilled = Math.min(lvl.slots, slotIdx + 1);
+        bp.foodLocked = true;
         playUiSound('coin');
       }
       bp.levels[lvl.id] = nextFilled;
@@ -3042,6 +3082,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       }
       playUiSound('coin');
       const nextFilled = currentFilled + 1;
+      bp.foodLocked = true;
       bp.levels[lvl.id] = nextFilled;
       saveState();
       checkAndCelebrateTierCompletion(state.activePlayer, lvl.id, currentFilled, nextFilled);
@@ -3051,6 +3092,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       const bp = getPlayerBackpack(state.activePlayer);
       const lvl = BACKPACK_LEVELS.find(l => l.id === bp.activeLevel) || BACKPACK_LEVELS[0];
       const currentFilled = bp.levels[lvl.id] || 0;
+      bp.foodLocked = true;
       bp.levels[lvl.id] = lvl.slots;
       saveState();
       if (currentFilled < lvl.slots) {
@@ -3194,20 +3236,76 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         }).join('');
       }
 
-      // 2. Render Tracked Food Selector Grid
+      // 2. Render Tracked Food Selector Grid + Character Oath Lock Banner
+      const oathLocked = isPlayerFoodOathLocked(state.activePlayer);
+      const oathFulfilled = completedCount >= 5;
       const foodLabelEl = document.getElementById('backpackActiveFoodLabel');
-      if (foodLabelEl) foodLabelEl.textContent = activeFood.name.toUpperCase();
+      if (foodLabelEl) {
+        foodLabelEl.textContent = `${activeFood.name.toUpperCase()} ${oathLocked ? '🔒' : (oathFulfilled ? '🏆' : '')}`;
+      }
+      const lockIconEl = document.getElementById('backpackOathLockIcon');
+      if (lockIconEl) {
+        lockIconEl.src = oathLocked ? '/assets/lock-locked.png' : '/assets/lock-unlocked.png';
+      }
+      const oathBannerEl = document.getElementById('backpackOathStatusBanner');
+      if (oathBannerEl) {
+        if (oathFulfilled) {
+          oathBannerEl.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${activeFood.icon}" alt="" class="w-6 h-6 pixel-art shrink-0" />
+              <div class="min-w-0">
+                <div class="font-mojangles text-[10px] text-[#6BC349] uppercase">OATH FULFILLED // 5 OF 5 COMPLETE</div>
+                <div class="font-mono text-xs font-bold text-white truncate">${state.activePlayer}: ${activeFood.name}</div>
+              </div>
+            </div>
+            <span class="bg-[#107C10] px-2 py-1 border border-white/30 font-mojangles text-[10px] text-white uppercase shrink-0">UNLOCKED 🏆</span>
+          `;
+        } else if (oathLocked) {
+          oathBannerEl.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${activeFood.icon}" alt="" class="w-6 h-6 pixel-art shrink-0" />
+              <div class="min-w-0">
+                <div class="font-mojangles text-[10px] text-warning uppercase">BOUND OATH // LOCKED UNTIL 5/5</div>
+                <div class="font-mono text-xs font-bold text-white truncate">${activeFood.name}</div>
+              </div>
+            </div>
+            <span class="bg-[#141415] px-2 py-1 border border-warning-border font-mojangles text-[10px] text-warning uppercase flex items-center gap-1 shrink-0">
+              <img src="/assets/lock-locked.png" alt="" class="w-3 h-3 pixel-art" />
+              <span>SEALED (${completedCount}/5)</span>
+            </span>
+          `;
+        } else {
+          oathBannerEl.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${activeFood.icon}" alt="" class="w-6 h-6 pixel-art shrink-0" />
+              <div class="min-w-0">
+                <div class="font-mojangles text-[10px] text-[#A0A0A0] uppercase">UNSEALED RATION CHOICE</div>
+                <div class="font-mono text-xs font-bold text-white truncate">${activeFood.name}</div>
+              </div>
+            </div>
+            <button onclick="lockInPlayerFoodOath()" class="ore-btn ore-btn-primary px-2.5 py-1 text-[10px] font-mojangles uppercase shrink-0">
+              Lock In Oath 🔒
+            </button>
+          `;
+        }
+      }
+
       const foodGridEl = document.getElementById('backpackFoodSelectorGrid');
       if (foodGridEl) {
         foodGridEl.innerHTML = BACKPACK_FOOD_OPTIONS.map(f => {
           const selected = f.id === bp.foodId;
+          const disabledByOath = oathLocked && !selected;
           return `
             <button onclick="selectBackpackFood('${f.id}')"
-              class="${selected ? 'ore-btn ore-btn-primary' : 'ore-btn'} p-2 flex items-center gap-2 text-left">
+              title="${disabledByOath ? `Locked: ${state.activePlayer} is bound to ${activeFood.name} until 5/5 completion` : (f.lore || f.name)}"
+              class="${selected ? 'ore-btn ore-btn-primary' : 'ore-btn'} ${disabledByOath ? 'opacity-45 cursor-not-allowed' : ''} p-2 flex items-center gap-2 text-left">
               <img src="${f.icon}" alt="" class="w-5 h-5 pixel-art object-contain shrink-0" />
               <div class="min-w-0 flex-1">
-                <div class="text-[11px] font-mono font-bold text-white truncate">${f.name}</div>
-                <div class="text-[9px] font-mojangles text-white/75">STACK: 64x</div>
+                <div class="text-[11px] font-mono font-bold text-white truncate flex items-center justify-between gap-1">
+                  <span class="truncate">${f.name}</span>
+                  ${selected && oathLocked ? '<img src="/assets/lock-locked.png" alt="Locked" class="w-3 h-3 pixel-art shrink-0" />' : ''}
+                </div>
+                <div class="text-[9px] font-mojangles text-white/75 truncate">${selected && oathLocked ? 'OATH BOUND · 64x' : 'STACK: 64x'}</div>
               </div>
             </button>
           `;
@@ -3230,6 +3328,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
 
         lbEl.innerHTML = standings.map((entry, idx) => {
           const isMaster = entry.tiersDone >= 5;
+          const entryLocked = isPlayerFoodOathLocked(entry.name);
           return `
             <div onclick="setActivePlayer('${entry.name.replace(/'/g, "\\'")}')"
               class="ore-slot p-2.5 flex items-center justify-between gap-2 cursor-pointer hover:border-white/25">
@@ -3243,7 +3342,9 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
                   </div>
                   <div class="text-[10px] font-mojangles text-[#A0A0A0] flex items-center gap-1.5 mt-0.5 tabular-nums">
                     <img src="${entry.pFood.icon}" alt="" class="w-3.5 h-3.5 pixel-art" />
-                    <span>${entry.totalItemsStacked.toLocaleString()} / 9,472 ITEMS</span>
+                    <span class="text-white">${entry.pFood.name}</span>
+                    ${entryLocked ? '<span class="text-warning">🔒</span>' : ''}
+                    <span>· ${entry.totalItemsStacked.toLocaleString()} / 9,472</span>
                   </div>
                 </div>
               </div>
