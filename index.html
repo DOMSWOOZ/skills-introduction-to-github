@@ -517,6 +517,14 @@
         <span>Archive</span>
         <span class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4</span>
       </button>
+
+      <!-- OPERATOR-ONLY BACK-END TAB (Hidden for standard Members, visible only to Operators DOMSWOOZ & ChibiZANIMUS) -->
+      <button onclick="switchTab('ops')" id="tab-ops" role="tab" aria-selected="false"
+        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        <img src="/assets/anvil.png" alt="" class="w-4 h-4 pixel-art" />
+        <span>Ops Back-End</span>
+        <span id="opsTabLockBadge" class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-warning border border-warning-border uppercase">OP ONLY</span>
+      </button>
       <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block ml-1" title="Next Tab (Gamepad RB)">RB</span>
     </nav>
   </header>
@@ -553,15 +561,15 @@
           <span class="font-mojangles text-xs bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">X</span>
         </button>
 
-        <!-- Dark Slate Keycap Row: Audio Toggle & Fresh PIN Reset -->
+        <!-- Dark Slate Keycap Row: Audio Toggle & Ops Console Shortcut -->
         <div class="grid grid-cols-2 gap-2">
           <button onclick="toggleSound()" class="ore-btn w-full">
             <span id="soundToggleBtn" class="font-sans text-xs text-[#E0E0E0] uppercase">SFX: ON</span>
             <span class="font-mono text-[11px] text-[#8E8E8E]">AUD</span>
           </button>
-          <button onclick="resetAllAuthForTesting()" title="Reset PINs &amp; Sessions to Fresh 1st-Entry State" class="ore-btn w-full">
-            <span class="font-sans text-xs text-[#E0E0E0] uppercase">Reset Auth</span>
-            <span class="font-mono text-[11px] text-warning">RST</span>
+          <button id="sidebarOpsShortcutBtn" onclick="switchTab('ops')" title="Operator Back-End Console (Operators Only)" class="ore-btn w-full">
+            <span class="font-sans text-xs text-[#E0E0E0] uppercase">Ops Back-End</span>
+            <span class="font-mono text-[11px] text-[#6BC349]">OPS</span>
           </button>
         </div>
       </div>
@@ -1056,53 +1064,23 @@
             <div id="backpackLeaderboardList" class="p-3 flex flex-col gap-2"></div>
           </div>
 
-          <!-- Bulletproof Hybrid Bridge #1 (PC ContentLog Watcher) + Bridge #3 (Signed In-Game Claim Codes) -->
+          <!-- Player In-Game Sync Card (Clean Player-Facing View — No Dev/Download Clutter!) -->
           <div class="xb-panel overflow-hidden">
             <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between gap-2">
-              <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">In-Game ↔ Web Sync Loop (#1 + #3)</span>
-              <span class="bg-[#107C10] px-1.5 py-0.5 border border-white/20 font-mojangles text-[10px] text-white">BRIDGE ACTIVE</span>
+              <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">In-Game Achievement Sync</span>
+              <span class="bg-[#107C10] px-1.5 py-0.5 border border-white/20 font-mojangles text-[10px] text-white">REALM LINKED</span>
             </div>
             <div class="p-3.5 flex flex-col gap-3 text-xs">
-              <!-- Bridge #3: Cryptographic In-Game Claim Code Verifier (Works on Xbox / Switch / Mobile / PC) -->
-              <div class="ore-slot p-3 flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                  <span class="font-mojangles text-[10px] text-warning uppercase">BRIDGE #3 // PASTE IN-GAME CLAIM CODE</span>
-                  <button type="button" onclick="generateSampleClaimCodeForActiveTier()" class="font-mono text-[10px] text-[#6BC349] hover:text-white underline">
-                    Fill Sample Code
-                  </button>
-                </div>
-                <p class="text-[11px] text-[#A0A0A0] leading-relaxed">
-                  Playing on Xbox, Mobile, or PC? Paste the signed code printed in Minecraft chat (e.g. <code id="sampleClaimCodeHint" class="text-white font-mono">BP1-DOMSWOOZ-27-spider_eye-...</code>) to verify &amp; unlock your tier:
-                </p>
-                <form onsubmit="handleVerifyInGameClaimCode(event)" class="flex items-center gap-1.5">
-                  <input type="text" id="inGameClaimCodeInput" required placeholder="BP1-DOMSWOOZ-27-spider_eye-XXXXXX"
-                    class="ore-slot ui-input flex-1 px-2.5 py-1.5 text-[11px] font-mono text-white" />
-                  <button type="submit" class="ore-btn ore-btn-primary px-3 py-1.5 text-xs font-mojangles uppercase shrink-0">
-                    Verify ✓
-                  </button>
-                </form>
-              </div>
-
-              <!-- Bridge #1: Local PC ContentLog Auto-Watcher + 1-Click .mcpack Behavior Pack Installer -->
-              <div class="ore-slot p-3 flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                  <span class="font-mojangles text-[10px] text-[#6BC349] uppercase">BRIDGE #1 // PC CONTENTLOG AUTO-SYNC</span>
-                  <span class="font-mojangles text-[10px] text-white">2.5s WATCHER</span>
-                </div>
-                <p class="text-[11px] text-[#A0A0A0] leading-relaxed">
-                  Install the <code class="text-white">.mcpack</code> Add-On on your Realm. While playing on PC, <code class="text-white">server.js</code> watches your Minecraft <code class="text-white">ContentLog</code> and syncs completions here automatically!
-                </p>
-                <a href="/assets/chibi-ultimate-backpacker.mcpack" download="chibi-ultimate-backpacker.mcpack"
-                  onclick="playUiSound('levelup'); showToast('Downloading chibi-ultimate-backpacker.mcpack — Double-click to import into Minecraft!');"
-                  class="ore-btn ore-btn-primary w-full py-2 px-3 text-center no-underline">
-                  <span class="font-mc-ten text-xs uppercase text-white">Download .MCPACK Behavior Pack</span>
-                  <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">A</span>
-                </a>
-                <button type="button" onclick="openBedrockScriptModal()" class="ore-btn ore-btn-stone w-full py-1.5 px-3 font-semibold">
-                  <span class="font-sans text-[11px] uppercase tracking-tight">Inspect Bridge #1 + #3 Script Code</span>
-                  <span class="font-mojangles text-[10px] bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">Y</span>
+              <p class="text-[11px] text-[#A0A0A0] leading-relaxed">
+                Your progress syncs automatically when an Operator is online in the Realm! Playing solo on Xbox or Mobile? Paste the verification code from in-game chat below:
+              </p>
+              <form onsubmit="handleVerifyInGameClaimCode(event)" class="flex items-center gap-1.5">
+                <input type="text" id="inGameClaimCodeInput" required placeholder="BP1-GAMERTAG-27-food-XXXXXX"
+                  class="ore-slot ui-input flex-1 px-2.5 py-1.5 text-[11px] font-mono text-white" />
+                <button type="submit" class="ore-btn ore-btn-primary px-3 py-1.5 text-xs font-mojangles uppercase shrink-0">
+                  Verify ✓
                 </button>
-              </div>
+              </form>
             </div>
           </div>
 
@@ -1166,6 +1144,205 @@
                 <span id="bpComparatorSignalLabel" class="font-mojangles text-xs text-[#8E8E8E]">REDSTONE COMPARATOR SIGNAL: 00 / 15</span>
               </div>
               <div id="backpackSlotsGrid" class="grid grid-cols-9 gap-1.5 bg-[#141415] p-3 border-2 border-[#0B0B0C]"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: OPERATOR & MODERATOR BACK-END COMMAND CONSOLE ==================== -->
+    <section id="view-ops" class="hidden flex flex-col gap-4">
+
+      <!-- Operator Back-End Header Banner -->
+      <div class="xb-panel p-5 flex flex-col gap-4">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex items-start gap-3.5">
+            <div class="ore-slot p-2.5 flex items-center justify-center shrink-0">
+              <img src="/assets/anvil.png" alt="Operator Console" class="w-11 h-11 pixel-art object-contain" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="bg-[#107C10] px-2 py-0.5 border border-white/20 font-mojangles text-[10px] text-white uppercase">RESTRICTED // REALM OPERATORS &amp; MODS ONLY</span>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-warning">COMMUNITY OPERATIONS &amp; DEV INFRASTRUCTURE</span>
+              </div>
+              <h2 class="font-mc-ten text-2xl text-white uppercase mt-1">OPERATOR BACK-END COMMAND CONSOLE</h2>
+              <p class="text-xs text-[#A0A0A0] mt-1 max-w-3xl leading-relaxed">
+                Dedicated back-end workspace for <strong>DOMSWOOZ</strong> &amp; <strong>ChibiZANIMUS</strong> to manage Realm Add-Ons (<code class="text-white">.mcpack</code>), inspect the PC <code class="text-white">ContentLog</code> auto-watcher, generate or audit player verification codes, and administer community roster permissions without cluttering the public player tabs.
+              </p>
+            </div>
+          </div>
+          <div class="ore-slot px-4 py-3 text-right shrink-0">
+            <span class="block font-mono text-[10px] uppercase text-[#8E8E8E]">ACTIVE SESSION CLEARANCE</span>
+            <span id="opsClearanceBadge" class="font-mc-ten text-lg text-[#6BC349] uppercase">OPERATOR: DOMSWOOZ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Access Denied Gate (Shown if a standard Member attempts to view #view-ops) -->
+      <div id="opsRestrictedGate" class="hidden xb-panel p-8 text-center max-w-lg mx-auto my-4">
+        <img src="/assets/access-denied.png" alt="Operator Clearance Required" class="w-14 h-14 mx-auto mb-3 object-contain" />
+        <div class="inline-block ore-slot px-2.5 py-1 mb-2 text-[11px] font-mojangles uppercase text-warning">
+          CLEARANCE LEVEL: REALM OPERATOR REQUIRED
+        </div>
+        <h3 class="font-mc-ten text-xl text-white uppercase">BACK-END CONSOLE RESTRICTED</h3>
+        <p class="text-xs text-[#A0A0A0] mt-2 mb-4 leading-relaxed">
+          This back-end section is reserved for Realm Operators (<strong>DOMSWOOZ</strong> &amp; <strong>ChibiZANIMUS</strong>) to manage server behavior packs, webhooks, and community administration.
+        </p>
+        <button onclick="openNodeSignInModal()" class="ore-btn ore-btn-primary px-5 py-2.5 font-mc-ten text-sm uppercase">
+          <span>Authenticate as Realm Operator</span>
+          <span class="font-mojangles text-xs bg-black/30 px-1.5 py-0.5 text-white">A</span>
+        </button>
+      </div>
+
+      <!-- Unlocked Operator Back-End Dashboard Grid -->
+      <div id="opsUnlockedDashboard" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+        <!-- LEFT 6 COLS: Behavior Pack (.mcpack) Deployment & Bridge #1 PC ContentLog Watcher -->
+        <div class="md:col-span-6 flex flex-col gap-4">
+
+          <!-- 1. Realm Behavior Pack (.MCPACK) & Script API Deployment -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/container-shulker.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#6BC349]">1. Realm Add-On &amp; Behavior Pack (.MCPACK)</span>
+              </div>
+              <span class="bg-[#107C10] px-1.5 py-0.5 border border-white/20 font-mojangles text-[10px] text-white">v1.0.0 READY</span>
+            </div>
+            <div class="p-4 flex flex-col gap-3 text-xs">
+              <p class="text-[#A0A0A0] leading-relaxed">
+                <strong>Host-Only Setup:</strong> Only the Realm Owner needs to download and attach this <code class="text-white">.mcpack</code> to the Realm world. Every player who joins on Xbox, PlayStation, Switch, Mobile, or PC is automatically tracked in-game without installing anything!
+              </p>
+              <div class="ore-slot p-3 flex flex-col gap-2 font-mono text-[11px] text-[#E0E0E0]">
+                <div>1. Click <strong>Download .MCPACK</strong> below on your Windows desktop.</div>
+                <div>2. Double-click <code class="text-[#6BC349]">chibi-ultimate-backpacker.mcpack</code> to auto-import into Minecraft.</div>
+                <div>3. In Minecraft → <strong>CHIBI~Zone Realm Settings (Pencil Icon) → Behavior Packs</strong> → Activate <strong>CHIBI~Zone: Ultimate Backpacker</strong>!</div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <a href="/assets/chibi-ultimate-backpacker.mcpack" download="chibi-ultimate-backpacker.mcpack"
+                  onclick="playUiSound('levelup'); showToast('Operator Download: chibi-ultimate-backpacker.mcpack');"
+                  class="ore-btn ore-btn-primary py-2.5 px-3 text-center no-underline">
+                  <span class="font-mc-ten text-xs uppercase text-white">Download .MCPACK Add-On</span>
+                  <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">A</span>
+                </a>
+                <button type="button" onclick="openBedrockScriptModal()" class="ore-btn ore-btn-stone py-2.5 px-3 font-semibold">
+                  <span class="font-sans text-xs uppercase tracking-tight">Inspect Script API Source</span>
+                  <span class="font-mojangles text-[10px] bg-black/15 px-1.5 py-0.5 text-[#1E1E1F]">Y</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Bridge #1: Local PC ContentLog Auto-Watcher & Webhook Simulator -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">2. Bridge #1 // PC ContentLog Watcher &amp; Webhook</span>
+              </div>
+              <span class="font-mojangles text-[10px] text-[#6BC349]">POLLING: 2.5s</span>
+            </div>
+            <div class="p-4 flex flex-col gap-3 text-xs">
+              <p class="text-[#A0A0A0] leading-relaxed">
+                While your desktop PC is running <code class="text-white">node server.js</code> and logged into the Realm, it tails <code class="text-white">%LOCALAPPDATA%\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\logs\ContentLog*.txt</code> for <code class="text-[#6BC349]">[CHIBI_BACKPACK_SYNC]</code> packets and updates player containers automatically.
+              </p>
+              <div class="ore-slot p-3 flex flex-col gap-1.5 font-mono text-[11px]">
+                <div class="flex items-center justify-between">
+                  <span class="text-[#8E8E8E]">WEBHOOK ENDPOINT:</span>
+                  <code class="text-white">POST /api/backpack-webhook</code>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[#8E8E8E]">LAST BRIDGE PACKET:</span>
+                  <span id="opsLastBridgeEventLabel" class="text-[#6BC349] font-mojangles">READY // LISTENING</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button type="button" onclick="simulateLiveWebhookTrigger()" class="ore-btn ore-btn-primary py-2 px-3 text-xs font-mono uppercase">
+                  <span>Fire Test Webhook Packet</span>
+                  <span class="font-mojangles text-[10px] bg-black/30 px-1.5 py-0.5 text-white">X</span>
+                </button>
+                <button type="button" onclick="generateSampleClaimCodeForActiveTier(); switchTab('backpack');" class="ore-btn py-2 px-3 text-xs font-mono uppercase">
+                  <span>Generate Sample Claim Code</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT 6 COLS: Operator Roster Override, Claim Code Generator & Auth/Database Maintenance -->
+        <div class="md:col-span-6 flex flex-col gap-4">
+
+          <!-- 3. Operator Claim Code Generator & Player Oath Manager -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/star-golden.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">3. Operator Claim Code Issuer &amp; Oath Admin</span>
+              </div>
+              <span class="font-mojangles text-[10px] text-warning">FNV-1A SIGNED</span>
+            </div>
+            <div class="p-4 flex flex-col gap-3 text-xs">
+              <p class="text-[#A0A0A0] leading-relaxed">
+                Generate a cryptographically signed <strong>Bridge #3 Claim Code</strong> for any Realm member who completed a container tier on Xbox/Console while the PC watcher was offline, or manage their Ration Oath lock:
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div>
+                  <label class="block font-mono text-[10px] uppercase text-[#8E8E8E] mb-1">REALM MEMBER</label>
+                  <select id="opsCodePlayerSelect" onchange="updateOpsGeneratedClaimCodePreview()" class="ore-slot ui-input w-full px-2.5 py-1.5 text-xs font-mono"></select>
+                </div>
+                <div>
+                  <label class="block font-mono text-[10px] uppercase text-[#8E8E8E] mb-1">STORAGE TIER</label>
+                  <select id="opsCodeLevelSelect" onchange="updateOpsGeneratedClaimCodePreview()" class="ore-slot ui-input w-full px-2.5 py-1.5 text-xs font-mono">
+                    <option value="1">Level 1: Barrels (27)</option>
+                    <option value="2">Level 2: Double Chest (54)</option>
+                    <option value="3">Level 3: Ender Chest (27)</option>
+                    <option value="4">Level 4: Shulker Box (27)</option>
+                    <option value="5">Level 5: Hoppers (13)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-mono text-[10px] uppercase text-[#8E8E8E] mb-1">RATION OATH</label>
+                  <select id="opsCodeFoodSelect" onchange="updateOpsGeneratedClaimCodePreview()" class="ore-slot ui-input w-full px-2.5 py-1.5 text-xs font-mono"></select>
+                </div>
+              </div>
+              <div class="ore-slot p-3 flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <span class="block font-mono text-[9px] uppercase text-[#8E8E8E]">SIGNED CLAIM TOKEN (SEND TO PLAYER OR APPLY):</span>
+                  <code id="opsGeneratedCodeDisplay" class="font-mono text-xs text-[#6BC349] select-all truncate block mt-0.5">BP1-DOMSWOOZ-27-spider_eye-Y8NK8W</code>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" onclick="copyOpsGeneratedClaimCode()" class="ore-btn px-2.5 py-1.5 text-[11px] font-mono uppercase">Copy</button>
+                  <button type="button" onclick="applyOpsGeneratedClaimCodeNow()" class="ore-btn ore-btn-primary px-2.5 py-1.5 text-[11px] font-mono uppercase">Apply Now ✓</button>
+                </div>
+              </div>
+              <div id="opsRosterAdminList" class="flex flex-col gap-1.5 max-h-56 overflow-y-auto pt-1"></div>
+            </div>
+          </div>
+
+          <!-- 4. Community State Backup, Auth Reset & Database Maintenance -->
+          <div class="xb-panel overflow-hidden">
+            <div class="p-3 border-b border-white/10 bg-[#141415] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img src="/assets/lock-locked.png" alt="" class="w-4 h-4 pixel-art" />
+                <span class="font-mono text-[11px] uppercase tracking-wider text-[#A0A0A0]">4. Security, State Snapshot &amp; Auth Maintenance</span>
+              </div>
+              <span class="font-mojangles text-[10px] text-white">AES-256-GCM</span>
+            </div>
+            <div class="p-4 flex flex-col gap-2.5 text-xs">
+              <p class="text-[#A0A0A0] leading-relaxed">
+                Administrative controls for resetting test PINs/sessions, exporting the full Realm JSON state, or opening the OAuth2 / XSTS configuration inspector.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button type="button" onclick="exportFullRealmJsonBackup()" class="ore-btn ore-btn-stone py-2 px-3 text-xs font-mono font-semibold uppercase">
+                  <span>Export Full State (.JSON)</span>
+                </button>
+                <button type="button" onclick="resetAllAuthForTesting()" class="ore-btn py-2 px-3 text-xs font-mono text-warning uppercase">
+                  <span>Reset All Auth / Test PINs</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2239,12 +2416,19 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
 
     function switchTab(tab) {
       if (state.activeTab === tab) return;
+      if (tab === 'ops' && getMemberRole(state.activePlayer) !== 'Operator') {
+        playUiSound('deny');
+        showToast('Access Restricted: Only Realm Operators (DOMSWOOZ & ChibiZANIMUS) can open Ops Back-End!');
+        openNodeSignInModal();
+        return;
+      }
       const tabSounds = {
         shared: 'enchant',
         vault: 'ender_open',
         gps: 'drawmap',
         backpack: 'toast',
-        gallery: 'amethyst'
+        gallery: 'amethyst',
+        ops: 'anvil'
       };
       playUiSound(tabSounds[tab] || 'drawer_open');
       const labels = {
@@ -2252,7 +2436,8 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         vault: 'ACCESSING ENDER TREASURY...',
         gps: 'CALIBRATING REALM GPS...',
         backpack: 'OPENING ULTIMATE BACKPACKER PROTOCOL...',
-        gallery: 'OPENING CITADEL ARCHIVE...'
+        gallery: 'OPENING CITADEL ARCHIVE...',
+        ops: 'AUTHENTICATING OPERATOR BACK-END CONSOLE...'
       };
       triggerScreenTransition(labels[tab] || 'SWITCHING SECTOR...', () => {
         state.activeTab = tab;
@@ -2660,17 +2845,41 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         lockBadge.className = 'px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums';
       }
 
-      ['shared', 'vault', 'gps', 'backpack', 'gallery'].forEach(t => {
+      // Show/hide Operator-only Back-End tab & sidebar shortcut based on active player role
+      const isOperator = getMemberRole(state.activePlayer) === 'Operator';
+      const opsTabBtn = document.getElementById('tab-ops');
+      const opsSidebarBtn = document.getElementById('sidebarOpsShortcutBtn');
+      if (opsTabBtn) {
+        if (isOperator) {
+          opsTabBtn.classList.remove('hidden');
+          opsTabBtn.classList.add('flex');
+        } else {
+          opsTabBtn.classList.add('hidden');
+          opsTabBtn.classList.remove('flex');
+          if (state.activeTab === 'ops') {
+            state.activeTab = 'shared';
+          }
+        }
+      }
+      if (opsSidebarBtn) {
+        if (isOperator) {
+          opsSidebarBtn.classList.remove('hidden');
+        } else {
+          opsSidebarBtn.classList.add('hidden');
+        }
+      }
+
+      ['shared', 'vault', 'gps', 'backpack', 'gallery', 'ops'].forEach(t => {
         const btn = document.getElementById('tab-' + t);
         const view = document.getElementById('view-' + t);
         if (!btn || !view) return;
         if (state.activeTab === t) {
           btn.setAttribute('aria-selected', 'true');
-          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
+          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
           view.classList.remove('hidden');
         } else {
           btn.setAttribute('aria-selected', 'false');
-          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2';
+          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
           view.classList.add('hidden');
         }
       });
@@ -2680,6 +2889,7 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       renderPrivateVault();
       renderGpsTable();
       renderBackpackSystem();
+      renderOpsBackendConsole();
     }
 
     function renderSharedTasks() {
@@ -3551,6 +3761,129 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
       }
     }
 
+    // ==================== OPERATOR & MODERATOR BACK-END COMMAND CONSOLE ====================
+    function renderOpsBackendConsole() {
+      const isOperator = getMemberRole(state.activePlayer) === 'Operator';
+      const gateEl = document.getElementById('opsRestrictedGate');
+      const dashEl = document.getElementById('opsUnlockedDashboard');
+      const badgeEl = document.getElementById('opsClearanceBadge');
+      if (!gateEl || !dashEl) return;
+
+      if (!isOperator) {
+        gateEl.classList.remove('hidden');
+        dashEl.classList.add('hidden');
+        if (badgeEl) {
+          badgeEl.textContent = `RESTRICTED (${state.activePlayer})`;
+          badgeEl.className = 'font-mc-ten text-lg text-warning uppercase';
+        }
+        return;
+      }
+
+      gateEl.classList.add('hidden');
+      dashEl.classList.remove('hidden');
+      if (badgeEl) {
+        badgeEl.textContent = `OPERATOR: ${state.activePlayer}`;
+        badgeEl.className = 'font-mc-ten text-lg text-[#6BC349] uppercase';
+      }
+
+      // Populate Operator Claim Code Generator selects
+      const playerSel = document.getElementById('opsCodePlayerSelect');
+      const foodSel = document.getElementById('opsCodeFoodSelect');
+      if (playerSel && playerSel.options.length !== state.crew.length) {
+        playerSel.innerHTML = state.crew.map(name => `<option value="${name}">${name}</option>`).join('');
+      }
+      if (foodSel && foodSel.options.length !== BACKPACK_FOOD_OPTIONS.length) {
+        foodSel.innerHTML = BACKPACK_FOOD_OPTIONS.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+      }
+      updateOpsGeneratedClaimCodePreview();
+
+      // Render Operator Roster Oath & Tier Admin rows
+      const adminListEl = document.getElementById('opsRosterAdminList');
+      if (adminListEl) {
+        adminListEl.innerHTML = state.crew.map(name => {
+          const pBp = getPlayerBackpack(name);
+          const pFood = getFoodMeta(pBp.foodId);
+          const tiersDone = getPlayerCompletedBackpackTiers(name);
+          const locked = isPlayerFoodOathLocked(name);
+          return `
+            <div class="ore-slot p-2 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <img src="${getAvatar(name)}" alt="" class="w-6 h-6 object-cover border border-white/15 pixel-art shrink-0" />
+                <div class="min-w-0">
+                  <div class="font-mono text-xs font-bold text-white truncate">${name} <span class="text-[10px] font-mojangles text-[#8E8E8E]">(${tiersDone}/5)</span></div>
+                  <div class="font-mojangles text-[10px] text-[#A0A0A0] flex items-center gap-1">
+                    <img src="${pFood.icon}" alt="" class="w-3 h-3 pixel-art" />
+                    <span>${pFood.name}</span>
+                    <span>${locked ? '🔒 SEALED' : '🔓 OPEN'}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="opsTogglePlayerOathLock('${name.replace(/'/g, "\\'")}')"
+                  class="ore-btn px-2 py-1 text-[10px] font-mono uppercase">
+                  ${locked ? 'Unlock Oath' : 'Seal Oath'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function updateOpsGeneratedClaimCodePreview() {
+      const playerSel = document.getElementById('opsCodePlayerSelect');
+      const levelSel = document.getElementById('opsCodeLevelSelect');
+      const foodSel = document.getElementById('opsCodeFoodSelect');
+      const codeEl = document.getElementById('opsGeneratedCodeDisplay');
+      if (!playerSel || !levelSel || !foodSel || !codeEl) return;
+
+      const player = playerSel.value || state.activePlayer;
+      const levelId = Number(levelSel.value || 1);
+      const lvl = BACKPACK_LEVELS.find(l => l.id === levelId) || BACKPACK_LEVELS[0];
+      const foodId = foodSel.value || getPlayerBackpack(player).foodId;
+      codeEl.textContent = generateClientClaimCode(player, levelId, lvl.slots, foodId);
+    }
+
+    function copyOpsGeneratedClaimCode() {
+      playUiSound('toast');
+      const codeEl = document.getElementById('opsGeneratedCodeDisplay');
+      if (!codeEl) return;
+      navigator.clipboard.writeText(codeEl.textContent);
+      showToast('Copied signed Claim Code: ' + codeEl.textContent);
+    }
+
+    function applyOpsGeneratedClaimCodeNow() {
+      const codeEl = document.getElementById('opsGeneratedCodeDisplay');
+      const input = document.getElementById('inGameClaimCodeInput');
+      if (!codeEl || !input) return;
+      input.value = codeEl.textContent;
+      handleVerifyInGameClaimCode({ preventDefault: () => {} });
+    }
+
+    function opsTogglePlayerOathLock(player) {
+      if (getMemberRole(state.activePlayer) !== 'Operator') {
+        playUiSound('deny');
+        return;
+      }
+      playUiSound('anvil');
+      const bp = getPlayerBackpack(player);
+      bp.foodLocked = !bp.foodLocked;
+      saveState();
+      showToast(`Operator Override: ${player}'s Ration Oath is now ${bp.foodLocked ? 'SEALED 🔒' : 'UNLOCKED 🔓'}`);
+    }
+
+    function exportFullRealmJsonBackup() {
+      playUiSound('toast');
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chibi-zone-realm-backup-day537.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported full CHIBI~Zone Realm JSON backup!');
+    }
+
     async function syncFromServer() {
       try {
         const res = await fetch('/api/state');
@@ -3689,9 +4022,11 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
     }
 
     function cycleMainTab(delta) {
-      const idx = TAB_ORDER.indexOf(state.activeTab);
-      const nextIdx = (idx + delta + TAB_ORDER.length) % TAB_ORDER.length;
-      switchTab(TAB_ORDER[nextIdx]);
+      const isOperator = getMemberRole(state.activePlayer) === 'Operator';
+      const activeTabs = isOperator ? ['shared', 'vault', 'gps', 'backpack', 'gallery', 'ops'] : ['shared', 'vault', 'gps', 'backpack', 'gallery'];
+      const idx = activeTabs.indexOf(state.activeTab);
+      const nextIdx = (idx + delta + activeTabs.length) % activeTabs.length;
+      switchTab(activeTabs[nextIdx]);
     }
 
     // Keyboard & Samsung DeX Arrow / Shortcut Handler
