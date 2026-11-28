@@ -206,37 +206,60 @@
       border-top: 1px solid rgba(255, 255, 255, 0.16);
     }
 
-    /* Xbox Guide Tab Item */
+    /* High-Contrast Ore UI Emerald Green Navigation Tab Buttons */
     .xb-tab {
       position: relative;
-      background: transparent;
-      color: #A0A0A0;
-      font-weight: 600;
-      padding: 10px 16px;
-      border: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--ore-green-face);
+      color: #FFFFFF;
+      font-weight: 700;
+      padding: 6px 12px 8px 12px;
+      border: 2px solid var(--ore-chassis-border);
+      box-shadow:
+        inset 2px 2px 0px var(--ore-green-light),
+        inset -2px -4px 0px var(--ore-green-dark);
+      text-shadow: 0px 2px 0px #1E4713;
       cursor: pointer;
-      transition: background-color 80ms linear, color 80ms linear;
+      user-select: none;
     }
 
     .xb-tab:hover {
-      background-color: var(--xb-surface-2);
+      background-color: var(--ore-green-hover);
       color: #FFFFFF;
+      box-shadow:
+        inset 2px 2px 0px #85D865,
+        inset -2px -4px 0px var(--ore-green-dark);
     }
 
+    .xb-tab:active {
+      padding-top: 8px;
+      padding-bottom: 6px;
+      box-shadow:
+        inset 2px 2px 0px var(--ore-green-dark),
+        inset -2px -2px 0px var(--ore-green-light);
+    }
+
+    /* Active Selected Tab: Crisp White Console Focus Rim + Bright Emerald Face */
     .xb-tab[aria-selected="true"] {
       color: #FFFFFF;
-      background-color: var(--xb-surface-2);
+      background-color: #469B2D;
+      border-color: #FFFFFF;
+      box-shadow:
+        inset 2px 2px 0px #8CE06D,
+        inset -2px -4px 0px #1E4713;
     }
 
-    /* Authentic Xbox Active Tab Indicator Bar */
     .xb-tab[aria-selected="true"]::after {
       content: "";
       position: absolute;
-      bottom: 0;
-      left: 12px;
-      right: 12px;
+      bottom: -6px;
+      left: 0;
+      right: 0;
       height: 3px;
-      background-color: var(--xb-green);
+      background-color: #FFFFFF;
     }
 
     /* =========================================================
@@ -480,52 +503,52 @@
       </div>
     </div>
 
-    <!-- Xbox Horizontal Guide Tabs (Exact h-full Console Guide Bar) -->
-    <nav class="flex items-center h-full overflow-x-auto" role="tablist">
-      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block mr-1" title="Previous Tab (Gamepad LB)">LB</span>
+    <!-- Xbox Horizontal Guide Tabs (High-Contrast Tactile Green Ore UI Keycap Buttons) -->
+    <nav class="flex items-center gap-1.5 h-full overflow-x-auto py-1.5" role="tablist">
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block mr-0.5" title="Previous Tab (Gamepad LB)">LB</span>
       <button onclick="switchTab('shared')" id="tab-shared" role="tab" aria-selected="true"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/enchanted-book.png" alt="" class="w-4 h-4 pixel-art" />
         <span>Quests</span>
-        <span id="sharedCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">6</span>
+        <span id="sharedCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-black/35 border border-white/20 text-white tabular-nums">6</span>
       </button>
 
       <button onclick="switchTab('vault')" id="tab-vault" role="tab" aria-selected="false"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/ender-chest.png" alt="" class="w-4 h-4 pixel-art" />
         <span><span id="vaultOwnerLabel">DOMSWOOZ</span> Vault</span>
         <span id="vaultLockBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] text-warning border border-warning-border tabular-nums">LOCKED</span>
       </button>
 
       <button onclick="switchTab('gps')" id="tab-gps" role="tab" aria-selected="false"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/conduit-128.png" alt="" class="w-4 h-4 object-contain" />
         <span>Realm GPS</span>
-        <span id="gpsCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">5</span>
+        <span id="gpsCountBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-black/35 border border-white/20 text-white tabular-nums">5</span>
       </button>
 
       <button onclick="switchTab('backpack')" id="tab-backpack" role="tab" aria-selected="false"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/container-shulker.png" alt="" class="w-4 h-4 pixel-art" />
         <span>Backpacker</span>
-        <span id="backpackTierBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#107C10] border border-white/20 text-white tabular-nums">LVL 0/5</span>
+        <span id="backpackTierBadge" class="px-1.5 py-0.5 text-[11px] font-mojangles bg-black/35 border border-white/20 text-white tabular-nums">0/5</span>
       </button>
 
       <button onclick="switchTab('gallery')" id="tab-gallery" role="tab" aria-selected="false"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/workbench.png" alt="" class="w-4 h-4 pixel-art" />
         <span>Archive</span>
-        <span class="px-1.5 py-0.5 text-[11px] font-mojangles bg-[#141415] border border-white/10 text-white tabular-nums">4</span>
+        <span class="px-1.5 py-0.5 text-[11px] font-mojangles bg-black/35 border border-white/20 text-white tabular-nums">4</span>
       </button>
 
       <!-- OPERATOR-ONLY BACK-END TAB (Hidden for standard Members, visible only to Operators DOMSWOOZ & ChibiZANIMUS) -->
       <button onclick="switchTab('ops')" id="tab-ops" role="tab" aria-selected="false"
-        class="xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
+        class="xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap flex items-center gap-2">
         <img src="/assets/anvil.png" alt="" class="w-4 h-4 pixel-art" />
-        <span>Ops Back-End</span>
-        <span id="opsTabLockBadge" class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-warning border border-warning-border uppercase">OP ONLY</span>
+        <span>OPs ONLY</span>
+        <span id="opsTabLockBadge" class="px-1.5 py-0.5 text-[10px] font-mojangles bg-[#141415] text-warning border border-warning-border uppercase">ADMIN</span>
       </button>
-      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block ml-1" title="Next Tab (Gamepad RB)">RB</span>
+      <span class="font-mojangles text-[10px] text-[#8E8E8E] px-1.5 py-0.5 bg-[#141415] border border-white/10 hidden xl:inline-block ml-0.5" title="Next Tab (Gamepad RB)">RB</span>
     </nav>
   </header>
 
@@ -567,8 +590,8 @@
             <span id="soundToggleBtn" class="font-sans text-xs text-[#E0E0E0] uppercase">SFX: ON</span>
             <span class="font-mono text-[11px] text-[#8E8E8E]">AUD</span>
           </button>
-          <button id="sidebarOpsShortcutBtn" onclick="switchTab('ops')" title="Operator Back-End Console (Operators Only)" class="ore-btn w-full">
-            <span class="font-sans text-xs text-[#E0E0E0] uppercase">Ops Back-End</span>
+          <button id="sidebarOpsShortcutBtn" onclick="switchTab('ops')" title="OPs ONLY Back-End Console (Operators Only)" class="ore-btn w-full">
+            <span class="font-sans text-xs text-[#E0E0E0] uppercase">OPs ONLY</span>
             <span class="font-mono text-[11px] text-[#6BC349]">OPS</span>
           </button>
         </div>
@@ -2875,11 +2898,11 @@ world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) =&gt; {
         if (!btn || !view) return;
         if (state.activeTab === t) {
           btn.setAttribute('aria-selected', 'true');
-          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
           view.classList.remove('hidden');
         } else {
           btn.setAttribute('aria-selected', 'false');
-          btn.className = 'xb-tab h-full font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
+          btn.className = 'xb-tab font-mono text-xs uppercase tracking-wider whitespace-nowrap ' + (t === 'ops' && !isOperator ? 'hidden' : 'flex') + ' items-center gap-2';
           view.classList.add('hidden');
         }
       });
