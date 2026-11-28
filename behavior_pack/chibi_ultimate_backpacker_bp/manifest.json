@@ -1,0 +1,26 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "CHIBI~Zone: Ultimate Backpacker (Bridge #1 + #3)",
+    "description": "Designed by ChibiZANIMUS & DOMSWOOZ. Tracks 5-Level Food Self-Sufficiency (Barrels 27x64, Double Chest 54x64, Ender Chest 27x64, Shulker Box 27x64, Hoppers 13x), displays live in-game HUD Scoreboard & Actionbar, emits PC ContentLog auto-sync packets, and generates signed Web Claim Codes!",
+    "uuid": "c41b120e-537d-4a99-b881-000000000001",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 0]
+  },
+  "modules": [
+    {
+      "description": "CHIBI~Zone Ultimate Backpacker Script Module",
+      "type": "script",
+      "language": "javascript",
+      "uuid": "c41b120e-537d-4a99-b881-000000000002",
+      "version": [1, 0, 0],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "1.14.0"
+    }
+  ]
+}
